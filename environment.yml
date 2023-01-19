@@ -1,0 +1,10 @@
+name: bbt
+channels: 
+  - conda-forge
+  - bioconda
+dependencies:
+  - graphviz=7.0.6
+  - mamba=1.2.0 
+  - numpy=1.24.1
+  - pandas=1.5.2
+  - snakemake=7.20.0
