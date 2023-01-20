@@ -1,2 +1,2 @@
 # bbt_research
-Research on basal bode temperature
+Research on basal body temperature

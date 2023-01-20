@@ -8,7 +8,9 @@ def process_temp(file, x, y, z):
     temperatures = pd.read_csv(file, 
                 usecols = ["User ID", "Cycle ID", "Raw Temp", "Smooth Temp", "Start Time", "prime", "Data"], 
                 index_col="prime")
-
+    temperatures['Start Time'] = pd.to_datetime(temperatures['Start Time'])
+    temperatures['Date'] = temperatures['Start Time'].dt.date
+    temperatures['Time'] = temperatures['Start Time'].dt.time
     temperatures['Start Time'] = pd.to_datetime(temperatures['Start Time']) #Convert date object to datetime
     temperatures['Date'] = temperatures['Start Time'].dt.date #Getting the date
     temperatures['Time'] = temperatures['Start Time'].dt.time #Getting the time
@@ -33,12 +35,12 @@ def process_temp(file, x, y, z):
     clean_4 = clean_3[~clean_3["User ID"].isin(check_4)] #Taking out records belonging to z 
 
 
-    #print("There are ", len(check_1), " User IDs with less than ", x, " Days of Data,", len(check_1_records), " records will be deleted")
-    #print(len(check_2), " \"Undefined\" records will be deleted ")
-    #print("There are ", len(check_3), " Cycle IDs with less than ", y, " Days,", len(check_3_records), " records will be deleted")
-    #print("There are ", len(check_4), " User IDs with less than ", z, " Cycles,", len(check_4_records), " records will be deleted")
+    print("There are ", len(check_1), " User IDs with less than ", x, " Days of Data,", len(check_1_records), " records will be deleted")
+    print(len(check_2), " \"Undefined\" records will be deleted ")
+    print("There are ", len(check_3), " Cycle IDs with less than ", y, " Days,", len(check_3_records), " records will be deleted")
+    print("There are ", len(check_4), " User IDs with less than ", z, " Cycles,", len(check_4_records), " records will be deleted")
 
-    clean_4.to_csv("data/sel_crt_1.csv")
-    #return clean_4
+    #clean_4.to_csv("../data/sel_crt_1.csv")
+    return clean_4
 if __name__ == "__main__":
     process_temp(file, x, y, z)

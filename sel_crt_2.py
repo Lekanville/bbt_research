@@ -36,7 +36,7 @@ def compute_mean(clean, x, y):
      #4c. getting the average data values
     data_new["Mean_Temp"] = data_new['Data_to_Compute'].apply(lambda x: np.array(x).mean().round(0).astype(int))
     data_new.drop("Data_to_Compute", axis = 1, inplace = True)
-    data_new.to_csv("../data/sel_crt_2.csv")
+    data_new.to_csv("data/sel_crt_2.csv")
 
 if __name__ == "__main__":
    compute_mean(clean, x, y)
