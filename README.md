@@ -7,7 +7,7 @@ Research on basal body temperature
 
 ## Setup
 
-"""bash
+```bash
 #Clone the Repo (use https if necessary)
 git clone git@github.com:Lekanville/bbt_research.git
 cd bbt_research
@@ -15,6 +15,11 @@ cd bbt_research
 #Create the Conda Environment
 conda env create -f environment.yml
 conda activate bbt
+
+#Add module directory to python path
+cd code
+pwd
+export PYTHONPATH=$PYTHONPATH:pwd
 
 #Choose Data Selection Criteria
 Open Snakefile
@@ -30,5 +35,5 @@ Open Snakefile
 #Run the Data Selection Worflow (you can specify the number of core to use with the -c command)
 
 snakemake -r targets -c 1
-"""
+```
 

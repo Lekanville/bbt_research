@@ -3,6 +3,12 @@
 
 import numpy as np
 import pandas as pd
+import argparse
+
+parser = argparse.ArgumentParser(description='A script filters data')
+parser.add_argument('-d','--data', type=str, required=True, help='The Dataset')
+parser.add_argument('-x','--min_data', type=int, required=True, help='Minimun number of true data')
+parser.add_argument('-y','--init_data', type=int, required=True, help='Initial data to take out')
 
 def compute_mean(clean, x, y):
     """
@@ -36,7 +42,8 @@ def compute_mean(clean, x, y):
      #4c. getting the average data values
     data_new["Mean_Temp"] = data_new['Data_to_Compute'].apply(lambda x: np.array(x).mean().round(0).astype(int))
     data_new.drop("Data_to_Compute", axis = 1, inplace = True)
-    data_new.to_csv("../data/sel_crt_2.csv")
+    data_new.to_csv("data/sel_crt_2.csv")
 
 if __name__ == "__main__":
-   compute_mean(clean, x, y)
+    args = parser.parse_args()
+    compute_mean(args.data, args.min_data, args.init_data)

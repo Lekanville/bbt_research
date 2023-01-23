@@ -27,5 +27,5 @@ rule sel_cr_2:
         cr_2_1 = 10,
         cr_2_2 = 5,
     shell:"""
-        python -c "from sel_crt_2 import compute_mean; compute_mean('{input.input_file}',  {params.cr_2_1},  {params.cr_2_1})" > {output.output_file}
+        python -m sel_crt_2 -d '{input.input_file}' -x {params.cr_2_1} -y {params.cr_2_2} > {output.output_file}
         """
