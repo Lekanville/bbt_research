@@ -1,5 +1,5 @@
 # bbt_research
-Research on basal body temperature
+Research on Basal Body Temperature
 
 ## Prerequisites 
 
@@ -33,7 +33,6 @@ Open Snakefile
     cr_2_2 = Clean out the first set of specified temperature values
 
 #Run the Data Selection Worflow (you can specify the number of core to use with the -c command)
-
 snakemake -r targets -c 1
 ```
 
