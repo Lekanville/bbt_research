@@ -1,5 +1,5 @@
 # bbt_research
-Research on basal body temperature
+Research on Basal Body Temperature
 
 ## Prerequisites 
 
