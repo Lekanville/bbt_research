@@ -7,7 +7,7 @@ Research on Basal Body Temperature
 
 ## Setup
 
-"""bash
+```bash
 #Clone the Repo (use https if necessary)
 git clone git@github.com:Lekanville/bbt_research.git
 cd bbt_research
@@ -30,5 +30,5 @@ Open Snakefile
 #Run the Data Selection Worflow (you can specify the number of core to use with the -c command)
 
 snakemake -r targets -c 1
-"""
+```
 
