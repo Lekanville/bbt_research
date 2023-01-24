@@ -3,14 +3,19 @@
 
 import numpy as np
 import pandas as pd
+import argparse
+
+parser = argparse.ArgumentParser(description= "A script to filter data")
+parser.add_argument('-d', '--data', type=str, required=True, help= 'The dataset')
+parser.add_argument('-r', '--min_records', type=int, required=True, help= 'Minimum number of record days')
+parser.add_argument('-n', '--min_days', type=int, required=True, help= 'Minimun number of days in a cycle')
+parser.add_argument('-c', '--min_cycles', type=int, required=True, help= 'Minimum number of cycles for a user')
 
 def process_temp(file, x, y, z):
     temperatures = pd.read_csv(file, 
                 usecols = ["User ID", "Cycle ID", "Raw Temp", "Smooth Temp", "Start Time", "prime", "Data"], 
                 index_col="prime")
-    temperatures['Start Time'] = pd.to_datetime(temperatures['Start Time'])
-    temperatures['Date'] = temperatures['Start Time'].dt.date
-    temperatures['Time'] = temperatures['Start Time'].dt.time
+
     temperatures['Start Time'] = pd.to_datetime(temperatures['Start Time']) #Convert date object to datetime
     temperatures['Date'] = temperatures['Start Time'].dt.date #Getting the date
     temperatures['Time'] = temperatures['Start Time'].dt.time #Getting the time
@@ -35,12 +40,13 @@ def process_temp(file, x, y, z):
     clean_4 = clean_3[~clean_3["User ID"].isin(check_4)] #Taking out records belonging to z 
 
 
-    print("There are ", len(check_1), " User IDs with less than ", x, " Days of Data,", len(check_1_records), " records will be deleted")
-    print(len(check_2), " \"Undefined\" records will be deleted ")
-    print("There are ", len(check_3), " Cycle IDs with less than ", y, " Days,", len(check_3_records), " records will be deleted")
-    print("There are ", len(check_4), " User IDs with less than ", z, " Cycles,", len(check_4_records), " records will be deleted")
+    #print("There are ", len(check_1), " User IDs with less than ", x, " Days of Data,", len(check_1_records), " records will be deleted")
+    #print(len(check_2), " \"Undefined\" records will be deleted ")
+    #print("There are ", len(check_3), " Cycle IDs with less than ", y, " Days,", len(check_3_records), " records will be deleted")
+    #print("There are ", len(check_4), " User IDs with less than ", z, " Cycles,", len(check_4_records), " records will be deleted")
 
-    #clean_4.to_csv("../data/sel_crt_1.csv")
-    return clean_4
+    clean_4.to_csv("data/sel_crt_1.csv")
+    #return clean_4
 if __name__ == "__main__":
-    process_temp(file, x, y, z)
+    args = parser.parse_args()
+    process_temp(args.data, args.min_records, args.min_days, args.min_cycles)

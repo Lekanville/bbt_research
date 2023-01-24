@@ -8,7 +8,7 @@ import argparse
 parser = argparse.ArgumentParser(description='A script filters data')
 parser.add_argument('-d','--data', type=str, required=True, help='The Dataset')
 parser.add_argument('-x','--min_data', type=int, required=True, help='Minimun number of true data')
-parser.add_argument('-y','--init_data', type=int, required=True, help='Initial data to take out')
+parser.add_argument('-y','--init_data', type=int, required=True, help='Number of initial data to take out')
 
 def compute_mean(clean, x, y):
     """

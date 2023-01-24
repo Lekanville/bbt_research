@@ -24,13 +24,13 @@ export PYTHONPATH=$PYTHONPATH:pwd
 #Choose Data Selection Criteria
 Open Snakefile
 1. Select parameters in "rule sel_cr_1"
-    cr_1_1 = Clean out users with records that is less than the selected days
-    cr_1_2 = Clean out cycles with less the selected number of days
-    cr_1_3 = Clean out users with less than the selected number of cycles
+    cr_1_1 = Minimum number of record days
+    cr_1_2 = Minimun number of days in a cycle
+    cr_1_3 = Minimum number of cycles for a user
 
 2. Select parameters in "rule sel_cr_2"
-    cr_2_1 = Clean out days with less than the specified number of actisl temperature readings (Temperatures that are not zero and not 34500)
-    cr_2_2 = Clean out the first set of specified temperature values
+    cr_2_1 = Minimun number of true data (Temperatures that are not zero and not 34500)
+    cr_2_2 = Number of initial data to take out
 
 #Run the Data Selection Worflow (you can specify the number of core to use with the -c command)
 snakemake -r targets -c 1
