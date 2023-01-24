@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 import argparse
 
+pd.options.mode.chained_assignment = None 
+
 parser = argparse.ArgumentParser(description='A script filters data')
 parser.add_argument('-d','--data', type=str, required=True, help='The Dataset')
 parser.add_argument('-x','--min_data', type=int, required=True, help='Minimun number of true data')

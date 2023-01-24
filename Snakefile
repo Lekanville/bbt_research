@@ -1,7 +1,18 @@
 rule targets:
     input:
+        "data/rec_clean.csv",
         "data/sel_crt_1.csv",
         "data/sel_crt_2.csv"
+
+rule data_clean:
+    input: 
+        input_script = "code/dat_clean.py"
+    output: 
+        output_file = "data/rec_clean.csv"
+    shell:"""
+        rm -rf data/rec_clean.csv
+        python -m dat_clean
+    """
 
 rule sel_cr_1:
     input:
