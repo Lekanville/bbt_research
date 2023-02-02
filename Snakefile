@@ -1,24 +1,37 @@
 rule targets:
     input:
-        "data/rec_clean.csv",
-        "data/sel_crt_1.csv",
-        "data/sel_crt_2.csv"
+        "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/cleaned.csv",
+        "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/decrypted.csv",
+        "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/sel_crt_1.csv",
+        "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/sel_crt_2.csv"
 
 rule data_clean:
     input: 
         input_script = "code/dat_clean.py"
     output: 
-        output_file = "data/rec_clean.csv"
+        output_file = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/cleaned.csv"
     shell:"""
-        rm -rf data/rec_clean.csv
-        python -m dat_clean
+        python -m dat_clean > {output.output_file}
+    """
+
+rule data_decrypt:
+    input: 
+        input_dataset = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/cleaned.csv",
+        input_script_js = "code/decrypt.js",
+        input_script_py = "code/decrypt_merge.py"
+
+    output: 
+        output_log = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/decryption_log",
+        output_file = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/decrypted.csv"
+    shell:"""
+        node {input.input_script_js} > {output.output_log} && python -m decrypt_merge > {output.output_file}
     """
 
 rule sel_cr_1:
     input:
-        input_file = "data/all_recordings.csv"
+        input_file = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/decrypted.csv"
     output:
-        output_file = "data/sel_crt_1.csv"
+        output_file = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/sel_crt_1.csv"
     params:
         cr_1_1 = 30,
         cr_1_2 = 10,
@@ -28,9 +41,9 @@ rule sel_cr_1:
         """
 rule sel_cr_2:
     input:
-        input_file = "data/sel_crt_1.csv"
+        input_file = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/sel_crt_1.csv"
     output:
-         output_file = "data/sel_crt_2.csv"
+         output_file = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/sel_crt_2.csv"
     params:
         cr_2_1 = 10,
         cr_2_2 = 5,

@@ -4,6 +4,7 @@ channels:
   - bioconda
 dependencies:
   - graphviz=7.0.6
+  - loguru=0.6.0
   - mamba=1.2.0 
   - numpy=1.24.1
   - pandas=1.5.2
