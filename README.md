@@ -38,7 +38,13 @@ snakemake -r data_clean -c 1
 snakemake -r data_decrypt -c 1
 ```
 
-## Task 3: Choose Data Selection Criteria
+## Task 3: Prepare and Merge the Decrypted Data
+Run the rule to prepare and merge the decrypted data (you can specify the number of core to use with the -c command)
+```
+snakemake -r process_decrypt -c 1
+```
+
+## Task 4: Choose Data Selection Criteria
 Open Snakefile
 1. Select parameters in "rule sel_cr_1"
     * cr_1_1 = Minimum number of record days
