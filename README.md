@@ -11,7 +11,7 @@ Research on Basal Body Temperature
 
 ```bash
 #Clone the Repo (use https if necessary)
-git clone git@github.com:Lekanville/bbt_research.git
+git@github.com:MRCIEU/bbt_research.git
 cd bbt_research
 
 #Create the Conda Environment
@@ -23,13 +23,17 @@ cd code
 pwd
 export PYTHONPATH=$PYTHONPATH:pwd
 ```
-## Task 1: Clean Data
+## Task 1: Clean the Data
 Run the data cleaning rule (you can specify the number of core to use with the -c command)
 ```
 snakemake -r data_clean -c 1
 ```
 ## Task 2: Decrypt the Data Column
-Run the data decrypting rule (you can specify the number of core to use with the -c command). You may need to increase your memory size for this (check point 2 of potential issues below). You can monitor the decrption process my monitorin the "decryption_log" file
+1. Open code/decrypt.js and define the batchsize for the decryption. The set defauult value is 450000
+
+2. Run the data decrypting rule (you can specify the number of core to use with the -c command). You may also need to increase your memory size for this (check point 2 of potential issues below). You can monitor the decrption process my monitorin the "decryption_log" file.
+
+3. You can monitor the decryption progress in the "decryption_log" file and on the console
 ```
 snakemake -r data_decrypt -c 1
 ```

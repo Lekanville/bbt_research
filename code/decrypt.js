@@ -1,5 +1,5 @@
 const dfd = require("danfojs-node")
-console.log('\x1b[32m%s\x1b[0m', "Loading dataset for decryption...")
+console.log("Loading dataset for decryption...")
 dfd.readCSV("/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/cleaned.csv")
   .then(df => {
   
@@ -57,7 +57,7 @@ for (let i = 1; i <= spl; i+=1){
   sub_df.addColumn("Data", new_col, { inplace: true})
   dfd.toCSV(sub_df, { filePath: out_file+id});
 
-  console.log('\x1b[33m%s\x1b[0m', "Decrypted range: "+rng, "\n")
+  console.log("Decrypted range: "+rng)
 
   j = j+batch_size
 }
@@ -71,10 +71,10 @@ if (all - (spl*batch_size) > 0){
   let new_col = sub_df['Data'].apply(recordingDataToTemperatureArray, { axis: 1 })
   sub_df.addColumn("Data", new_col, { inplace: true})
   dfd.toCSV(sub_df, { filePath: out_file+id});
-  console.log('\x1b[33m%s\x1b[0m', "Decrypted range: "+rng, "\n")
+  console.log("Decrypted range: "+rng)
 }
 
-console.log('\x1b[43m%s\x1b[0m', "Data decryption ended");
+console.log("Data decryption ended");
 
   }).catch(err=>{
     console.log(err);

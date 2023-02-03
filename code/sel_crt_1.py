@@ -3,8 +3,10 @@
 
 import numpy as np
 import pandas as pd
+import os
 import argparse
 
+OUT_FILE = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/"
 parser = argparse.ArgumentParser(description= "A script to filter data")
 parser.add_argument('-d', '--data', type=str, required=True, help= 'The dataset')
 parser.add_argument('-r', '--min_records', type=int, required=True, help= 'Minimum number of record days')
@@ -45,7 +47,9 @@ def process_temp(file, x, y, z):
     #print("There are ", len(check_3), " Cycle IDs with less than ", y, " Days,", len(check_3_records), " records will be deleted")
     #print("There are ", len(check_4), " User IDs with less than ", z, " Cycles,", len(check_4_records), " records will be deleted")
 
-    clean_4.to_csv("data/sel_crt_1.csv")
+    #clean_4.to_csv("data/sel_crt_1.csv")
+    
+    clean_4.to_csv(os.path.join(OUT_FILE,"sel_crt_1.csv"))
     #return clean_4
 if __name__ == "__main__":
     args = parser.parse_args()
