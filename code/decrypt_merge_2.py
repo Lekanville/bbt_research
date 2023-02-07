@@ -7,7 +7,6 @@ import csv
 from loguru import logger
 
 ABSOLUTE = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/decrypted"
-#OUT_FILE = "data/"
 OUT_FILE = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/"
 
 decrytped_path = os.path.join(ABSOLUTE, "*.csv") 
