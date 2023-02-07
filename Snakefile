@@ -1,3 +1,5 @@
+#!python
+#!/usr/bin/env python3
 rule targets:
     input:
         "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/cleaned.csv",
