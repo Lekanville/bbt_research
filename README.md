@@ -73,7 +73,7 @@ then
 snakemake -r sel_cr_2 -c 1
 ```
 
-## Potential issues tha could be met
+## Potential issues that could be met
 1. AttributeError: module 'lib' has no attribute 'OpenSSL_add_all_algorithms'
 Cause: This is caused by cryptography==39.0.0
 Fix: As of the time of writing, downgrading to cryptography==38.0.4 fixes the problem.

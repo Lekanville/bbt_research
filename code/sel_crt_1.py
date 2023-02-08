@@ -9,7 +9,7 @@ import os
 pd.options.mode.chained_assignment = None 
 
 OUT_FILE = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/"
-parser = argparse.ArgumentParser(description='A script filters data')
+parser = argparse.ArgumentParser(description='A script to filters data')
 parser.add_argument('-d','--data', type=str, required=True, help='The Dataset')
 parser.add_argument('-x','--min_data', type=int, required=True, help='Minimun number of true data')
 parser.add_argument('-y','--init_data', type=int, required=True, help='Number of initial data to take out')

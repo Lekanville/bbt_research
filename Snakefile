@@ -2,11 +2,12 @@
 #!/usr/bin/env python3
 rule targets:
     input:
-        "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/cleaned.csv",
-        "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/decrypted.csv",
+        #"/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/cleaned.csv",
+        #"/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/decrypted.csv",
         "code/decrypt_merge.py",
         "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/sel_crt_1.csv",
-        "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/sel_crt_2.csv"
+        "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/sel_crt_2.csv",
+        "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/images/plot_temps_log"
 
 rule data_clean:
     input: 
@@ -60,3 +61,12 @@ rule sel_cr_2:
     shell:"""
         python -m sel_crt_2 -d '{input.input_file}' -r {params.cr_1_1} -n {params.cr_1_2} -c {params.cr_1_3} > {output.output_file}
         """
+rule plot_temps:
+    input:
+        input_file = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/sel_crt_2.csv",
+        input_script_py = "code/plot_temps.py"
+    output:
+        output_log = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/images/plot_temps_log"
+    shell:"""
+        python -m plot_temps -d '{input.input_file}'  > {output.output_log}
+    """
