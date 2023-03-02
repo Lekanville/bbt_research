@@ -3,6 +3,7 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
+  - fastdtw=0.3.4
   - graphviz=7.0.6
   - loguru=0.6.0
   - mamba=1.2.0 

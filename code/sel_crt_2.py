@@ -47,7 +47,7 @@ def process_temp(file, x, y, z):
 
     #clean_4.to_csv("data/sel_crt_1.csv")
     
-    clean_4[["Cycle ID","Raw Temp","Smooth Temp",\
+    clean_4[["User ID","Cycle ID","Raw Temp","Smooth Temp",\
     	"Start Time","Data","Data_2","Data_len","Mean_Temp","Date","Time"]]\
         .to_csv(os.path.join(OUT_FILE,"sel_crt_2.csv"))
     #return clean_4

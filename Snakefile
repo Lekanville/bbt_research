@@ -7,7 +7,8 @@ rule targets:
         "code/decrypt_merge.py",
         "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/sel_crt_1.csv",
         "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/sel_crt_2.csv",
-        "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/images/plot_temps_log"
+        "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/images/plot_temps_log",
+        "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/temp_dates_duration.csv"
 
 rule data_clean:
     input: 
@@ -69,4 +70,14 @@ rule plot_temps:
         output_log = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/images/plot_temps_log"
     shell:"""
         python -m plot_temps -d '{input.input_file}'  > {output.output_log}
+    """
+
+rule process_cycles:
+    input:
+        input_file = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/sel_crt_2.csv",
+        input_script_py = "code/process_cycles.py"
+    output:
+        output_file = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/temp_dates_duration.csv"
+    shell:"""
+        python -m plot_temps > {output.output_file}
     """
