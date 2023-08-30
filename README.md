@@ -24,7 +24,7 @@ pwd
 export PYTHONPATH=$PYTHONPATH:pwd
 ```
 ## Task 1: Clean the Data
-Run the data cleaning rule (you can specify the number of core to use with the -c command)
+Run the data cleaning rule (you can specify the number of cores to use with the -c command)
 ```
 snakemake -r data_clean -c 1
 ```
@@ -47,12 +47,12 @@ snakemake -r process_decrypt -c 1
 ## Task 4: Choose Data Selection Criteria
 Open Snakefile
 1. Select parameters in "rule sel_cr_1"
-    * cr_1_1 = Minimun number of true data (Temperatures that are not zero and not 34500)
+    * cr_1_1 = Minimum number of true data (Temperatures that are not zero and not 34500)
     * cr_1_2 = Number of initial data to take out
 
 2. Select parameters in "rule sel_cr_2"
     * cr_2_1 = Minimum number of record days
-    * cr_2_2 = Minimun number of days in a cycle
+    * cr_2_2 = Minimum number of days in a cycle
     * cr_2_3 = Minimum number of cycles for a user
 
 Data selection workflow can be run both at once by running the second rule  (you can specify the number of core to use with the -c command)

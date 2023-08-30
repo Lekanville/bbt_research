@@ -134,3 +134,6 @@ data/
 
 #snamemake config files
 .snakemake
+
+#dynamic time warping tests
+dtw_tests/

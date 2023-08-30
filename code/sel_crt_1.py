@@ -11,7 +11,7 @@ pd.options.mode.chained_assignment = None
 OUT_FILE = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/"
 parser = argparse.ArgumentParser(description='A script to filters data')
 parser.add_argument('-d','--data', type=str, required=True, help='The Dataset')
-parser.add_argument('-x','--min_data', type=int, required=True, help='Minimun number of true data')
+parser.add_argument('-x','--min_data', type=int, required=True, help='Minimum number of true data')
 parser.add_argument('-y','--init_data', type=int, required=True, help='Number of initial data to take out')
 
 def remove_nan(temp):
@@ -34,7 +34,7 @@ def compute_mean(clean, x, y):
     data["Data_2"] = data["Data"].apply(remove_nan)
 
     
-    #4a.Getting the lenght of each data field
+    #4a.Getting the length of each data field
     data["Data_len"] = data["Data_2"].apply(lambda x: len(x))
         
     #4a. Getting rows with more than x data

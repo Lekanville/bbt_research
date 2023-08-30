@@ -10,7 +10,7 @@ OUT_FILE = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results
 parser = argparse.ArgumentParser(description= "A script to filter data")
 parser.add_argument('-d', '--data', type=str, required=True, help= 'The dataset')
 parser.add_argument('-r', '--min_records', type=int, required=True, help= 'Minimum number of record days')
-parser.add_argument('-n', '--min_days', type=int, required=True, help= 'Minimun number of days in a cycle')
+parser.add_argument('-n', '--min_days', type=int, required=True, help= 'Minimum number of days in a cycle')
 parser.add_argument('-c', '--min_cycles', type=int, required=True, help= 'Minimum number of cycles for a user')
 
 def process_temp(file, x, y, z):
