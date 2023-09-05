@@ -1,3 +1,27 @@
+#!python
+#!/usr/bin/env python3
+
+#############################################################################################
+#The “process_cycles.py” script
+#The script expects the output file from the previous rule (sel_cr_2.py) and the folder 
+#containing the cycles files (allusercycles.csv) as input and will output the specified 
+#selected data as a CSV. The script reads all user cycle files and concatenates them into a 
+#single data frame. The temperature records outputted from the previous rule (sel_cr_2.py) 
+#are equally read in.  The temperatures table is merged with the cycles table and grouped by 
+#the user IDs and cycle IDs. The dates are converted into datetime formats. Records that have 
+#indicated cycle start dates were selected.
+#The length of each cycle is computed by subtracting succeeding start dates (as indicated by 
+#the user) and the last cycle is given the value “indeterminate last cycle”.
+#Cycle offsets (number of days between the cycle start and the day of the first temperature 
+#recording) are computed by subtracting the first date of temperature recording from the cycle 
+#start date (as indicated by the user).
+#Again, cycle durations were computed by subtracting the last day of temperature recording 
+#from the first day of temperature recording. The cycle offsets and durations are then merged 
+#and saved as “dates_duration”.
+#Finally, the result is outputted as the specified file
+#############################################################################################
+
+
 import numpy as np
 import pandas as pd
 from loguru import logger
