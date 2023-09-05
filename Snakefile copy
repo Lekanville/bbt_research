@@ -8,7 +8,8 @@ rule targets:
         variables.merged_decrypted["output_file"],
         variables.sel_cr_1["output_file"],
         variables.sel_cr_2["output_file"],
-        variables.process_cycles["output_file"]
+        "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/images/plot_temps_log",
+        "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/temp_dates_duration.csv"
 
 rule data_clean:
     input: 
@@ -64,13 +65,22 @@ rule sel_cr_2:
     shell:"""
         python -m sel_crt_2 -i '{input.input_file}' -o {output.output_file} -r {params.cr_2_1} -n {params.cr_2_2} -c {params.cr_2_3} > {output.output_file}
         """
+rule plot_temps:
+    input:
+        input_file = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/sel_crt_2.csv",
+        input_script_py = "code/plot_temps.py"
+    output:
+        output_log = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/images/plot_temps_log"
+    shell:"""
+        python -m plot_temps -d '{input.input_file}'  > {output.output_log}
+    """
 
 rule process_cycles:
     input:
-        input_folder = variables.process_cycles["input_folder"],
-        input_file = variables.process_cycles["input_file"]
+        input_file = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/sel_crt_2.csv",
+        input_script_py = "code/process_cycles.py"
     output:
-        output_file = variables.process_cycles["output_file"]
+        output_file = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/temp_dates_duration.csv"
     shell:"""
-        python -m process_cycles -i '{input.input_folder}' -j '{input.input_file}' -o {output.output_file} > {output.output_file}
+        python -m plot_temps > {output.output_file}
     """

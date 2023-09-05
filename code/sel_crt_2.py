@@ -6,15 +6,15 @@ import pandas as pd
 import os
 import argparse
 
-OUT_FILE = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/"
 parser = argparse.ArgumentParser(description= "A script to filter data")
-parser.add_argument('-d', '--data', type=str, required=True, help= 'The dataset')
+parser.add_argument('-i', '--input_file', type=str, required=True, help= 'The input dataset')
+parser.add_argument('-o', '--output_file', type=str, required=True, help= 'The output dataset')
 parser.add_argument('-r', '--min_records', type=int, required=True, help= 'Minimum number of record days')
 parser.add_argument('-n', '--min_days', type=int, required=True, help= 'Minimum number of days in a cycle')
 parser.add_argument('-c', '--min_cycles', type=int, required=True, help= 'Minimum number of cycles for a user')
 
-def process_temp(file, x, y, z):
-    temperatures = pd.read_csv(file, index_col="prime")
+def process_temp(INPUT, OUTPUT, x, y, z):
+    temperatures = pd.read_csv(INPUT, index_col="prime")
 
     temperatures['Start Time'] = pd.to_datetime(temperatures['Start Time']) #Convert date object to datetime
     temperatures['Date'] = temperatures['Start Time'].dt.date #Getting the date
@@ -49,8 +49,8 @@ def process_temp(file, x, y, z):
     
     clean_4[["User ID","Cycle ID","Raw Temp","Smooth Temp",\
     	"Start Time","Data","Data_2","Data_len","Mean_Temp","Date","Time"]]\
-        .to_csv(os.path.join(OUT_FILE,"sel_crt_2.csv"))
+        .to_csv(OUTPUT)
     #return clean_4
 if __name__ == "__main__":
     args = parser.parse_args()
-    process_temp(args.data, args.min_records, args.min_days, args.min_cycles)
+    process_temp(args.input_file, args.output_file, args.min_records, args.min_days, args.min_cycles)

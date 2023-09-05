@@ -8,9 +8,9 @@ import os
 
 pd.options.mode.chained_assignment = None 
 
-OUT_FILE = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/"
 parser = argparse.ArgumentParser(description='A script to filters data')
-parser.add_argument('-d','--data', type=str, required=True, help='The Dataset')
+parser.add_argument('-i','--input_data', type=str, required=True, help='The input dataset')
+parser.add_argument('-o','--output_file', type=str, required=True, help='The output dataset')
 parser.add_argument('-x','--min_data', type=int, required=True, help='Minimum number of true data')
 parser.add_argument('-y','--init_data', type=int, required=True, help='Number of initial data to take out')
 
@@ -23,12 +23,12 @@ def remove_nan(temp):
             j.append(floated)
     return j
 
-def compute_mean(clean, x, y):
+def compute_mean(INPUT, OUTPUT, x, y):
     """
     This ensures each record have a minimum number of data (x), removes a specified
     number of initial data (y) and computes the average of the values
     """
-    data = pd.read_csv(clean, index_col="prime")
+    data = pd.read_csv(INPUT, index_col="prime")
     data["Data"] = data["Data"].apply(lambda x: x.replace('[', "").replace(']', "").replace("'", "").split(', '))
     
     data["Data_2"] = data["Data"].apply(remove_nan)
@@ -48,7 +48,8 @@ def compute_mean(clean, x, y):
     data_new["Mean_Temp"] = data_new['Data_to_Compute'].apply(lambda x: np.array(x).mean().round(0).astype(int))
     data_new.drop("Data_to_Compute", axis = 1, inplace = True)
     #data_new.to_csv("data/sel_crt_2.csv")
-    data_new.to_csv(os.path.join(OUT_FILE,"sel_crt_1.csv"))
+    data_new.to_csv(OUTPUT)
+    
 if __name__ == "__main__":
     args = parser.parse_args()
-    compute_mean(args.data, args.min_data, args.init_data)
+    compute_mean(args.input_data, args.output_file, args.min_data, args.init_data)

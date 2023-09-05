@@ -5,14 +5,18 @@ import os
 import glob
 import matplotlib.pyplot as plt
 from scipy.signal import savgol_filter
+import argparse
 
-#get cycles from the allusercycles files
-ABSOLUTE = "/projects/MRC-IEU/research/data/fertility_focus/ovusense/released/2022-11-30/data/temperature/"
-OUT_FILE = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/"
-PATH = os.path.join(ABSOLUTE, "allusercycles*")
-FOLDER = glob.glob(PATH)
+parser = argparse.ArgumentParser(description= "A script to process the cycles")
+parser.add_argument('-i', '--input_cycles', type=str, required=True, help= 'The folder of the input cycles datasets')
+parser.add_argument('-j', '--input_temps', type=str, required=True, help= 'The output file from select_criteria_2')
+parser.add_argument('-o', '--output_file', type=str, required=True, help= 'The output dataset')
 
-def process_cycles():
+def process_cycles(INPUT_CYCLES, INPUT_TEMPS, OUTPUT):
+    #get cycles from the allusercycles files
+    PATH = os.path.join(INPUT_CYCLES, "allusercycles*")
+    FOLDER = glob.glob(PATH)
+
     #combine the allusercycles files
     df = pd.DataFrame()
     for file in FOLDER:
@@ -27,9 +31,7 @@ def process_cycles():
     logger.info("Cycles dataset loaded and sorted by date")
 
     #get cleaned temperatures from the workflow
-    INPUT = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/"
-    file = "sel_crt_2.csv"
-    temperatures = pd.read_csv(os.path.join(INPUT, file), usecols=["prime","Cycle ID","Start Time","Mean_Temp","Date","Time"])
+    temperatures = pd.read_csv(INPUT_TEMPS, usecols=["prime","Cycle ID","Start Time","Mean_Temp","Date","Time"])
     temperatures["User ID"] = temperatures["prime"].apply(lambda x: x.split("_")[0])
     temp_sort = temperatures.sort_values("Date").reset_index(drop = True)
     temp_sort["Cycle ID"] = temp_sort["Cycle ID"].apply(lambda x: x.lower())
@@ -135,8 +137,9 @@ def process_cycles():
     temp_dates_duration = data_duration(temp_sort, offsets)
     logger.info("temperatures duration computed")
 
-    temp_dates_duration.to_csv(os.path.join(OUT_FILE, "temp_dates_duration.csv"))
+    temp_dates_duration.to_csv(OUTPUT)
     logger.info("Completed: Dataset ready and saved")
 
 if __name__ == "__main__":
-    process_cycles()
+    args = parser.parse_args()
+    process_cycles(args.input_cycles, args.input_temps, args.output_file)

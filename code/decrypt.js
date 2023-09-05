@@ -1,6 +1,19 @@
+// The “decrypt.js” script
+// The script expects the file from the cleaned combined temperature recordings (allrecordings.csv) 
+// from the previous rule (“data_clean” process) and will output chunked decrypted files into the 
+// specified output folder.
+// The script uses decryption routines provided by Ovusense. The length of the file is chunked into 
+// batch size specified and decrypted using the decryption routine. The batch is then labelled accordingly 
+// and saved as a CSV.
+
 const dfd = require("danfojs-node")
+
+
+var arguments = process.argv
+var to_decrypt = arguments[2]
+
 console.log("Loading dataset for decryption...")
-dfd.readCSV("/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/cleaned.csv")
+dfd.readCSV(to_decrypt)
   .then(df => {
   
   function recordingDataToTemperatureArray(recordingData) {
@@ -43,14 +56,15 @@ dfd.readCSV("/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/result
 //console.log(df.shape[0])
 
 all = df.shape[0]
-batch_size = 450000
-out_file = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/decrypted/"
+batch_size = 100000
+out_file = arguments[3]
+
 let spl = Math.floor(df.shape[0]/batch_size)
 let j = 0
 for (let i = 1; i <= spl; i+=1){
   start = j;
   end = i*batch_size;
-  id = "decrypted" + i;
+  id = "/decrypted" + i;
   rng = start+":"+end
   let sub_df = df.iloc({rows: [rng]})
   let new_col = sub_df['Data'].apply(recordingDataToTemperatureArray, { axis: 1 })
@@ -65,7 +79,7 @@ for (let i = 1; i <= spl; i+=1){
 if (all - (spl*batch_size) > 0){
   start = spl*batch_size
   end = all
-  id = "decrypted last";
+  id = "/decrypted_last";
   rng = start+":"+end
   let sub_df = df.iloc({rows: [rng]})
   let new_col = sub_df['Data'].apply(recordingDataToTemperatureArray, { axis: 1 })
