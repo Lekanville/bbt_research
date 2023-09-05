@@ -23,7 +23,7 @@ rule data_clean:
 
 rule data_decrypt:
     input:
-        input_script_js = "code/decrypt.js" ,
+        input_script_js = "code/decrypt.js",
         input_file = variables.data_decryption["input_file"],
 
     output:

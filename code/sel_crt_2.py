@@ -1,6 +1,19 @@
 #!python
 #!/usr/bin/env python3
 
+#############################################################################################
+#The “sel_cr_2.py” script
+#The script expects the output file from the previous rule (sel_cr_1.py) as input and will 
+#output the specified selected data as a CSV. The script extracts the date and time from the 
+#“Start Time”. It groups the records by their user IDs and selects users that have more than 
+#the total number of records specified in the variables file.
+#Afterwards, it takes out cycles with undefined IDs, groups the records by the cycle IDs and 
+#selects cycles that have more than the total number of records specified in the variables file. 
+#Again, the records were grouped by the user IDs and the number of cycles for each user was 
+#counted. Records that have more than the specified number of cycles are then selected.
+#Finally, the result is outputted as the specified file
+#############################################################################################
+
 import numpy as np
 import pandas as pd
 import os
@@ -32,7 +45,7 @@ def process_temp(INPUT, OUTPUT, x, y, z):
     df_cycle_group = clean_2.groupby('Cycle ID').count() #Group by Cycle ID
     check_3 = list(df_cycle_group[df_cycle_group['Data'] < y].index) #Get list of Cycle IDs less than y
     check_3_records = list(clean_2[clean_2["Cycle ID"].isin(check_3)].index) #Get records belonging to y
-    clean_3 = clean_2[~clean_2["Cycle ID"].isin(check_3)] #Taking out records belonging to x 
+    clean_3 = clean_2[~clean_2["Cycle ID"].isin(check_3)] #Taking out records belonging to y 
 
     df_cycle_less_days=clean_3.groupby('User ID')["Cycle ID"].nunique() #Get Users with Cycles less than z
     check_4 = list(df_cycle_less_days[df_cycle_less_days < z].index) #Get list of Users Cycles less than z

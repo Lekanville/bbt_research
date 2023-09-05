@@ -1,6 +1,19 @@
 #!python
 #!/usr/bin/env python3
 
+#############################################################################################
+#The “sel_cr_1.py” script
+#The script expects the output file from the previous rule (merge_decrypted.py) ans input and will output the 
+#specified selected data as a CSV. The script removes invalid data (NaN, 0.0 and 34500) from 
+#the daily temperature records array. Afterwards, it computes the lengths of the data array 
+#(the number of recordings in the data array) and selects only records that have more than 
+#the specified minimum (defined in the variables file and imported into the snakefile). It 
+#then selects the temperatures recorded from a specified point (defined in the variables 
+#file and imported into the snakefile, it ensures device stabilization in taking measurements)
+#and computes the average of the data values.
+# Finally, the result is outputted as the specified file
+#############################################################################################
+
 import numpy as np
 import pandas as pd
 import argparse

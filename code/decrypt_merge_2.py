@@ -1,5 +1,16 @@
 #! usr/bin/env python3
 
+#############################################################################################
+#The “decrypt_merge.py” script
+#The script expects the folder that contains the decrypted files from the previous rule 
+#(decrypt.js) and will output the merged file as specified. Each decrypted CSV file is 
+#converted into a multidimensional list. Each row in the multidimensional list is a daily 
+#temperature record. The actual decrypted values (data) are selected from each row and 
+#appropriately added to the row. The encrypted data is then deleted.
+#Afterwards, the records are then converted into a data frame and concatenated. The result 
+#is then outputted. 
+#############################################################################################
+
 import numpy as np
 import pandas as pd
 import os
