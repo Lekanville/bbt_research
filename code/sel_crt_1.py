@@ -3,7 +3,7 @@
 
 #############################################################################################
 #The “sel_cr_1.py” script
-#The script expects the output file from the previous rule (merge_decrypted.py) ans input and will output the 
+#The script expects the output file from the previous rule (merge_decrypted.py) as its input and will output the 
 #specified selected data as a CSV. The script removes invalid data (NaN, 0.0 and 34500) from 
 #the daily temperature records array. Afterwards, it computes the lengths of the data array 
 #(the number of recordings in the data array) and selects only records that have more than 

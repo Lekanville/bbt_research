@@ -137,3 +137,6 @@ data/
 
 #dynamic time warping tests
 dtw_tests/
+
+#dags from previous builds
+dags/

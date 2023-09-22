@@ -12,7 +12,7 @@
 #indicated cycle start dates were selected.
 #The length of each cycle is computed by subtracting succeeding start dates (as indicated by 
 #the user) and the last cycle is given the value “indeterminate last cycle”.
-#Cycle offsets (number of days between the cycle start and the day of the first temperature 
+#Cycle offsets (number of days between the cycle start and the first day of temperature 
 #recording) are computed by subtracting the first date of temperature recording from the cycle 
 #start date (as indicated by the user).
 #Again, cycle durations were computed by subtracting the last day of temperature recording 
@@ -30,6 +30,7 @@ import glob
 import matplotlib.pyplot as plt
 from scipy.signal import savgol_filter
 import argparse
+from classes.classes import Frames
 
 parser = argparse.ArgumentParser(description= "A script to process the cycles")
 parser.add_argument('-i', '--input_cycles', type=str, required=True, help= 'The folder of the input cycles datasets')
@@ -55,10 +56,7 @@ def process_cycles(INPUT_CYCLES, INPUT_TEMPS, OUTPUT):
     logger.info("Cycles dataset loaded and sorted by date")
 
     #get cleaned temperatures from the workflow
-    temperatures = pd.read_csv(INPUT_TEMPS, usecols=["prime","Cycle ID","Start Time","Mean_Temp","Date","Time"])
-    temperatures["User ID"] = temperatures["prime"].apply(lambda x: x.split("_")[0])
-    temp_sort = temperatures.sort_values("Date").reset_index(drop = True)
-    temp_sort["Cycle ID"] = temp_sort["Cycle ID"].apply(lambda x: x.lower())
+    temp_sort = Frames(INPUT_TEMPS).read_temp()
     logger.info("Temperatures dataset loaded and sorted by date")
 
     #merge the temperatures table with the cycles table

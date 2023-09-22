@@ -8,7 +8,9 @@ rule targets:
         variables.merged_decrypted["output_file"],
         variables.sel_cr_1["output_file"],
         variables.sel_cr_2["output_file"],
-        variables.process_cycles["output_file"]
+        variables.process_cycles["output_file"],
+        variables.process_quest["output_file"],
+        "data/model.json"
 
 rule data_clean:
     input: 
@@ -73,4 +75,23 @@ rule process_cycles:
         output_file = variables.process_cycles["output_file"]
     shell:"""
         python -m process_cycles -i '{input.input_folder}' -j '{input.input_file}' -o {output.output_file} > {output.output_file}
+    """
+
+rule process_quest:
+    input:
+        input_file = variables.process_quest["input_file"],
+        input_cycles = variables.process_quest["input_cycles"]
+    output:
+        output_file = variables.process_quest["output_file"]
+    shell:"""
+        python -m process_quest -i '{input.input_file}' -j '{input.input_cycles}' -o {output.output_file}
+    """
+
+rule model_cycle:
+    input:
+        input_file = "model_cycle.sh"
+    output:
+        output_file = "data/model.json"
+    shell:"""
+        sh '{input.input_file}'
     """

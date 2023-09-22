@@ -29,7 +29,7 @@ class Variables:
     ### For Rule 3 (merged_decrypted) - 
     ### 1. The input folder must be the same as the output of rule 2 (the data_decrypt rule)
     ### 2. Define the ouput file. Can be anywhere but the same folder as the previous rule is 
-    ###     reccommended                   
+    ###     reccommended. Note that is is a CSV file                   
         #############################################################################################
     merged_decrypted_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/merged_decrypted.csv"  
 
@@ -37,7 +37,7 @@ class Variables:
     ### For Rule 4 (sel_cr_1) -
     ### 1. The input file must be the same as the output of the "merged_decrypted" rule (rule 3)
     ### 2. Define the ouput file. Can be anywhere but the same folder as the previous rule is 
-    ###     reccommended
+    ###     reccommended. Note that is is a CSV file  
     ### 3. Define the minimum number of true data (not NaN,34500.0 or 0.0) for row validity
     ### 4. Define the data start point (takes out temperature data before this point)                   
         #############################################################################################
@@ -49,7 +49,7 @@ class Variables:
     ### For Rule 5 (sel_cr_2) -  
     ### 1. The input file must be the same as the output of the "sel_cr_1" rule (rule 4)
     ### 2. Define the ouput file. Can be anywhere but the same folder as the previous rule is 
-    ###     reccommended
+    ###     reccommended. Note that is is a CSV file  
     ### 3. Define the minimum number of true data (not NaN,34500.0 or 0.0) for row validity
     ### 4. Define the data start point (takes out temperature data before this point)                   
         #############################################################################################
@@ -63,13 +63,35 @@ class Variables:
     ### 1. The first input is the output of the "sel_cr_1" rule (rule 5)
     ### 2. Specify the folder of the input cycles (the cycle files are prefixed with "allusercycles"
     ### 3. Specify the ouput file. Can be anywhere but the same folder as the previous rule is 
-    ###     reccommended                
+    ###     reccommended. Note that is is a CSV file                  
         #############################################################################################
     process_cycles_input_folder = "/projects/MRC-IEU/research/data/fertility_focus/ovusense/released/2022-11-30/data/temperature/"
     process_cycles_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/temp_dates_duration.csv"
 
+      #############################################################################################
+    ### For Rule 7 (process_quationnaire) - 
+    ### 1. The first input is the questionnaire data (This is an excel file)
+    ### 2. The second input is the output of the "sel_cr_2" rule (rule 6)
+    ### 3. Specify the ouput file. Can be anywhere but the same folder as the previous rule is 
+    ###     reccommended. Note that is is a CSV file         
+        #############################################################################################
+    process_quest_input_file = "/projects/MRC-IEU/research/data/fertility_focus/ovusense/released/2022-11-30/data/uob-questionnaire/OvuSense_Cycle_Characteristics_Study-Survey-to_18NOV22_anon.xlsx"
+    process_quest_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/temp_dates_duration_pcos.csv"
 
 
+        #############################################################################################
+    ### For Rule 8 (model_cycle) - 
+    ### The variable for this is defined in model_cycle.sh. The only variable to add is the processed
+    ### temperature data from "sel_cr_2". There may not be a need to run this process recurrently.
+    ### If there is a need to add more to the normal cycles or remove some cycles from 
+    ### current set, please open code/normal_cycles_process/normal_cycles.py and add the User and
+    ### and Cycle IDs to be added. YOu an the rerun this rule.
+        #############################################################################################
+
+
+
+
+#######################################You do not need to edit aything beyond this point#######################################
     #rule 1 data
     data_clean_input_folder = data_clean_input_folder
     data_clean_output_file = data_clean_output_folder + "data_cleaned.csv"
@@ -122,7 +144,7 @@ class Variables:
         "cr_2_3":cr_2_3,
     }
 
-    #rule d data
+    #rule 6 data
     process_cycles_input_cycles =  process_cycles_input_folder
     process_cycles_input_temps = sel_cr_2_output_file
     process_cycles_output_file = process_cycles_output
@@ -131,5 +153,17 @@ class Variables:
         "input_file":process_cycles_input_temps,
         "output_file":process_cycles_output_file
     }
+
+    #rule 7 data
+    process_quest_input_quest =  process_quest_input_file
+    process_quest_input_cycles = process_cycles_output_file
+    process_quest_output_file = process_quest_output
+    process_quest = {
+        "input_file":process_quest_input_quest,
+        "input_cycles":process_quest_input_cycles,
+        "output_file":process_quest_output_file,
+    }
+    
+    #rule 8 need no furthe processing
 
 variables = Variables()
