@@ -135,9 +135,9 @@ def DBA_update(center, series, cost_mat, path_mat, delta_mat):
 
     return np.divide(updated_center, n_elements)
 
-def save_model_cycle(model_cycle):
+def save_model_cycle(model_cycle, OUTPUT):
     try:
-        with open("data/model.json", "w") as f:
+        with open(OUTPUT, "w") as f:
             json.dump(model_cycle, f)
     except Exception as ex:
         print("Error while saving object:", ex)

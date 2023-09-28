@@ -1,5 +1,6 @@
 import json
 import numpy as np
+import pandas as pd
 
 #My generic algorithm for getting all users in a multi-index
 def get_users(grouped_data):
@@ -36,9 +37,9 @@ def matrix_generator():
     return inc
 
 #Loading the model cycle
-def load_model_cycle():
+def load_model_cycle(model_cycle):
     try:
-        with open("/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/model.json", "r") as f:
+        with open(model_cycle, "r") as f:
             model_cycles = json.load(f)
     except Exception as ex:
         print("Could not load the model cycle: ", ex)
@@ -77,3 +78,77 @@ def users_btw_3_and_10(cycles):
     users_less_10 = cycle_counts[(cycle_counts["Cycle ID"] >= 3) & (cycle_counts["Cycle ID"] <= 10)] #get the users with the values
     users_10_cycles = get_users_cycles(users_less_10) #now get the the users
     return users_10_cycles
+
+#This algorithm takes outliers for standardized data
+def trimming_for_outliers(df):
+    #Trimming value for peak day
+    peak_day_mean = float("{0:.2f}".format(np.mean(df["Standard_peak_day"].values))) #the mean of the peak days
+    peak_day_std = float("{0:.2f}".format(np.std(df["Standard_peak_day"].values))) #the standard deviation of the peak days
+    peak_day_trim = peak_day_mean+(3*peak_day_std) #trim peak day upto 3 times the std after mean
+
+    #Trimming value for Nadir temperature
+    nadir_temp_mean = float("{0:.2f}".format(np.mean(df["Standard_nadir_temp_actual"].values))) #mean of the nadir temps
+    nadir_temp_std = float("{0:.2f}".format(np.std(df["Standard_nadir_temp_actual"].values))) #std of the nadir temps
+    nadir_temp_trim_left = nadir_temp_mean-(3*nadir_temp_std) #trim nadir temps upto 3 times std before the mean
+    nadir_temp_trim_right = nadir_temp_mean+(3*nadir_temp_std) #trim nadir temps upto 3 times std after the mean
+
+    df = df[(df["Standard_nadir_day"] <= 50) & #Trim out cycles with nadirs greater than 50 
+                    (df["Standard_peak_day"] <= peak_day_trim) & #Trim out cycles with peaks greater than trim 
+                    (df["Standard_nadir_day"] != df["Standard_peak_day"]) & #Trim out cycles with nadirs 
+                                                                                    #equalling peaks. This is peculiar
+                                                                                    #of cycles that are basically 
+                                                                                    #descends
+                    (df["Standard_nadir_temp_actual"] > nadir_temp_trim_left) &
+                    (df["Standard_nadir_temp_actual"] < nadir_temp_trim_right) &
+                    (df["Standard_low_to_high_temp"] > 0) & #Trim out cycles with a negative high and low temp.
+                                                                #difference. This is peculiar of cycles that a near 
+                                                                #flat temperature reading at the nadir and peak positions
+                    ~(df["Date_Diff"].isnull())& #remove last cycles most of which are largely incomplete
+                    (df["Data_Length"] < 101) #remove cycles with more than 100 days
+                   ]
+
+    return df
+
+#This algorithm takes outliers for normalized data
+def trimming_for_outliers_MM(df):
+    #Trimming value for peak day
+    peak_day_mean = float("{0:.2f}".format(np.mean(df["MinMax_peak_day"].values))) #the mean of the peak days
+    peak_day_std = float("{0:.2f}".format(np.std(df["MinMax_peak_day"].values))) #the standard deviation of the peak days
+    peak_day_trim = peak_day_mean+(3*peak_day_std) #trim peak day upto 3 times the std after mean
+
+    #Trimming value for Nadir temperature
+    nadir_temp_mean = float("{0:.2f}".format(np.mean(df["MinMax_nadir_temp_actual"].values))) #mean of the nadir temps
+    nadir_temp_std = float("{0:.2f}".format(np.std(df["MinMax_nadir_temp_actual"].values))) #std of the nadir temps
+    nadir_temp_trim_left = nadir_temp_mean-(3*nadir_temp_std) #trim nadir temps upto 3 times std before the mean
+    nadir_temp_trim_right = nadir_temp_mean+(3*nadir_temp_std) #trim nadir temps upto 3 times std after the mean
+
+    df = df[(df["MinMax_nadir_day"] <= 50) & #Trim out cycles with nadirs greater than 50 
+                    (df["MinMax_peak_day"] <= peak_day_trim) & #Trim out cycles with peaks greater than trim 
+                    (df["MinMax_nadir_day"] != df["MinMax_peak_day"]) & #Trim out cycles with nadirs 
+                                                                                    #equalling peaks. This is peculiar
+                                                                                    #of cycles that are basically 
+                                                                                    #descends
+                    (df["MinMax_nadir_temp_actual"] > nadir_temp_trim_left) &
+                    (df["MinMax_nadir_temp_actual"] < nadir_temp_trim_right) &
+                    (df["MinMax_low_to_high_temp"] > 0) & #Trim out cycles with a negative high and low temp.
+                                                                #difference. This is peculiar of cycles that a near 
+                                                                #flat temperature reading at the nadir and peak positions
+                    ~(df["Date_Diff"].isnull())& #remove last cycles most of which are largely incomplete
+                    (df["Data_Length"] < 101) #remove cycles with more than 100 days
+                   ]
+
+    return df
+
+#select 3 cycles each from the users
+def select_3_cycles(df):
+    df_3 = pd.DataFrame()
+    for j in list(df["User"].unique()):
+        user_cycles = list(df[df["User"] == j]["Cycle"]) #Getting cycles for a user
+        
+        rng = np.random.default_rng(seed=101)
+        rand_3_cycles = list(rng.choice(user_cycles, 3, replace=False))
+        
+        for i in rand_3_cycles:
+            df_cycle = df[df["Cycle"] == i] #Data for each of the selected cycles
+            df_3 = pd.concat([df_3, df_cycle], axis = 0) #add to the data for learning
+    return df_3

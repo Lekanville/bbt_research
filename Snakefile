@@ -1,7 +1,8 @@
 #!python
 #!/usr/bin/env python3
 
-from variables import variables
+from variables_preprocessing import variables
+from variables_learning import learning
 
 rule targets:
     input:
@@ -10,7 +11,9 @@ rule targets:
         variables.sel_cr_2["output_file"],
         variables.process_cycles["output_file"],
         variables.process_quest["output_file"],
-        "data/model.json"
+        variables.cycle_level_data["model_cycle"],
+        variables.cycle_level_data["output_file"],
+        learning.get_learning_variables["output_file"]
 
 rule data_clean:
     input: 
@@ -91,7 +94,29 @@ rule model_cycle:
     input:
         input_file = "model_cycle.sh"
     output:
-        output_file = "data/model.json"
+        output_file = variables.cycle_level_data["model_cycle"]
     shell:"""
         sh '{input.input_file}'
+    """
+
+rule cycle_level_data:
+    input:
+        input_temps = variables.cycle_level_data["input_temps"],
+        input_cycles = variables.cycle_level_data["input_cycles"],
+        model_cycle = variables.cycle_level_data["model_cycle"]
+    output:
+        output_file = variables.cycle_level_data["output_file"]
+    shell:"""
+        python -m nadirs_and_peaks -i '{input.input_temps}' -j '{input.input_cycles}' -m {input.model_cycle} -o {output.output_file}
+    """
+
+rule get_learning_variables:
+    input: 
+        #input_temps = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/features_dtw_MM.csv"
+        input_temps = learning.get_learning_variables["input_file"]
+    output:
+        output_file = learning.get_learning_variables["output_file"]
+        #python -m learning_variables_MM -i {input.input_temps} -o {output.output_file}
+    shell:"""
+        python -m learning_variables -i {input.input_temps} -o {output.output_file}
     """

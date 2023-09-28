@@ -8,7 +8,7 @@ import argparse
 from loguru import logger
 
 OUT_FILE = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/images"
-parser = argparse.ArgumentParser(description="A script to plot cylce temperatures")
+parser = argparse.ArgumentParser(description="A script to plot cycle temperatures")
 parser.add_argument("-d", "--data", type=str, required=True, help="The dataset")
 
 def plot_temps(file):

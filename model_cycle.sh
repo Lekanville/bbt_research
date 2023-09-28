@@ -4,6 +4,6 @@
 #executing this script (also to be executed from the snake file). You need to defime the 
 #location of the result from rule 5 below (-i)
 
-mkdir -p data
 python -m normal_cycles_process.model_cycle \
--i /projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/sel_crt_2.csv
+-i /projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/sel_crt_2.csv \
+-o "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/model.json"

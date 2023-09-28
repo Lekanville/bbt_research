@@ -2,7 +2,7 @@
 #!/usr/bin/env python3
 
 #############################################################################################
-#The “data_extractor.py” script - this version use z-normalization (standard scaling)
+#The “data_extractor.py” script - this version use normalization (normalization scaling)
 #This script extracts the cycle level features of the data. To make it faster, horizontal scaling
 #usimg multiprocessing is employed for the task. 
 #The first part of the script will tries to locate missing days that are not mre than 10 at a
@@ -93,67 +93,66 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     smooth_temps = list(cycle_temp["Smooth_Temp"])#the smoothed cycle temperatures
 
     #standardizing the smooth values    
-    scalerStandard = StandardScaler()
-    Standard_model_cycle = scalerStandard.fit_transform(np.array(model_cycle).reshape(-1, 1))
-    Standard_smooth_temps = scalerStandard.fit_transform(np.array(smooth_temps).reshape(-1, 1))
+    scaler_MinMax = MinMaxScaler()
+    MinMax_model_cycle =  scaler_MinMax.fit_transform(np.array(model_cycle).reshape(-1, 1))
+    MinMax_smooth_temps =  scaler_MinMax.fit_transform(np.array(smooth_temps).reshape(-1, 1))
 
     #New dtw method    
-    Standard_path = dtw.warping_path(Standard_model_cycle, Standard_smooth_temps)
-    Standard_distance = "{0:.2f}".format(dtw.distance(Standard_model_cycle, Standard_smooth_temps))    
+    MinMax_path = dtw.warping_path(MinMax_model_cycle, MinMax_smooth_temps)
+    MinMax_distance = "{0:.2f}".format(dtw.distance(MinMax_model_cycle, MinMax_smooth_temps))    
 
     #Getting the length of warping line and warping amount
-    path_x_axis = [x[0] for x in Standard_path]
-    path_y_axis = [x[1] for x in Standard_path]
+    path_x_axis = [x[0] for x in MinMax_path]
+    path_y_axis = [x[1] for x in MinMax_path]
     path_length = tools.length_of_line(path_y_axis, path_x_axis)
     warp_deg = tools.warp_degree(path_y_axis, path_x_axis)
 
     #Computing nadir and peak using DTW and standardized temperature values
-    Standard_nadir_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == 4]
-    Standard_nadir_temp = min([Standard_smooth_temps[mapy] for mapx, mapy in  Standard_path if mapx == 4])
-    Standard_nadir_position = [i for i, e in enumerate(Standard_nadir_temp_list) if e == Standard_nadir_temp][-1]
+    MinMax_nadir_temp_list = [ MinMax_smooth_temps[mapy] for mapx, mapy in  MinMax_path if mapx == 4]
+    MinMax_nadir_temp = min([ MinMax_smooth_temps[mapy] for mapx, mapy in   MinMax_path if mapx == 4])
+    MinMax_nadir_position = [i for i, e in enumerate(MinMax_nadir_temp_list) if e == MinMax_nadir_temp][-1]
 
-    Standard_nadir_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == 4]
-    Standard_nadir_day = Standard_nadir_day_list[Standard_nadir_position][1]
-    Standard_nadir_temp_actual = smooth_temps[Standard_nadir_day]
+    MinMax_nadir_day_list = [[mapx, mapy] for mapx, mapy in MinMax_path if mapx == 4]
+    MinMax_nadir_day = MinMax_nadir_day_list[MinMax_nadir_position][1]
+    MinMax_nadir_temp_actual = smooth_temps[MinMax_nadir_day]
 
-    Standard_peak_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == 15]
-    Standard_peak_temp = max([Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == 15])
-    Standard_peak_position = [i for i, e in enumerate(Standard_peak_temp_list) if e == Standard_peak_temp][0]
+    MinMax_peak_temp_list = [MinMax_smooth_temps[mapy] for mapx, mapy in MinMax_path if mapx == 15]
+    MinMax_peak_temp = max([MinMax_smooth_temps[mapy] for mapx, mapy in MinMax_path if mapx == 15])
+    MinMax_peak_position = [i for i, e in enumerate(MinMax_peak_temp_list) if e == MinMax_peak_temp][0]
 
-    Standard_peak_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == 15]
-    Standard_peak_day = Standard_peak_day_list[Standard_peak_position][1]
-    Standard_peak_temp_actual = smooth_temps[Standard_peak_day]
+    MinMax_peak_day_list = [[mapx, mapy] for mapx, mapy in MinMax_path if mapx == 15]
+    MinMax_peak_day = MinMax_peak_day_list[MinMax_peak_position][1]
+    MinMax_peak_temp_actual = smooth_temps[MinMax_peak_day]
 
     #Nadir and Peak Validity Check
     temp_diffs = [smooth_temps[i+1] - smooth_temps[i] for i in range(len(smooth_temps)-1)]
-    lower_curve_list = temp_diffs[:Standard_nadir_day]
-    top_curve_list = temp_diffs[Standard_peak_day:]
+    lower_curve_list = temp_diffs[:MinMax_nadir_day]
+    top_curve_list = temp_diffs[MinMax_peak_day:]
 
     nadir_valid = any(i < 0 for i in lower_curve_list)
     peak_valid = any(i < 0 for i in top_curve_list)
 
     #Time from nadir to peak using Standard Scaling
-    Standard_nadir_to_peak = Standard_peak_day - Standard_nadir_day
+    MinMax_nadir_to_peak = MinMax_peak_day - MinMax_nadir_day
 
     #Difference between lowest and highest temperature using Standard Scaling
-    Standard_low_to_high_temp = Standard_peak_temp_actual - Standard_nadir_temp_actual
+    MinMax_low_to_high_temp = MinMax_peak_temp_actual - MinMax_nadir_temp_actual
 
     #we create a dictionary of the results for each cycle
     data = {"User":user, "Cycle":cycle, "Temps":temps, "Smooth_Temp":smooth_temps, "Initial_Cycle_Range":date_dur, 
             "Ovulation Day":ovulation, "Date_Diff":Date_Diff, "Offset":offset, "PCOS":PCOS,
 
-            "Standard_model_cycle":Standard_model_cycle, "Standard_smooth_temps":Standard_smooth_temps, 
-            "Standard_distance":Standard_distance, "Standard_path":Standard_path, 
-            "Standard_nadir_day":Standard_nadir_day, "Standard_peak_day":Standard_peak_day, 
-            "Standard_nadir_temp":Standard_nadir_temp, "Standard_peak_temp":Standard_peak_temp,
-            "Standard_nadir_temp_actual":Standard_nadir_temp_actual, "Standard_peak_temp_actual":Standard_peak_temp_actual,
-            "Standard_nadir_to_peak":Standard_nadir_to_peak, "Standard_low_to_high_temp":Standard_low_to_high_temp,
+            "MinMax_model_cycle":MinMax_model_cycle, "MinMax_smooth_temps":MinMax_smooth_temps, 
+            "MinMax_distance":MinMax_distance, "MinMax_path":MinMax_path, 
+            "MinMax_nadir_day":MinMax_nadir_day, "MinMax_peak_day":MinMax_peak_day, 
+            "MinMax_nadir_temp":MinMax_nadir_temp, "MinMax_peak_temp":MinMax_peak_temp,
+            "MinMax_nadir_temp_actual":MinMax_nadir_temp_actual, "MinMax_peak_temp_actual":MinMax_peak_temp_actual,
+            "MinMax_nadir_to_peak":MinMax_nadir_to_peak, "MinMax_low_to_high_temp":MinMax_low_to_high_temp,
             "nadir_valid":nadir_valid, "peak_valid":peak_valid,
             "path_length":path_length, "warp_degree":warp_deg
         }
 
     return data
-
 
 def curve_by_length(nad_and_peak):
     offset = nad_and_peak["Offset"]
@@ -167,4 +166,3 @@ def curve_by_length(nad_and_peak):
     distance = {"Curve_Length":curve_length, "Data_Length":data_length, "Curve_by_Data":curve_by_data}
 
     return distance
-

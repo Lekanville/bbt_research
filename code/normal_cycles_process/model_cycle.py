@@ -23,6 +23,7 @@ import normal_cycles_process.temp_and_day as temp_and_day
 
 parser = argparse.ArgumentParser(description='A script for averaging the normal cycles')
 parser.add_argument('-i','--input_temp', type=str, required=True, help='The input temperature dataset')
+parser.add_argument('-o','--output_file', type=str, required=True, help='The output file')
 
 def get_normal(normal, temps):
     normal_smooths = []
@@ -38,7 +39,7 @@ def get_normal(normal, temps):
         normal_smooths.append(smooth_normal)
     return normal_smooths
 
-def main(normal_smooths):
+def main(normal_smooths, OUTPUT):
     individual_series = [np.array(i) for i in normal_smooths]
     series = np.array(individual_series, dtype="object")
     
@@ -49,11 +50,9 @@ def main(normal_smooths):
     
     model_cycle = {"model":list(computed_avg_smoothed)}
     
-    DBA.save_model_cycle(model_cycle)
-
-    print (model_cycle)
+    DBA.save_model_cycle(model_cycle, OUTPUT)
 
 if __name__ == "__main__":
     args = parser.parse_args()
     normal_smooths = get_normal(normal, args.input_temp)
-    main(normal_smooths)
+    main(normal_smooths, args.output_file)

@@ -20,7 +20,7 @@ class Variables:
     ###     reccommended
     ### 3. The log will be created where the output folder is. You do not need to edit this. 
     ###     If there is ever a need to run rule 2 again without the need to run rule 1, just
-    ###     delete the log file. Rule 2 will then be availabe for a rerun.                       
+    ###     delete the log file. Rule 2 will then be availabe for a re-run.                       
         #############################################################################################
     data_decrypt_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/decrypted/"
     
@@ -50,8 +50,9 @@ class Variables:
     ### 1. The input file must be the same as the output of the "sel_cr_1" rule (rule 4)
     ### 2. Define the ouput file. Can be anywhere but the same folder as the previous rule is 
     ###     reccommended. Note that is is a CSV file  
-    ### 3. Define the minimum number of true data (not NaN,34500.0 or 0.0) for row validity
-    ### 4. Define the data start point (takes out temperature data before this point)                   
+    ### 3. Define the minimum number of total temperature values acrooss all cycles recorded for a user
+    ### 4. Define the minimun number of daily tempearures that must be recorded in a cycle
+    ### 5. Define the minimum number of cycles a with daily temperatures that must be recorded for a user                   
         #############################################################################################
     sel_cr_2_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/sel_crt_2.csv"
     min_number_of_total_record_days = 30
@@ -60,7 +61,7 @@ class Variables:
 
         #############################################################################################
     ### For Rule 6 (process_cycles) - 
-    ### 1. The first input is the output of the "sel_cr_1" rule (rule 5)
+    ### 1. The first input is the output of the "sel_cr_2" rule (rule 5)
     ### 2. Specify the folder of the input cycles (the cycle files are prefixed with "allusercycles"
     ### 3. Specify the ouput file. Can be anywhere but the same folder as the previous rule is 
     ###     reccommended. Note that is is a CSV file                  
@@ -71,24 +72,33 @@ class Variables:
       #############################################################################################
     ### For Rule 7 (process_quationnaire) - 
     ### 1. The first input is the questionnaire data (This is an excel file)
-    ### 2. The second input is the output of the "sel_cr_2" rule (rule 6)
+    ### 2. The second input is the output of the "process_cycles" rule (rule 6)
     ### 3. Specify the ouput file. Can be anywhere but the same folder as the previous rule is 
     ###     reccommended. Note that is is a CSV file         
         #############################################################################################
     process_quest_input_file = "/projects/MRC-IEU/research/data/fertility_focus/ovusense/released/2022-11-30/data/uob-questionnaire/OvuSense_Cycle_Characteristics_Study-Survey-to_18NOV22_anon.xlsx"
     process_quest_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/temp_dates_duration_pcos.csv"
 
-
         #############################################################################################
     ### For Rule 8 (model_cycle) - 
     ### The variable for this is defined in model_cycle.sh. The only variable to add is the processed
-    ### temperature data from "sel_cr_2". There may not be a need to run this process recurrently.
-    ### If there is a need to add more to the normal cycles or remove some cycles from 
+    ### temperature data from "sel_cr_2".
+    ### If there is a need to add more cycles or remove some from the
     ### current set, please open code/normal_cycles_process/normal_cycles.py and add the User and
-    ### and Cycle IDs to be added. YOu an the rerun this rule.
+    ### and Cycle IDs of the normal cycles to be added. You an the re-run this rule.
+    ### for subsequent processing, there is no need to re=run this rule (except if normal cycles are edited)
         #############################################################################################
 
-
+        #############################################################################################
+    ### For Rule 9 (cycle_level_data) - 
+    ### 1. The first input is the temperature data set - the output of the "sel_cr_2" rule (rule 5)
+    ### 2. The second input is the cycles dataset with PCOS column - the output of the "process_quationnaire" rule (rule 7)
+    ### 3. The file location of the model cycle - output of rule 8 (open model_cycle.sh to check)    
+    ### 4. Specify the ouput file. Can be anywhere but the same folder as the previous rule is 
+    ###     reccommended. Note that is is a CSV file    
+        #############################################################################################
+    model_cycle = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/model.json"
+    cycle_level_data_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/features_dtw_SS.csv"
 
 
 #######################################You do not need to edit aything beyond this point#######################################
@@ -141,7 +151,7 @@ class Variables:
         "output_file":sel_cr_2_output_file,
         "cr_2_1":cr_2_1,
         "cr_2_2":cr_2_2,
-        "cr_2_3":cr_2_3,
+        "cr_2_3":cr_2_3
     }
 
     #rule 6 data
@@ -161,9 +171,21 @@ class Variables:
     process_quest = {
         "input_file":process_quest_input_quest,
         "input_cycles":process_quest_input_cycles,
-        "output_file":process_quest_output_file,
+        "output_file":process_quest_output_file
     }
     
-    #rule 8 need no furthe processing
+    #rule 8 need no further processing
+
+
+    #rule 9 data
+    cycle_level_data_input_temps =  sel_cr_2_output_file
+    cycle_level_data_input_cycles = process_quest_output
+    cycle_level_data_output_file = cycle_level_data_output
+    cycle_level_data = {
+        "input_temps":cycle_level_data_input_temps,
+        "input_cycles":cycle_level_data_input_cycles,
+        "model_cycle": model_cycle,
+        "output_file":cycle_level_data_output_file
+    }
 
 variables = Variables()
