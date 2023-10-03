@@ -6,14 +6,15 @@ from variables_learning import learning
 
 rule targets:
     input:
-        variables.merged_decrypted["output_file"],
-        variables.sel_cr_1["output_file"],
+        ##variables.merged_decrypted["output_file"],
+        #variables.sel_cr_1["output_file"],
         variables.sel_cr_2["output_file"],
-        variables.process_cycles["output_file"],
+        #variables.process_cycles["output_file"],
         variables.process_quest["output_file"],
         variables.cycle_level_data["model_cycle"],
         variables.cycle_level_data["output_file"],
-        learning.get_learning_variables["output_file"]
+        learning.get_learning_variables["output_file"],
+        learning.cycle_level_learning_variables["output_folder"]
 
 rule data_clean:
     input: 
@@ -119,4 +120,16 @@ rule get_learning_variables:
         #python -m learning_variables_MM -i {input.input_temps} -o {output.output_file}
     shell:"""
         python -m learning_variables -i {input.input_temps} -o {output.output_file}
+    """
+
+rule cycle_level_learning:
+    input: 
+        input_variables = learning.cycle_level_learning_variables["input_file"]
+    params:
+        input_splits = learning.cycle_level_learning_variables["number_of_splits"]
+    output:
+        output_file = directory(learning.cycle_level_learning_variables["output_folder"])
+        #output_log = learning.cycle_level_learning_variable["log"]
+    shell:"""
+        python -m cycle_level_learning -i {input.input_variables} -k {params.input_splits} -o {output.output_file}
     """

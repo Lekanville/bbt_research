@@ -9,7 +9,7 @@
 #upto 3 times the standard deviation before abd after the mean. Records that have their nadir
 #days to be greater than 50 were also trimmed out. Records with the difference between their
 #nadirs and peaks days as zero, incomplete cycles (mostly last cycles) and cycles with data
-#lenghts more than 101 are also taken out
+#lengths more than 101 are also taken out
 #############################################################################################
 
 import numpy as np

@@ -9,7 +9,7 @@
 #upto 3 times the standard deviation before abd after the mean. Records that have their nadir
 #days to be greater than 50 were also trimmed out. Records with the difference between their
 #nadirs and peaks days as zero, incomplete cycles (mostly last cycles) and cycles with data
-#lenghts more than 101 are also taken out
+#lengths more than 101 are also taken out
 #############################################################################################
 
 import numpy as np
@@ -29,9 +29,9 @@ def the_variables(INPUT, OUTPUT):
     temperatures_pcos = temperatures_trimmed_out[temperatures_trimmed_out["PCOS"] != 2] #select users with known PCOS values
 
     dep_and_indep = temperatures_pcos[[
-    "User", "Cycle", "Standard_distance", "Standard_nadir_day", "Standard_peak_day", "Standard_nadir_temp_actual",  
-    "Standard_peak_temp_actual", "Standard_nadir_to_peak", "Standard_low_to_high_temp", "nadir_valid", "peak_valid",
-    "path_length", "warp_degree", "Curve_Length", "Data_Length", "Curve_by_Data", "PCOS"    
+    "User", "Cycle", "Standard_smooth_temps", "Standard_distance", "Standard_nadir_day", "Standard_peak_day", 
+    "Standard_nadir_temp_actual", "Standard_peak_temp_actual", "Standard_nadir_to_peak", "Standard_low_to_high_temp", 
+    "nadir_valid", "peak_valid", "path_length", "warp_degree", "Curve_Length", "Data_Length", "Curve_by_Data", "PCOS"    
     ]] #select the independent and non-indepent variables
 
     #Maintain the "Minimum of 3 Cycles per User" rule

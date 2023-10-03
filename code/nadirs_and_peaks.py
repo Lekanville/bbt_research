@@ -21,7 +21,7 @@ from multiprocess import Pool
 from tqdm import tqdm
 
 from classes.classes import Frames
-import tools.data_extractor_mm as extract
+import tools.data_extractor_ss as extract
 import tools.tools as tools
 
 parser = argparse.ArgumentParser(description='A script for getting nairs and peaks using DTW')
@@ -105,7 +105,7 @@ def compute_features(users):
 def save_data(extracted, OUTPUT):
     data = [i for ls in extracted for i in ls]
     df = pd.DataFrame(data)
-    df.to_parquet(OUTPUT)
+    df.to_csv(OUTPUT)
 
 if __name__ == "__main__":
     args = parser.parse_args() #get the args variables
