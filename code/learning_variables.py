@@ -4,7 +4,7 @@
 #############################################################################################
 #The “learning_variables.py” script
 #The script expects the output file from the previous rule (cycle_level_data) as input and will 
-#output the features tto a CSV file. Ater the the input is read the outliers on the peak day 
+#output the features to a CSV file. After the the input is read the outliers on the peak day 
 #are trimmed upto 3 times the std after mean. Outliers on the nadir temp are equally trimmed
 #upto 3 times the standard deviation before abd after the mean. Records that have their nadir
 #days to be greater than 50 were also trimmed out. Records with the difference between their

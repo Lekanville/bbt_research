@@ -6,7 +6,7 @@ from sklearn.metrics import classification_report, confusion_matrix, accuracy_sc
 
 import tools.classifier_algorithms as class_alg
 
-def classifier_roc_cross_val(classifier_name, df, OUTPUT_FOLDER):  
+def classifier_roc_cross_val(level, classifier_name, df, OUTPUT_FOLDER):  
     #random_state = np.random.RandomState(0)
 
     classifier = class_alg.get_algorithm(classifier_name)
@@ -79,11 +79,12 @@ def classifier_roc_cross_val(classifier_name, df, OUTPUT_FOLDER):
         ylim=[-0.05, 1.05],
         xlabel="False Positive Rate",
         ylabel="True Positive Rate",
-        title=f"Mean ROC curve with variability-"+classifier_name,
+        title=f"Mean ROC curve with variability-"+level+" "+classifier_name,
     )
     ax.axis("square")
     ax.legend(loc="lower right")
-    filename = classifier_name+"_cycle_level.png"
+    name_and_ext = "_".join(level.split(" "))+".png"
+    filename = classifier_name+"_"+ name_and_ext
     plt.savefig(os.path.join(OUTPUT_FOLDER, filename))
 
     return classifier

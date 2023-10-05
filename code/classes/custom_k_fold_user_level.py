@@ -5,45 +5,37 @@ import loguru
 from sklearn.preprocessing import StandardScaler
 #############################################################################################
 #The “custom_k_fold.py” script
-#This scrip contains a class which splits the data into k folds for k-1 training data set and
+#This script contains a class which splits the data into k folds for k-1 training data set and
 #1 test dataset. It ensures that ratio of the postive and negative outcomes are maintained
-#in each k for the users and cycles and eqaully ensures that all cycles for each user belong
-#to the same k for the cycle level
+#in each k for the users.
 #############################################################################################
 
 class CustomKFold:
-    def __init__(self, n_splits, df, level):
+    def __init__(self, n_splits, df):
         self.n_splits = n_splits
         self.df = df
-        self.level = level
-
-        if level == "Cycle Level":
-            self.independent_variables = ["Standard_distance","Standard_nadir_day","Standard_peak_day","Standard_nadir_temp_actual",
-                            "Standard_peak_temp_actual","Standard_nadir_to_peak","Standard_low_to_high_temp",
-                            "path_length","warp_degree","Curve_Length","Data_Length","Curve_by_Data"]
+        self.independent_variables = ['med_pair_distances','med_pair_lengths',
+                                      
+                                      'min_dist_to_model','min_nadir_days','min_peak_days','min_nadir_temps',
+                                      'min_peak_temps','min_nadirs_to_peaks','min_low_to_high_temps',
+                                      'min_path_length_to_model','min_warp_degree_with_model','min_Curve_Lengths',
+                                      'min_Data_Lengths','min_Curves_by_Data',
+                                      
+                                      'max_dist_to_model','max_nadir_days','max_peak_days','max_nadir_temps',
+                                      'max_peak_temps','max_nadirs_to_peaks','max_low_to_high_temps',
+                                      'max_path_length_to_model','max_warp_degree_with_model','max_Curve_Lengths',
+                                      'max_Data_Lengths','max_Curves_by_Data',
+                                      
+                                      'med_dist_to_model','med_nadir_days','med_peak_days','med_nadir_temps',
+                                      'med_peak_temps','med_nadirs_to_peaks','med_low_to_high_temps',
+                                      'med_path_length_to_model','med_warp_degree_with_model','med_Curve_Lengths',
+                                      'med_Data_Lengths','med_Curves_by_Data',
+                                      
+                                      'rge_dist_to_model','rge_nadir_days','rge_peak_days','rge_nadir_temps',
+                                      'rge_peak_temps','rge_nadirs_to_peaks','rge_low_to_high_temps',
+                                      'rge_path_length_to_model','rge_warp_degree_with_model','rge_Curve_Lengths',
+                                      'rge_Data_Lengths','rge_Curves_by_Data']
         
-        else:
-            self.independent_variables = ['med_pair_distances','med_pair_lengths',
-                                
-                                'min_dist_to_model','min_nadir_days','min_peak_days','min_nadir_temps',
-                                'min_peak_temps','min_nadirs_to_peaks','min_low_to_high_temps',
-                                'min_path_length_to_model','min_warp_degree_with_model','min_Curve_Lengths',
-                                'min_Data_Lengths','min_Curves_by_Data',
-                                
-                                'max_dist_to_model','max_nadir_days','max_peak_days','max_nadir_temps',
-                                'max_peak_temps','max_nadirs_to_peaks','max_low_to_high_temps',
-                                'max_path_length_to_model','max_warp_degree_with_model','max_Curve_Lengths',
-                                'max_Data_Lengths','max_Curves_by_Data',
-                                
-                                'med_dist_to_model','med_nadir_days','med_peak_days','med_nadir_temps',
-                                'med_peak_temps','med_nadirs_to_peaks','med_low_to_high_temps',
-                                'med_path_length_to_model','med_warp_degree_with_model','med_Curve_Lengths',
-                                'med_Data_Lengths','med_Curves_by_Data',
-                                
-                                'rge_dist_to_model','rge_nadir_days','rge_peak_days','rge_nadir_temps',
-                                'rge_peak_temps','rge_nadirs_to_peaks','rge_low_to_high_temps',
-                                'rge_path_length_to_model','rge_warp_degree_with_model','rge_Curve_Lengths',
-                                'rge_Data_Lengths','rge_Curves_by_Data']
         self.dependent_variable = "PCOS"
         
     def customSplit(self):
@@ -67,7 +59,7 @@ class CustomKFold:
         pcos_composition = float("{0:.0f}".format(group_compostion * pcos_ratio)) #number of pcos in a group
         
         groups = []
-        ############################This for the non-PCOS users#############################
+        ############################This for the non-PCOS user#############################
         i = 0 #for iterating over the non-pcos users
         a = 0 #for iterating over the groups
         
@@ -88,7 +80,7 @@ class CustomKFold:
             i = i + 1 #increment the position
         ###################################################################################
         
-        ############################This for the PCOS users################################    
+        ############################This for the PCOS user################################    
         i = 0 #for iterating over the pcos users
         a = 0 #for iterating over the groups
         
@@ -111,13 +103,12 @@ class CustomKFold:
         
         initial_user_groups = pd.DataFrame(groups) #convert the list of groups and labels to a dataframe
         
-        
-        def edit_outstanding_groups(grped_users):
+        def edit_outstanding_groups(grped_users, splits):
             df = grped_users
             x = list(df["Group"].value_counts()) #list of the groups
             y = x[1:] #list of the groups starting from 1
             
-            #trying to pad incomplete groups if exists (happens if the disection isnt up to the defined split)
+            #trying to pad incomplete groups if the exist (happens if the dicision isnt up to the defined split)
             try:
                 incomplete_value = [j for i,j in zip(x,y) if i != j][0] #finding the start of incomplete groups
                 outgroup_val = [j for i,j in zip(x,y) if i != j][-1] #group outside defined set
@@ -127,7 +118,7 @@ class CustomKFold:
                 outgroup = [i for i,j in enumerate(x) if j == outgroup_val][0] + 1 #positing incomplete groups (+1 gives the exact group)
 
                 pad_groups = [] 
-                for i in list(range((incomplete_start),(self.n_splits))):
+                for i in list(range((incomplete_start),(splits))):
                     pad_groups.append(i+1) #the incomplete groups
 
                 for i in pad_groups:
@@ -145,7 +136,7 @@ class CustomKFold:
 
                 i = 0 #to start the list iteration
                 a = 1 #to start grouping again from the start of the group
-                while (a < self.n_splits) and (i < len(edit)):
+                while (a < 10) and (i < len(edit)):
                         df.loc[edit[i], "Group"] = a #edit it to a complete group
                         a = a + 1 #increment the group
                         i = i + 1 #move to the next element in the set
@@ -155,37 +146,13 @@ class CustomKFold:
         
             return(df)
         
-        user_grouped = edit_outstanding_groups(initial_user_groups) #edit the user groups for uniformity
+        user_grouped = edit_outstanding_groups(initial_user_groups, self.n_splits) #edit the user groups for uniformity
         df_merged = pd.merge(df_sorted, user_grouped, how = 'inner', on = "User") #merge the df with the original
         df_grouped = df_merged.sort_values(by = ["User", "Group"]) #sort by the users and groups
         
         groups = list(range(self.n_splits)) #a list of the groups  
-   
-############################For User and Cycle Level Splitting####################################
-        def user_and_cycle_groups_list(grped_df, grps): 
-            #To see the number of users and cycles in each group
-            grps_list = [] #empty groups list
-            cycles_list = [] #empty cycles list
-            
-            cycle_groups = list(grped_df.groupby(["Group", "Cycle"]).count().index) #group by the groups and cycles
-            user_groups = list(grped_df.groupby(["Group", "User"]).count().index) #group by the groups and users
-            
-            for i in grps:
-                x = sum(1 for j in user_groups if j[0] == i+1) #count the users in each group (+1 is necssary becuase
-                                                                #the initial counting satrted at 1)  
-                y = sum(1 for j in cycle_groups if j[0] == i+1) #count the users in each group (+1 is necssary becuase
-                                                                #the initial counting satrted at 1) 
-                
-                x_count = {"Group":i, "User_Count":x} #a dictionary of the group and user counts
-                y_count = {"Group":i, "Cycle_Count":y} #a dictionary of the group and cycle counts
-                
-                grps_list.append(x_count) #append the group and user count
-                cycles_list.append(y_count) #append the group and cycle count
-            
-            return(grps_list, cycles_list) #return the functions
-###################################################################################################  
-     
-############################For User and Cycle Level Splitting####################################   
+       
+    
         def user_groups_list(grped_df, grps): 
             #To see the number of users in each group
             grps_list = [] #empty groups list
@@ -197,7 +164,6 @@ class CustomKFold:
                 x_count = {"Group":i, "User_Count":x} #a dictionary of the group and user counts
                 grps_list.append(x_count) #append the group and user count
             return(grps_list) #return the functions
-###################################################################################################         
         
         def fold_data(grped_df, grps):
             the_folds = [] #an empty fold list
@@ -209,19 +175,25 @@ class CustomKFold:
                                                                     #cos the initial counting satrted at 1) 
                 scaler = StandardScaler() #using scaling
                 
+                
+                ###start from here by defining the independednt variables
+                ###I might not need scaling again
+                
                 testing_data_independent = testing_data[self.independent_variables] #independent variables for testing
                 scaler.fit(testing_data_independent) #fitting the independent variables for testing
                 X_test = scaler.transform(testing_data_independent) #Transforming the independent variables for testing
-                #X_test = np.array(testing_data_independent)
                 y_test = list(testing_data[self.dependent_variable]) #listing the dependent variable for testing
-                #testing_variables = [X_test, y_test]
                 
                 training_data_independent = training_data[self.independent_variables] #independent variables for training              
                 scaler.fit(training_data_independent) #fitting the independent variables for training
                 X_train = scaler.transform(training_data_independent) #fitting the independent variables for training
-                #X_train = np.array(training_data_independent)
-                y_train = list(training_data[self.dependent_variable]) #listing the dependent variable for training
-                #training_variables = np.array([X_train,y_train])              
+                y_train = list(training_data[self.dependent_variable]) #listing the dependent variable for training        
+                
+                
+                #X_test = testing_data_independent
+                #y_test = list(testing_data[self.dependent_variable])
+                #X_train = training_data_independent
+                #y_train = list(training_data[self.dependent_variable])
                 
                 train = {"train":{"X_train":X_train, "y_train":y_train}} #dictionary of training data for each fold
                 test = {"test":{"X_test":X_test, "y_test":y_test}} #dictionary of testing data for each fold
@@ -230,11 +202,7 @@ class CustomKFold:
                 the_folds.append(fold) #appending the fold
                 
             return (the_folds) #returning the fold
-        
-        if self.level == "Cycle Level":
-            grps_list = user_and_cycle_groups_list(df_grouped, groups) #getting the group and cycle lists for cycle level only
-        else:
-             grps_list = user_groups_list(df_grouped, groups) #getting the group lists for user level only
-
+                
+        grps_list = user_groups_list(df_grouped, groups) #getting the groupa nd cycle lists
         folds = fold_data(df_grouped, groups) #getting the folds
-        return (df_grouped, grps_list, folds) #returning the folds
+        return (df_grouped, grps_list, folds) #returning the folds"""

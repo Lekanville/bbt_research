@@ -2,10 +2,10 @@
 #!/usr/bin/env python3
 
 #############################################################################################
-#The “cycle_learning_variables.py” script
+#The “user_learning_variables.py” script
 #The script expects the output file from the previous rule (cycle_level_data) as input and will 
 #output the features to defined folder. After the input is read the data splitted into k-folds
-#and learning with k-folds cross validation and ROC is carried ou on the data at the cycle level
+#and learning with k-folds cross validation and ROC is carried ou on the data at the user level
 #############################################################################################
 
 import numpy as np
@@ -24,9 +24,9 @@ parser.add_argument('-i', '--input_file', type=str, required=True, help= 'The in
 parser.add_argument('-k', '--splits', type=int, required=True, help= 'The number of splits')
 parser.add_argument('-o', '--output_folder', type=str, required=True, help= 'The output folder')
 
-def cycle_level_learning(INPUT, SPLITS, OUTPUT):
+def user_level_learning(INPUT, SPLITS, OUTPUT):
     #reading the data
-    logger.info("Reading cycle level variables for learning")
+    logger.info("Reading user level variables for learning")
     df = pd.read_csv(INPUT) 
     logger.info("Dataset read")
 
@@ -37,7 +37,7 @@ def cycle_level_learning(INPUT, SPLITS, OUTPUT):
 
     #splitting the data into k-folds
     logger.info("Splitting the dataframe into " +str(SPLITS)+ " folds")
-    splitted_df = CustomKFold(n_splits = SPLITS, df = df, level="Cycle Level").customSplit()
+    splitted_df = CustomKFold(n_splits = SPLITS, df = df, level="User Level").customSplit()
     print("The splits \n", splitted_df[1])
 
     #the splitted data
@@ -48,28 +48,28 @@ def cycle_level_learning(INPUT, SPLITS, OUTPUT):
 
     #RFC classifier
     logger.info("Performing Random Forest Classification")
-    rfc_model = classifier_roc_cross_val("Cycle Level", "RFC", df_for_learning, OUTPUT)
+    rfc_model = classifier_roc_cross_val("User Level", "RFC", df_for_learning, OUTPUT)
     #RFC variable importance
-    plot_importance("Cycle Level", "RFC Model Importance", rfc_model.feature_importances_, OUTPUT)
+    plot_importance("User Level", "RFC Model Importance", rfc_model.feature_importances_, OUTPUT)
 
     #SVM classifier
     logger.info("Performing Support Vector Machine Classification")
-    svm_model = classifier_roc_cross_val("Cycle Level", "SVM", df_for_learning, OUTPUT)
+    svm_model = classifier_roc_cross_val("User Level", "SVM", df_for_learning, OUTPUT)
     #SVM variable importance
-    plot_importance("Cycle Level", "SVM Model Importance", svm_model.coef_[0], OUTPUT)
+    plot_importance("User Level", "SVM Model Importance", svm_model.coef_[0], OUTPUT)
 
     #LogReg classifier
     logger.info("Performing Logistic Regression")
-    logreg_model = classifier_roc_cross_val("Cycle Level", "LogReg", df_for_learning, OUTPUT)
+    logreg_model = classifier_roc_cross_val("User Level", "LogReg", df_for_learning, OUTPUT)
     #LogReg variable importance
-    plot_importance("Cycle Level", "LogReg Model Importance", logreg_model.coef_[0], OUTPUT)
+    plot_importance("User Level", "LogReg Model Importance", logreg_model.coef_[0], OUTPUT)
 
     #DT classifier
     logger.info("Performing Decsion Tree Classification")
-    dt_model = classifier_roc_cross_val("Cycle Level", "DT", df_for_learning, OUTPUT)
+    dt_model = classifier_roc_cross_val("User Level", "DT", df_for_learning, OUTPUT)
     #LogReg variable importance
-    plot_importance("Cycle Level", "DT Model Importance", dt_model.feature_importances_, OUTPUT)
+    plot_importance("User Level", "DT Model Importance", dt_model.feature_importances_, OUTPUT)
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    cycle_level_learning(args.input_file, args.splits, args.output_folder)
+    user_level_learning(args.input_file, args.splits, args.output_folder)

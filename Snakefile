@@ -14,7 +14,9 @@ rule targets:
         variables.cycle_level_data["model_cycle"],
         variables.cycle_level_data["output_file"],
         learning.get_learning_variables["output_file"],
-        learning.cycle_level_learning_variables["output_folder"]
+        learning.cycle_level_learning["output_folder"],
+        learning.user_level_variables["output_file"],
+        learning.user_level_learning["output_folder"]
 
 rule data_clean:
     input: 
@@ -124,12 +126,32 @@ rule get_learning_variables:
 
 rule cycle_level_learning:
     input: 
-        input_variables = learning.cycle_level_learning_variables["input_file"]
+        input_variables = learning.cycle_level_learning["input_file"]
     params:
-        input_splits = learning.cycle_level_learning_variables["number_of_splits"]
+        input_splits = learning.cycle_level_learning["number_of_splits"]
     output:
-        output_file = directory(learning.cycle_level_learning_variables["output_folder"])
+        output_file = directory(learning.cycle_level_learning["output_folder"])
         #output_log = learning.cycle_level_learning_variable["log"]
     shell:"""
         python -m cycle_level_learning -i {input.input_variables} -k {params.input_splits} -o {output.output_file}
+    """
+
+rule user_level_variables:
+    input: 
+        input_variables = learning.user_level_variables["input_file"]
+    output:
+        output_file = learning.user_level_variables["output_file"]
+    shell:"""
+        python -m user_level_variables -i {input.input_variables} -o {output.output_file}
+    """
+
+rule user_level_learning:
+    input: 
+        input_variables = learning.user_level_learning["input_file"]
+    params:
+        input_splits = learning.user_level_learning["number_of_splits"]
+    output:
+        output_file = directory(learning.user_level_learning["output_folder"])
+    shell:"""
+        python -m user_level_learning -i {input.input_variables} -k {params.input_splits} -o {output.output_file}
     """
