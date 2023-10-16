@@ -16,7 +16,8 @@ rule targets:
         learning.get_learning_variables["output_file"],
         learning.cycle_level_learning["output_folder"],
         learning.user_level_variables["output_file"],
-        learning.user_level_learning["output_folder"]
+        learning.user_level_learning["output_folder"],
+        learning.get_BMI["output_file"]
 
 rule data_clean:
     input: 
@@ -154,4 +155,14 @@ rule user_level_learning:
         output_file = directory(learning.user_level_learning["output_folder"])
     shell:"""
         python -m user_level_learning -i {input.input_variables} -k {params.input_splits} -o {output.output_file}
+    """
+
+rule get_bmi:
+    input: 
+        input_file = learning.get_BMI["input_file"],
+        input_users = learning.get_BMI["user_level_data"]
+    output:
+        output_file = learning.get_BMI["output_file"]
+    shell:"""
+        python -m quest_variables -i {input.input_file} -j {input.input_users} -o {output.output_file}
     """

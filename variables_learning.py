@@ -39,6 +39,16 @@ class Learning:
     user_level_learning_results =  "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/user_learning_results/"
     user_level_learning_number_of_k_splits =  10
 
+        ############################################################################################
+    ### For Rule 14 (get_BMI) - 
+    ### 1. The first input is the questionnaire data (This is an excel file)
+    ### 2. The second input is the output of the "user_level_variables" rule (rule 12)
+    ### 3. Specify the ouput file. Can be anywhere but the same folder as the previous rule is 
+    ###     reccommended. Note that is is a CSV file   
+        ############################################################################################"
+    get_BMI_input = "/projects/MRC-IEU/research/data/fertility_focus/ovusense/released/2022-11-30/data/uob-questionnaire/OvuSense_Cycle_Characteristics_Study-Survey-to_18NOV22_anon.xlsx"
+    get_BMI_output =  "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/BMI.csv"
+
 
 #######################################You do not need to edit aything beyond this point#######################################
     #rule 10 data
@@ -75,4 +85,13 @@ class Learning:
                     #"log": cycle_level_learning_output_log
     }
 
+    #rule 14 data
+    get_BMI_input_file = get_BMI_input
+    get_BMI_input_users =  user_level_variables_output
+    get_BMI_output_file = get_BMI_output
+    get_BMI = {"input_file":get_BMI_input_file,
+                    "user_level_data": get_BMI_input_users,
+                    "output_file":get_BMI_output_file
+                    #"log": cycle_level_learning_output_log
+    }
 learning = Learning()

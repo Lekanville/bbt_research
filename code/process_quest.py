@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 from classes.classes import Frames
 import argparse
+import tools.tools as tools
 
 parser = argparse.ArgumentParser(description='A script for initial data cleaning')
 parser.add_argument('-i','--input_file', type=str, required=True, help='The input dataset')
@@ -28,13 +29,16 @@ def process_quest(INPUT, INPUT_CYCLES, OUTPUT):
     df = Frames(INPUT).excel_df()
 
     #clean up the file
-    df.rename({"Unnamed: 0":"User ID"}, inplace = True, axis = 1)
-    df = df.iloc[2:,:]
-    df.reset_index(inplace = True, drop = True)
+    #df.rename({"Unnamed: 0":"User ID"}, inplace = True, axis = 1)
+    #df = df.iloc[2:,:]
+    #df.reset_index(inplace = True, drop = True)
 
     #drop partial duplicates
-    df["count"] = df.isnull().sum(1)
-    df_new = df.sort_values("count").drop_duplicates(subset = ["User ID"], keep='first').drop(columns = 'count')
+    #df["count"] = df.isnull().sum(1)
+    #df_new = df.sort_values("count").drop_duplicates(subset = ["User ID"], keep='first').drop(columns = 'count')
+    
+    #clean up the file  
+    df_new = tools.clean_quest(df)
 
     #rename the PCOS column
     df_new.rename({"What diagnoses were made? (tick all that apply)":"PCOS"}, axis = 1, inplace=True)

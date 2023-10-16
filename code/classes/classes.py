@@ -50,3 +50,10 @@ class Frames:
             )
         cycles = cycles.sort_values("Date_x")
         return cycles
+
+    def read_user_level_data(self):
+        INPUT_USER_LEVEL = self.df
+        user_data = pd.read_csv(
+            INPUT_USER_LEVEL, usecols = ["User", "PCOS"]
+            )
+        return user_data

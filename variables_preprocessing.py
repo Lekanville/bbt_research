@@ -70,7 +70,7 @@ class Variables:
     process_cycles_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/temp_dates_duration.csv"
 
       #############################################################################################
-    ### For Rule 7 (process_quationnaire) - 
+    ### For Rule 7 (process_questionnaire) - 
     ### 1. The first input is the questionnaire data (This is an excel file)
     ### 2. The second input is the output of the "process_cycles" rule (rule 6)
     ### 3. Specify the ouput file. Can be anywhere but the same folder as the previous rule is 
