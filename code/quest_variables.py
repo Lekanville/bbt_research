@@ -37,8 +37,11 @@ def process_quest(INPUT, INPUT_USERS, OUTPUT):
     #getting the BMI
     df_bmi = Quest_data(df_values_and_pcos).get_bmi()
 
-    #getting the Smoking variable    
+    #getting the smoking variable    
     df_smoking = Quest_data(df_values_and_pcos).get_smoking_variables()
+
+    #getting the sleep and daily activity variable
+    df_sleep_and_daily_activity = Quest_data(df_values_and_pcos).get_sleep_and_daily_activity()
 
 if __name__ == "__main__":
     args = parser.parse_args()

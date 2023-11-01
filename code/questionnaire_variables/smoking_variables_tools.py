@@ -7,8 +7,9 @@ def select_variables(df):
     x = {"Have you ever been a regular smoker":"Regular Smoker: Yes", "Unnamed: 91":"Regular Smoker: No",
          "Unnamed: 92":"Regular Smoker: Prefer not to answer"}
     df_renamed = df_process.rename(columns = x)
+    df_sorted = df_renamed.sort_values("User ID").reset_index().drop(columns = "index")
     
-    return df_renamed
+    return df_sorted
 
 def clean_smoking_age(df):
     df_to_clean = df.copy()
@@ -40,7 +41,7 @@ def combine_smoking_column(df):
         df_combined = df.copy()
         df_combined["Regular Smoker"] = ""
         
-        for i in range(len(df)):
+        for i in range(len(df_combined)):
             #Combine all
             if df_combined.loc[i, "Regular Smoker: Yes"] == "Yes":
                 df_combined.loc[i, "Regular Smoker"] = "Yes"
@@ -49,4 +50,4 @@ def combine_smoking_column(df):
             else:
                 df_combined.loc[i, "Regular Smoker"] = "Prefer not to answer"
                 
-        return df_combined[["PCOS", "Regular Smoker"]]
+        return df_combined[["User ID", "PCOS", "Regular Smoker"]]

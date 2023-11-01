@@ -46,7 +46,8 @@ class Learning:
     ### 3. Specify the ouput file. Can be anywhere but the same folder as the previous rule is 
     ###     reccommended. Note that is is a CSV file   
         ############################################################################################"
-    get_BMI_input = "/projects/MRC-IEU/research/data/fertility_focus/ovusense/released/2022-11-30/data/uob-questionnaire/OvuSense_Cycle_Characteristics_Study-Survey-to_18NOV22_anon.xlsx"
+    #get_BMI_input = "/projects/MRC-IEU/research/data/fertility_focus/ovusense/released/2022-11-30/data/uob-questionnaire/OvuSense_Cycle_Characteristics_Study-Survey-to_18NOV22_anon.xlsx"
+    get_BMI_input = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/Olalekan_OvuSense_Cycle_Characteristics_Study-Survey-to_18NOV22_anon.xlsx"
     get_BMI_output =  "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/BMI.csv"
 
 

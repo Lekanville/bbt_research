@@ -1,6 +1,7 @@
 import numpy as np
 import questionnaire_variables.bmi_tools as bmi_tools
 import questionnaire_variables.smoking_variables_tools as smk_tools
+import questionnaire_variables.sleep_and_activity_tools as slp_tools
 
 class Quest_data():
     def __init__(self, df):
@@ -50,7 +51,26 @@ class Quest_data():
         #Combine the smoking column
         df_combined = smk_tools.combine_smoking_column(df_cleaned)
 
-        print(df_combined)
+        return df_combined
 
-        return df_process
+    def get_sleep_and_daily_activity(self):
+        df = self.df
 
+        #selecting the relevant data and renaming the columnns
+        df_process = slp_tools.select_variables(df)
+
+        #Combine the sleeping 
+        df_combined_1 = slp_tools.combining_sleep(df_process)
+
+        #Combine the unintentional day sleep columns
+        df_combined_2 = slp_tools.combining_unintentional_day_sleep(df_combined_1)
+
+        #Convert hours to numeric
+        df_combined_3 = slp_tools.combining_active_time_of_day(df_combined_2)
+
+        #Imputaton for missing data and converting hours to numeric
+        df_converted = slp_tools.convert_hours(df_combined_3)
+
+        print (df_converted)
+
+        return df_converted
