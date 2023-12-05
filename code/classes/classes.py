@@ -10,11 +10,11 @@ class Frames:
     def recode_pcos(self):
         the_df = self.df
         for i in range(len(the_df)):
-            if the_df.iloc[i, 1] == "Polycystic Ovarian Syndrome (PCOS)":
-                the_df.iloc[i, 1] = 1
+            if the_df.iloc[i, 678] == "Polycystic Ovarian Syndrome (PCOS)":
+                the_df.iloc[i, 678] = 1
 
             else:
-                the_df.iloc[i, 1] = 0
+                the_df.iloc[i, 678] = 0
         return the_df
 
     def the_cycles_temp_dates_duration(self):

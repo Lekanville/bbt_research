@@ -2,6 +2,7 @@ import numpy as np
 import questionnaire_variables.bmi_tools as bmi_tools
 import questionnaire_variables.smoking_variables_tools as smk_tools
 import questionnaire_variables.sleep_and_activity_tools as slp_tools
+import questionnaire_variables.ailments_tools as ail_tools
 
 class Quest_data():
     def __init__(self, df):
@@ -11,7 +12,7 @@ class Quest_data():
         df = self.df
 
         #selecting the relevant data
-        df_process = df.iloc[:, np.r_[0, 61:90, -1]]
+        df_process = df.iloc[:, np.r_[0, 61:90, 678]]
 
         #edit wrong entries
         df_process = bmi_tools.edit_wrong_inputs(df_process)
@@ -37,6 +38,7 @@ class Quest_data():
         #imputation for missing BMIs
         df_bmi_final = bmi_tools.missing_bmi_imputation(df_bmi_with_missing_data)
 
+
         return df_bmi_final
 
     def get_smoking_variables(self):
@@ -48,7 +50,7 @@ class Quest_data():
         #cleaning the smoking data
         df_cleaned = smk_tools.clean_smoking_age(df_process)
         
-        #Combine the smoking column
+        #combine the smoking column
         df_combined = smk_tools.combine_smoking_column(df_cleaned)
 
         return df_combined
@@ -59,18 +61,37 @@ class Quest_data():
         #selecting the relevant data and renaming the columnns
         df_process = slp_tools.select_variables(df)
 
-        #Combine the sleeping 
+        #combine the sleeping 
         df_combined_1 = slp_tools.combining_sleep(df_process)
 
-        #Combine the unintentional day sleep columns
+        #combine the unintentional day sleep columns
         df_combined_2 = slp_tools.combining_unintentional_day_sleep(df_combined_1)
 
-        #Convert hours to numeric
+        #convert hours to numeric
         df_combined_3 = slp_tools.combining_active_time_of_day(df_combined_2)
 
-        #Imputaton for missing data and converting hours to numeric
+        #imputaton for missing data and converting hours to numeric
         df_converted = slp_tools.convert_hours(df_combined_3)
-
-        print (df_converted)
-
+        
         return df_converted
+    
+    def get_ailments(self):
+        df = self.df
+
+        #selecting the relevant data and renaming the columnns
+        df_process = ail_tools.select_variables(df)
+
+        #combining (Collapsing) the diabetes and HBD columns¶
+        df_combined_1 = ail_tools.combining_diabetes_hbd_columns(df_process)
+
+        #getting the other ailments
+        df_ailments_final = ail_tools.other_ailments(df_combined_1)
+
+        #combining the diabetes and HBD Columns with the Cardiometabolic column
+        df_cardiometabolic_cleaned = ail_tools.clean_cardiometabolic(df_ailments_final)
+
+        #adding the PCOS in other ailments columns to the main PCOS column (because some specidied it in 
+        #ailments and not the main PCOs column)
+        df_extra_pcos_cleaned = ail_tools.clean_wrong_pcos_values(df_cardiometabolic_cleaned)
+
+        return df_extra_pcos_cleaned

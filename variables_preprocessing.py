@@ -85,8 +85,8 @@ class Variables:
     ### temperature data from "sel_cr_2".
     ### If there is a need to add more cycles or remove some from the
     ### current set, please open code/normal_cycles_process/normal_cycles.py and add the User and
-    ### and Cycle IDs of the normal cycles to be added. You an the re-run this rule.
-    ### for subsequent processing, there is no need to re=run this rule (except if normal cycles are edited)
+    ### and Cycle IDs of the normal cycles to be added. You can the re-run this rule.
+    ### for subsequent processing, there is no need to re-run this rule (except if normal cycles are edited)
         #############################################################################################
 
         #############################################################################################

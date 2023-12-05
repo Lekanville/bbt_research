@@ -4,7 +4,7 @@ import pandas as pd
 #selecting the relevant data and renaming the columnns
 def select_variables(df):
     df_selected = df.copy()
-    df_process = df_selected.iloc[:, np.r_[0, 171:188, -1]]
+    df_process = df_selected.iloc[:, np.r_[0, 171:188, 678]]
     x = {"About how many hours sleep do you get in every 24 hours? (please include naps)":"Sleep Hours", 
          "Do you have trouble falling asleep at night or do you wake up in the middle of the night?": "Night Sleep Troubles (Never/ rarely)",
          "Unnamed: 173":"Night Sleep Troubles (Sometimes)",

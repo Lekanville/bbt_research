@@ -3,12 +3,12 @@ import pandas as pd
 
 def select_variables(df):
     df_selected = df.copy()
-    df_process = df_selected.iloc[:, np.r_[0, 90:94, -1]]
+    df_process = df_selected.iloc[:, np.r_[0, 90:94, 678]]
     x = {"Have you ever been a regular smoker":"Regular Smoker: Yes", "Unnamed: 91":"Regular Smoker: No",
          "Unnamed: 92":"Regular Smoker: Prefer not to answer"}
     df_renamed = df_process.rename(columns = x)
     df_sorted = df_renamed.sort_values("User ID").reset_index().drop(columns = "index")
-    
+     
     return df_sorted
 
 def clean_smoking_age(df):
@@ -49,5 +49,5 @@ def combine_smoking_column(df):
                 df_combined.loc[i, "Regular Smoker"] = "No"
             else:
                 df_combined.loc[i, "Regular Smoker"] = "Prefer not to answer"
-                
+
         return df_combined[["User ID", "PCOS", "Regular Smoker"]]

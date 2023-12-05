@@ -18,6 +18,7 @@ import pandas as pd
 from classes.classes import Frames
 import argparse
 import tools.tools as tools
+from questionnaire_variables.get_quest_variables import Quest_data
 
 parser = argparse.ArgumentParser(description='A script for initial data cleaning')
 parser.add_argument('-i','--input_file', type=str, required=True, help='The input dataset')
@@ -26,7 +27,7 @@ parser.add_argument('-o','--output_file', type=str, required=True, help='The out
 
 def process_quest(INPUT, INPUT_CYCLES, OUTPUT):
     #read an excel dataframe
-    df = Frames(INPUT).excel_df()
+    df_questionnaire = Frames(INPUT).excel_df()
 
     #clean up the file
     #df.rename({"Unnamed: 0":"User ID"}, inplace = True, axis = 1)
@@ -38,21 +39,33 @@ def process_quest(INPUT, INPUT_CYCLES, OUTPUT):
     #df_new = df.sort_values("count").drop_duplicates(subset = ["User ID"], keep='first').drop(columns = 'count')
     
     #clean up the file  
-    df_new = tools.clean_quest(df)
+    df_cleaned_questionnaire = tools.clean_quest(df_questionnaire)
 
     #rename the PCOS column
-    df_new.rename({"What diagnoses were made? (tick all that apply)":"PCOS"}, axis = 1, inplace=True)
+    df_cleaned_questionnaire.rename({"What diagnoses were made? (tick all that apply)":"PCOS"}, axis = 1, inplace=True)
 
-    #Select the relevant columns
-    df_new = df_new[["User ID", "PCOS"]]
+    #recode the PCOS column, gives a df of coded PCOS (0-negative, 1-positive) rows from the questionnaire
+    the_quest_df = Frames(df_cleaned_questionnaire).recode_pcos()
 
-    #recode the PCOS column, gives a df of coded PCOS (0-negative, 1-positive) rows from the questinnaire
-    the_df = Frames(df_new).recode_pcos()
+    #processing the BMI variables
+    df_bmi = Quest_data(the_quest_df).get_bmi()
+
+    #processing the smoking variables    
+    df_smoking = Quest_data(the_quest_df).get_smoking_variables()
+
+    #processing the sleep and daily activity variables
+    df_sleep_and_daily_activity = Quest_data(the_quest_df).get_sleep_and_daily_activity()
+
+    #processing the ailments variables - I must use the PCOS values from here
+    df_ailments = Quest_data(the_quest_df).get_ailments()
 
     #get the cycles processed from process cycles
     cycles = Frames(INPUT_CYCLES).the_cycles_temp_dates_duration()
 
-    #merge the questionnaire with the cycle 
+    #I need to do this later   #Select the relevant columns #Had to use df_ailments because of the updated PCOS column
+    df_new = df_ailments[["User ID", "PCOS"]]
+
+    #merge the questionnaire (df_ailments) with the cycle 
     temp_dates_duration_pcos = pd.merge(
         cycles, df_new, left_on="User ID_y", right_on="User ID", how = "left"
         ).drop(
@@ -64,7 +77,6 @@ def process_quest(INPUT, INPUT_CYCLES, OUTPUT):
             temp_dates_duration_pcos.loc[i,'PCOS'] = 2
     
     temp_dates_duration_pcos.to_csv(OUTPUT)
-
 
 if __name__ == "__main__":
     args = parser.parse_args()
