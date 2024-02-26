@@ -197,7 +197,8 @@ def missing_bmi_imputation(df):
     
     for i in range(len(df_funct)):    
         if (df_funct.loc[i, "BMI"] == ""):
-            df_funct.loc[i, "BMI"] = median_bmi
+            #df_funct.loc[i, "BMI"] = median_bmi
+            df_funct.loc[i, "BMI"] = "No response"
           
-    df_funct['BMI'] = df_funct['BMI'].apply(pd.to_numeric, errors='coerce')
+    #df_funct['BMI'] = df_funct['BMI'].apply(pd.to_numeric, errors='coerce')
     return df_funct

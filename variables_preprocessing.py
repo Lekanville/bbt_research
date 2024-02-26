@@ -73,11 +73,15 @@ class Variables:
     ### For Rule 7 (process_questionnaire) - 
     ### 1. The first input is the questionnaire data (This is an excel file)
     ### 2. The second input is the output of the "process_cycles" rule (rule 6)
-    ### 3. Specify the ouput file. Can be anywhere but the same folder as the previous rule is 
-    ###     reccommended. Note that is is a CSV file         
+    ### 3. Specify the ouput file for temperatures and duration. Can be anywhere but the same folder as the previous rule is 
+    ###     reccommended. Note that is is a CSV file
+    ### 4. Specify the ouput file for cleaned questionnaire       
         #############################################################################################
-    process_quest_input_file = "/projects/MRC-IEU/research/data/fertility_focus/ovusense/released/2022-11-30/data/uob-questionnaire/OvuSense_Cycle_Characteristics_Study-Survey-to_18NOV22_anon.xlsx"
-    process_quest_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/temp_dates_duration_pcos.csv"
+    #process_quest_input_file = "/projects/MRC-IEU/research/data/fertility_focus/ovusense/released/2022-11-30/data/uob-questionnaire/OvuSense_Cycle_Characteristics_Study-Survey-to_18NOV22_anon.xlsx"
+    #process_quest_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/temp_dates_duration_pcos.csv"
+    process_quest_input_file = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/Olalekan_OvuSense_Cycle_Characteristics_Study-Survey-to_18NOV22_anon.xlsx"
+    process_quest_temps_dur = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/temp_dates_duration_pcos.csv"
+    process_quest_cleaned = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/df_questionnaire_final.csv"
 
         #############################################################################################
     ### For Rule 8 (model_cycle) - 
@@ -167,11 +171,13 @@ class Variables:
     #rule 7 data
     process_quest_input_quest =  process_quest_input_file
     process_quest_input_cycles = process_cycles_output_file
-    process_quest_output_file = process_quest_output
+    process_quest_temps_dur_file = process_quest_temps_dur
+    process_quest_cleaned_quest_file = process_quest_cleaned
     process_quest = {
         "input_file":process_quest_input_quest,
         "input_cycles":process_quest_input_cycles,
-        "output_file":process_quest_output_file
+        "output_file_1":process_quest_temps_dur_file,
+        "output_file_2":process_quest_cleaned_quest_file
     }
     
     #rule 8 need no further processing
@@ -179,7 +185,7 @@ class Variables:
 
     #rule 9 data
     cycle_level_data_input_temps =  sel_cr_2_output_file
-    cycle_level_data_input_cycles = process_quest_output
+    cycle_level_data_input_cycles = process_quest_temps_dur
     cycle_level_data_output_file = cycle_level_data_output
     cycle_level_data = {
         "input_temps":cycle_level_data_input_temps,

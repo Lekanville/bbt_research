@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 from classes.classes import Frames
 import argparse
+from functools import reduce
 import tools.tools as tools
 from questionnaire_variables.get_quest_variables import Quest_data
 
@@ -24,8 +25,9 @@ parser = argparse.ArgumentParser(description='A script for initial data cleaning
 parser.add_argument('-i','--input_file', type=str, required=True, help='The input dataset')
 parser.add_argument('-j','--input_cycles', type=str, required=True, help='The input cycles dataset')
 parser.add_argument('-o','--output_file', type=str, required=True, help='The output file')
+parser.add_argument('-q','--output_cleaned_quest', type=str, required=True, help='The output of the cleaned questionnaire')
 
-def process_quest(INPUT, INPUT_CYCLES, OUTPUT):
+def process_quest(INPUT, INPUT_CYCLES, OUTPUT, CLEANED_QUEST):
     #read an excel dataframe
     df_questionnaire = Frames(INPUT).excel_df()
 
@@ -59,10 +61,32 @@ def process_quest(INPUT, INPUT_CYCLES, OUTPUT):
     #processing the ailments variables - I must use the PCOS values from here
     df_ailments = Quest_data(the_quest_df).get_ailments()
 
+    #processing the pregnancy related variables
+    df_pregnancy = Quest_data(the_quest_df).get_pregnants()
+
+    #processing the menstrual period related variables
+    df_menstrual = Quest_data(the_quest_df).get_menstruals()
+
+    data_frames = [
+        df_bmi[["User ID", "BMI"]], 
+        df_smoking[["User ID", "Regular Smoker"]],
+        df_sleep_and_daily_activity[["User ID", "Sleep Hours", "Night Sleep Troubles", "Unintentional Day Sleep", "When Active"]],
+        df_ailments[["User ID", "Endocrine_Problems", "Autoimmune_Problems", "Cardiometabolic_Problems"]],
+        df_pregnancy[["User ID", "Currently Pregnant", "Time before current preg", "Previous Pregancies", 
+                        "Time before one preg", "Live birth", "Baby weight (Kg)"]],
+        df_menstrual[["User ID", "Age menstration started", "Period in last 3 months",  "Acceptable?",
+                        "Regular periods", "Heavy periods", "Painful periods"]],
+        df_ailments[["User ID", "PCOS"]]
+                        ]
+
+    df_questionnaire_final = reduce(lambda left, right: pd.merge(left, right, on = "User ID", how = "outer"), data_frames)
+
+    df_questionnaire_final.to_csv(CLEANED_QUEST, index=False)
+    
     #get the cycles processed from process cycles
     cycles = Frames(INPUT_CYCLES).the_cycles_temp_dates_duration()
 
-    #I need to do this later   #Select the relevant columns #Had to use df_ailments because of the updated PCOS column
+    #I need to do this later   #Select the relevant columns #I had to use df_ailments because of the updated PCOS column
     df_new = df_ailments[["User ID", "PCOS"]]
 
     #merge the questionnaire (df_ailments) with the cycle 
@@ -78,6 +102,7 @@ def process_quest(INPUT, INPUT_CYCLES, OUTPUT):
     
     temp_dates_duration_pcos.to_csv(OUTPUT)
 
+
 if __name__ == "__main__":
     args = parser.parse_args()
-    process_quest(args.input_file, args.input_cycles, args.output_file)
+    process_quest(args.input_file, args.input_cycles, args.output_file, args.output_cleaned_quest)

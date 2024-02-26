@@ -8,16 +8,18 @@ rule targets:
     input:
         ##variables.merged_decrypted["output_file"],
         #variables.sel_cr_1["output_file"],
-        variables.sel_cr_2["output_file"],
+        #variables.sel_cr_2["output_file"],
         #variables.process_cycles["output_file"],
-        variables.process_quest["output_file"],
-        variables.cycle_level_data["model_cycle"],
-        variables.cycle_level_data["output_file"],
-        learning.get_learning_variables["output_file"],
+        #variables.process_quest["output_file"],
+        #variables.cycle_level_data["model_cycle"],
+        #variables.cycle_level_data["output_file"],
+        #learning.get_learning_variables["output_file"],
         learning.cycle_level_learning["output_folder"],
-        learning.user_level_variables["output_file"],
+        #learning.user_level_variables["output_file"],
         learning.user_level_learning["output_folder"],
-        learning.get_BMI["output_file"]
+        #learning.get_BMI["output_file"]
+        learning.quest_level_learning["output_folder"],
+        learning.user_and_quest_level_learning["output_folder"]
 
 rule data_clean:
     input: 
@@ -89,9 +91,10 @@ rule process_quest:
         input_file = variables.process_quest["input_file"],
         input_cycles = variables.process_quest["input_cycles"]
     output:
-        output_file = variables.process_quest["output_file"]
+        output_temps_dur = variables.process_quest["output_file_1"],
+        output_quest = variables.process_quest["output_file_2"]
     shell:"""
-        python -m process_quest -i '{input.input_file}' -j '{input.input_cycles}' -o {output.output_file}
+        python -m process_quest -i '{input.input_file}' -j '{input.input_cycles}' -o {output.output_temps_dur} -q {output.output_quest} 
     """
 
 rule model_cycle:
@@ -157,12 +160,34 @@ rule user_level_learning:
         python -m user_level_learning -i {input.input_variables} -k {params.input_splits} -o {output.output_file}
     """
 
-rule get_bmi:
+rule preprocess_quest:
     input: 
-        input_file = learning.get_BMI["input_file"],
-        input_users = learning.get_BMI["user_level_data"]
+        input_file = learning.preprocess_quest["input_file"]
     output:
-        output_file = learning.get_BMI["output_file"]
+        output_file = learning.preprocess_quest["output_file"]
     shell:"""
-        python -m quest_variables -i {input.input_file} -j {input.input_users} -o {output.output_file}
+        python -m quest_preprocess -i {input.input_file} -o {output.output_file}
+    """
+
+rule quest_level_learning:
+    input: 
+        input_variables = learning.quest_level_learning["input_file"]
+    params:
+        input_splits = learning.quest_level_learning["number_of_splits"]
+    output:
+        output_file = directory(learning.quest_level_learning["output_folder"])
+    shell:"""
+         python -m quest_level_learning -i {input.input_variables} -k {params.input_splits} -o {output.output_file}
+    """
+
+rule user_and_quest_level_learning:
+    input: 
+        input_variables_1 = learning.user_and_quest_level_learning["input_file_1"],
+        input_variables_2 = learning.user_and_quest_level_learning["input_file_2"]      
+    params:
+        input_splits = learning.user_and_quest_level_learning["number_of_splits"]
+    output:
+        output_file = directory(learning.user_and_quest_level_learning["output_folder"])
+    shell:"""
+         python -m user_and_quest_learning -i {input.input_variables_1} -j {input.input_variables_2} -k {params.input_splits} -o {output.output_file}
     """

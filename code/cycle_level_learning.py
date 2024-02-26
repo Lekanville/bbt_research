@@ -40,6 +40,8 @@ def cycle_level_learning(INPUT, SPLITS, OUTPUT):
     splitted_df = CustomKFold(n_splits = SPLITS, df = df, level="Cycle Level").customSplit()
     print("The splits \n", splitted_df[1])
 
+    print(splitted_df[0]["PCOS"].value_counts())
+   
     #the splitted data
     df_for_learning = splitted_df[2]
 

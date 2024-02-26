@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-#selecting the relevant data and renaming the columnns
+#Selecting the relevant data and renaming the columnns
 def select_variables(df):
     df_selected = df.copy()
     df_process = df_selected.iloc[:, np.r_[0, 171:188, 678]]
@@ -167,7 +167,8 @@ def convert_hours(df):
     median_sleep_hours = np.median(df_convert[~pd.isnull(df_convert['Sleep Hours'])]['Sleep Hours'].astype(float))
     for i in range(len(df_convert)):    
         if pd.isnull(df_convert.loc[i, "Sleep Hours"]):
-            df_convert.loc[i, "Sleep Hours"] = median_sleep_hours
+            #df_convert.loc[i, "Sleep Hours"] = median_sleep_hours
+            df_convert.loc[i, "Sleep Hours"] = "No response"
     
-    df_convert['Sleep Hours'] = df_convert['Sleep Hours'].apply(pd.to_numeric, errors='coerce')
+    #df_convert['Sleep Hours'] = df_convert['Sleep Hours'].apply(pd.to_numeric, errors='coerce')
     return df_convert

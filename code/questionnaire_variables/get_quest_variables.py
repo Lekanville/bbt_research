@@ -3,6 +3,8 @@ import questionnaire_variables.bmi_tools as bmi_tools
 import questionnaire_variables.smoking_variables_tools as smk_tools
 import questionnaire_variables.sleep_and_activity_tools as slp_tools
 import questionnaire_variables.ailments_tools as ail_tools
+import questionnaire_variables.pregnancy_tools as preg_tools
+import questionnaire_variables.menstrual_tools as menst_tools
 
 class Quest_data():
     def __init__(self, df):
@@ -29,7 +31,7 @@ class Quest_data():
         #the final unit values
         df_values_final = df_units_values.iloc[:, np.r_[0, 30:41]]
 
-        #standarize the values
+        #standardize the values (same units)
         df_unit_values = bmi_tools.get_standard_values(df_values_final)
 
         #getting the BMI
@@ -95,3 +97,31 @@ class Quest_data():
         df_extra_pcos_cleaned = ail_tools.clean_wrong_pcos_values(df_cardiometabolic_cleaned)
 
         return df_extra_pcos_cleaned
+
+    def get_pregnants(self):
+        df = self.df
+
+        #Selecting the relevant data and renaming the columnns
+        df_process = preg_tools.select_variables(df)
+
+        #Combining (collapsing) the currently pregnant columns
+        df_combined_1 = preg_tools.combining_currently_pregant_columns(df_process)
+
+        #Getting the previous pregancies
+        df_pregs_final = preg_tools.number_of_previous_pregs(df_combined_1)
+
+        #Getting the previous pregancies
+        df_with_preg = preg_tools.one_pregnancy(df_pregs_final)
+
+        return df_with_preg
+
+    def get_menstruals(self):
+        df = self.df
+
+        #Selecting the relevant data and renaming the columnns
+        df_process = menst_tools.select_variables(df)
+        
+        #Combining (collapsing) the menstrual columns
+        df_combined_1 = menst_tools.combining_menstrual_columns(df_process)
+
+        return df_combined_1
