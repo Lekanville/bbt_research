@@ -2,7 +2,7 @@
 #!/usr/bin/env python3
 
 #############################################################################################
-#The “learning_variables.py” script - this is for standardization
+#The “learning_variables.py” script 
 #The script expects the output file from the previous rule (cycle_level_data) as input and will 
 #output the features to a CSV file. After the the input is read the user level data is computed
 #from the cycle level data.
@@ -69,7 +69,7 @@ def the_user_level_variables(INPUT, OUTPUT):
         #c1_c3_path_len = path_lengths[1]
         #c2_c3_path_len = path_lengths[2]
 
-        #Average Pairwisedistances and path lengths
+        #Average Pairwise distances and path lengths
         med_pair_distances = np.median(distances)
         med_pair_lengths = np.median(path_lengths)
 
@@ -101,7 +101,7 @@ def the_user_level_variables(INPUT, OUTPUT):
         min_Data_Lengths = np.min(list(test_df["Data_Length"]))
         min_Curves_by_Data = np.min(list(test_df["Curve_by_Data"]))
         
-        #minimum cycle level features
+        #maximum cycle level features
         max_dist_to_model = np.max(list(test_df["Standard_distance"]))
         max_nadir_days = np.max(list(test_df["Standard_nadir_day"]))
         max_peak_days = np.max(list(test_df["Standard_peak_day"]))

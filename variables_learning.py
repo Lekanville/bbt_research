@@ -8,7 +8,7 @@ class Learning:
     ### For Rule 10 (get_learning_variables) - 
     ### 1. The first input is the file containing the preprocessed data - the output of 
     ### cycle_level_data (rule 9)                                                                    
-    ### 2. Specify the output file
+    ### 2. Specify the output file to save the cycle-level variables
         ############################################################################################"
     get_learning_variables_output =  "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/features_learning.csv"
     #get_learning_variables_output =  "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/features_learning_MM.csv"
@@ -27,14 +27,14 @@ class Learning:
     ### For Rule 12 (user_level_variables) - 
     ### 1. The first input is the file containing the dependent and independent variables
     ###  - the output of get_learning_variables (rule 10)                                                                    
-    ### 2. Specify the output folder to save the learning results of the user level data
+    ### 2. Specify the output file to save the user-level variables
         ############################################################################################"
     user_level_variables_output =  "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/user_level_variables.csv"
 
         ############################################################################################
     ### For Rule 13 (user_level_learning) - 
     ### 1. The first input is the file containing the dependent and independent variables of the user level data
-    ###  - the output of get_learning_variables (rule 12)                                                                    
+    ###  - the output of user_level_variables (rule 12)                                                                    
     ### 2. Specify the output folder to save the learning results of the user level learning
     ##  3. Specify the number of k-splits
         ############################################################################################"
@@ -66,8 +66,8 @@ class Learning:
     ###  - the output of get_learning_variables (rule 12) 
     ### 2. The second input is the file containing the dependent and independent variables of the questionnaire data
     ###  - the output of preprocess_quest rule (rule 14)                                                                    
-    ### 2. Specify the output folder to save the learning results of the questionnaire level learning
-    ##  3. Specify the number of k-splits
+    ### 3. Specify the output folder to save the learning results of the questionnaire level learning
+    ##  4. Specify the number of k-splits
         ############################################################################################"
     user_and_quest_level_learning_results =  "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/user_and_quest_learning_results/"
     user_and_quest_level_learning_number_of_k_splits =  10

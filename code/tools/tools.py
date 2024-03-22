@@ -79,7 +79,7 @@ def users_btw_3_and_10(cycles):
     users_10_cycles = get_users_cycles(users_less_10) #now get the the users
     return users_10_cycles
 
-#This algorithm takes outliers for standardized data
+#This algorithm takes out outliers for a normalized data
 def trimming_for_outliers(df):
     #Trimming value for peak day
     peak_day_mean = float("{0:.2f}".format(np.mean(df["Standard_peak_day"].values))) #the mean of the peak days
@@ -109,7 +109,7 @@ def trimming_for_outliers(df):
 
     return df
 
-#This algorithm takes outliers for normalized data
+#This algorithm takes out outliers for a normalized data
 def trimming_for_outliers_MM(df):
     #Trimming value for peak day
     peak_day_mean = float("{0:.2f}".format(np.mean(df["MinMax_peak_day"].values))) #the mean of the peak days

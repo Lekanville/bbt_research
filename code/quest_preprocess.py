@@ -17,7 +17,8 @@ parser.add_argument('-i','--input_file', type=str, required=True, help='The inpu
 parser.add_argument('-o','--output_file', type=str, required=True, help='The output file')
 
 def preprocess_cleaned(INPUT, OUTPUT):
-    df_quest = pd.read_csv("/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/df_questionnaire_final.csv")
+    #df_quest = pd.read_csv("/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/df_questionnaire_final.csv")
+    df_quest = pd.read_csv(INPUT)
 
     #getting and defining row and columns missingness levels
     df_missing = preprocess.get_missing(df_quest)

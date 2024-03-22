@@ -2,10 +2,10 @@
 #!/usr/bin/env python3
 
 #############################################################################################
-#The “user_learning_variables.py” script
-#The script expects the output file from the previous rule (cycle_level_data) as input and will 
-#output the features to defined folder. After the input is read the data splitted into k-folds
-#and learning with k-folds cross validation and ROC is carried ou on the data at the user level
+#The “user_and_quest_learning.py” script
+#The script reads the output of both the user_level_variables rule (rule 12) and the preprocess_quest rule (rule 14). 
+# It will combine both dataset and then perform machine learning on the combined dataset with k-folds cross validation and ROC. 
+# The results are then saved in the specified output folder. The variables and code are given below.
 #############################################################################################
 
 import numpy as np

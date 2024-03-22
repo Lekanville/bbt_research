@@ -139,8 +139,8 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     Standard_low_to_high_temp = Standard_peak_temp_actual - Standard_nadir_temp_actual
 
     #we create a dictionary of the results for each cycle
-    data = {"User":user, "Cycle":cycle, "Temps":temps, "Smooth_Temp":smooth_temps, "Initial_Cycle_Range":date_dur, 
-            "Ovulation Day":ovulation, "Date_Diff":Date_Diff, "Offset":offset, "PCOS":PCOS,
+    data = {"User":user, "Cycle":cycle, "Temps":temps, "Smooth_Temp":smooth_temps, 
+            "Ovulation Day":ovulation, "Next Cycle Difference":Date_Diff, "Offset":offset, "PCOS":PCOS,
 
             "Standard_model_cycle":Standard_model_cycle, "Standard_smooth_temps":Standard_smooth_temps, 
             "Standard_distance":Standard_distance, "Standard_path":Standard_path, 
@@ -151,7 +151,8 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
             "nadir_valid":nadir_valid, "peak_valid":peak_valid,
             "path_length":path_length, "warp_degree":warp_deg
         }
-
+    #"Cycle_Range":date_dur I took this out because it might not does not reflect neccesarily reflect the number of 
+    # data in a cycle. E.g. (user:20D10lQ18M, cycle:b852d110-de46-4e53-88b6-a36b8bbdd062)
     return data
 
 

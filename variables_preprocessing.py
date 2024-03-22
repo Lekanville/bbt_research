@@ -5,8 +5,7 @@
 class Variables:
         ############################################################################################
     ### For Rule 1 (data_clean) - 
-    ### 1. Specify the folder of the input temperatures (the temperature files are prefixed with 
-    ###     "allrecordings"                                                                      
+    ### 1. Specify the folder containing the raw temperatures (the temperature files are prefixed with "allrecordings")                                                                   
     ### 2. Define the output folder
         ############################################################################################
     data_clean_input_folder = "/projects/MRC-IEU/research/data/fertility_focus/ovusense/released/2022-11-30/data/temperature/"
@@ -19,8 +18,8 @@ class Variables:
     ### 2. Define the ouput folder. Can be anywhere but the same folder as the previous result is 
     ###     reccommended
     ### 3. The log will be created where the output folder is. You do not need to edit this. 
-    ###     If there is ever a need to run rule 2 again without the need to run rule 1, just
-    ###     delete the log file. Rule 2 will then be availabe for a re-run.                       
+    ###     If there is a need to run rule 2 again without the need to run rule 1, just
+    ###     delete the log file. Rule 2 will then be available for a re-run.                       
         #############################################################################################
     data_decrypt_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/decrypted/"
     
@@ -29,7 +28,7 @@ class Variables:
     ### For Rule 3 (merged_decrypted) - 
     ### 1. The input folder must be the same as the output of rule 2 (the data_decrypt rule)
     ### 2. Define the ouput file. Can be anywhere but the same folder as the previous rule is 
-    ###     reccommended. Note that is is a CSV file                   
+    ###     reccommended. Note that this is is a CSV file                   
         #############################################################################################
     merged_decrypted_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/merged_decrypted.csv"  
 
@@ -38,8 +37,8 @@ class Variables:
     ### 1. The input file must be the same as the output of the "merged_decrypted" rule (rule 3)
     ### 2. Define the ouput file. Can be anywhere but the same folder as the previous rule is 
     ###     reccommended. Note that is is a CSV file  
-    ### 3. Define the minimum number of true data (not NaN,34500.0 or 0.0) for row validity
-    ### 4. Define the data start point (takes out temperature data before this point)                   
+    ### 3. Define the minimum number of true data (data that is not NaN,34500.0 or 0.0) in each daily record. This is necessary for row validity
+    ### 4. Define the data start point (Nightly values before this point will be deleted)                   
         #############################################################################################
     sel_cr_1_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/sel_crt_1.csv"
     min_number_of_true_temp_values = 10
@@ -50,9 +49,9 @@ class Variables:
     ### 1. The input file must be the same as the output of the "sel_cr_1" rule (rule 4)
     ### 2. Define the ouput file. Can be anywhere but the same folder as the previous rule is 
     ###     reccommended. Note that is is a CSV file  
-    ### 3. Define the minimum number of total temperature values acrooss all cycles recorded for a user
-    ### 4. Define the minimun number of daily tempearures that must be recorded in a cycle
-    ### 5. Define the minimum number of cycles a with daily temperatures that must be recorded for a user                   
+    ### 3. Define the minimum number of total temperature values across all cycles recorded for a user
+    ### 4. Define the minimum number of daily temperatures that must be recorded in a cycle
+    ### 5. Define the minimum number of cycles that must be recorded for a user                  
         #############################################################################################
     sel_cr_2_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/sel_crt_2.csv"
     min_number_of_total_record_days = 30
@@ -62,7 +61,7 @@ class Variables:
         #############################################################################################
     ### For Rule 6 (process_cycles) - 
     ### 1. The first input is the output of the "sel_cr_2" rule (rule 5)
-    ### 2. Specify the folder of the input cycles (the cycle files are prefixed with "allusercycles"
+    ### 2. Specify the folder that contains the input cycles (the cycle files are prefixed with "allusercycles")
     ### 3. Specify the ouput file. Can be anywhere but the same folder as the previous rule is 
     ###     reccommended. Note that is is a CSV file                  
         #############################################################################################
@@ -70,7 +69,7 @@ class Variables:
     process_cycles_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/temp_dates_duration.csv"
 
       #############################################################################################
-    ### For Rule 7 (process_questionnaire) - 
+    ### For Rule 7 (process_quest) - 
     ### 1. The first input is the questionnaire data (This is an excel file)
     ### 2. The second input is the output of the "process_cycles" rule (rule 6)
     ### 3. Specify the ouput file for temperatures and duration. Can be anywhere but the same folder as the previous rule is 
@@ -96,7 +95,7 @@ class Variables:
         #############################################################################################
     ### For Rule 9 (cycle_level_data) - 
     ### 1. The first input is the temperature data set - the output of the "sel_cr_2" rule (rule 5)
-    ### 2. The second input is the cycles dataset with PCOS column - the output of the "process_quationnaire" rule (rule 7)
+    ### 2. The second input is the cycles dataset with PCOS column - the output of the "process_questionnaire" rule (rule 7)
     ### 3. The file location of the model cycle - output of rule 8 (open model_cycle.sh to check)    
     ### 4. Specify the ouput file. Can be anywhere but the same folder as the previous rule is 
     ###     reccommended. Note that is is a CSV file    

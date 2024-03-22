@@ -2,9 +2,9 @@
 #!/usr/bin/env python3
 
 #############################################################################################
-#The “user_learning_variables.py” script
-#The script expects the output file from the previous rule (cycle_level_data) as input and will 
-#output the features to defined folder. After the input is read the data splitted into k-folds
+#The “quest_level_learning.py” script
+#The script expects the output file from the previous rule (preprocess_quest) as input and will 
+#output the features to defined folder. After the input is read the data split into k-folds
 #and learning with k-folds cross validation and ROC is carried ou on the data at the user level
 #############################################################################################
 
