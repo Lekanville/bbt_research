@@ -1,6 +1,7 @@
 #################################################################
 #####Define all variables here according to the instructions#####
 #################################################################
+import os
 
 class Variables:
         ############################################################################################
@@ -61,7 +62,7 @@ class Variables:
         #############################################################################################
     ### For Rule 6 (process_cycles) - 
     ### 1. The first input is the output of the "sel_cr_2" rule (rule 5)
-    ### 2. Specify the folder that contains the input cycles (the cycle files are prefixed with "allusercycles")
+    ### 2. Specify the folder that contains the cycles (the cycle files are prefixed with "allusercycles")
     ### 3. Specify the ouput file. Can be anywhere but the same folder as the previous rule is 
     ###     reccommended. Note that is is a CSV file                  
         #############################################################################################
@@ -84,23 +85,24 @@ class Variables:
 
         #############################################################################################
     ### For Rule 8 (model_cycle) - 
-    ### The variable for this is defined in model_cycle.sh. The only variable to add is the processed
-    ### temperature data from "sel_cr_2".
-    ### If there is a need to add more cycles or remove some from the
-    ### current set, please open code/normal_cycles_process/normal_cycles.py and add the User and
-    ### and Cycle IDs of the normal cycles to be added. You can the re-run this rule.
-    ### for subsequent processing, there is no need to re-run this rule (except if normal cycles are edited)
+    ### 1. The first input is the questionnaire data (This is an excel file)
+    ### 2. The second input is the cycles data obatined from rule 6 (process_cycles) i.e. temp_dates_duration.csv
+    ### 3. The third input is the user daily temprtatures records obtained form rule 5 (sel_cr_2) i.e sel_cr_2.csv
+    ### 4. Specify the folder to save the outputs. Note that this is a file
         #############################################################################################
+    model_cycle_quest_input_file = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/Olalekan_OvuSense_Cycle_Characteristics_Study-Survey-to_18NOV22_anon.xlsx"
+    model_cycle_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/normal_cycle/model_cycle.json"
+
 
         #############################################################################################
     ### For Rule 9 (cycle_level_data) - 
     ### 1. The first input is the temperature data set - the output of the "sel_cr_2" rule (rule 5)
-    ### 2. The second input is the cycles dataset with PCOS column - the output of the "process_questionnaire" rule (rule 7)
-    ### 3. The file location of the model cycle - output of rule 8 (open model_cycle.sh to check)    
+    ### 2. The second input is the cycles dataset with PCOS column - One of the outputs of the "process_questionnaire" rule (rule 7)
+    ### 3. The location of the model cycle - output of rule 8  
     ### 4. Specify the ouput file. Can be anywhere but the same folder as the previous rule is 
     ###     reccommended. Note that is is a CSV file    
         #############################################################################################
-    model_cycle = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/model.json"
+    #model_cycle = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/model.json"
     cycle_level_data_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/features_dtw_SS.csv"
 
 
@@ -180,16 +182,26 @@ class Variables:
     }
     
     #rule 8 need no further processing
-
+    model_cycle_input_quest = model_cycle_quest_input_file
+    model_cycle_input_cycles = process_cycles_output
+    model_cycle_input_temps = sel_cr_2_output_file
+    model_cycle_output = model_cycle_output
+    model_cycle_data = {
+        "input_quest":model_cycle_input_quest,
+        "input_cycles":model_cycle_input_cycles,
+        "input_temps":model_cycle_input_temps,
+        "output_file":model_cycle_output
+    }
 
     #rule 9 data
     cycle_level_data_input_temps =  sel_cr_2_output_file
     cycle_level_data_input_cycles = process_quest_temps_dur
+    the_model_cycle = model_cycle_output
     cycle_level_data_output_file = cycle_level_data_output
     cycle_level_data = {
         "input_temps":cycle_level_data_input_temps,
         "input_cycles":cycle_level_data_input_cycles,
-        "model_cycle": model_cycle,
+        "model_cycle": the_model_cycle,
         "output_file":cycle_level_data_output_file
     }
 

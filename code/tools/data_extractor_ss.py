@@ -47,8 +47,8 @@ def actual_day(group_temp, user, cycle):
         temperature_vals.loc[i, "Missing_length"] = first_day_after_miss - last_day_before_miss - 1
 
     try:    
-        missed = temperature_vals[temperature_vals["Missing_length"] > 10].head(1).index.values[0] #if there are more than 10 missing days
-        temperature_vals = temperature_vals.iloc[0:missed] #drop all recordings after 10 missing days
+        missed = temperature_vals[temperature_vals["Missing_length"] > 10].head(1).index.values[0] #more than 10 missing days
+        temperature_vals = temperature_vals.iloc[0:missed] #drop all recordings after 10-day miss
     except IndexError:
         temperature_vals = temperature_vals #otherwise keep all temperatures with the missing dates
 
@@ -60,7 +60,7 @@ def actual_day(group_temp, user, cycle):
 
 
 def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
-    model_cycle = tools.load_model_cycle(model_cycle)['model']#the model cycle 
+    model_cycle = tools.load_model_cycle(model_cycle)['model_cycle']#the model cycle 
     keep = user_cycles[user_cycles.index == cycle]
     date_dur = keep["Data_Dur"].values[0]#get the data duration of the cycle
     offset = int(keep["Offset"])#get the offset of the cycle
@@ -108,21 +108,7 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     warp_deg = tools.warp_degree(path_y_axis, path_x_axis)
 
     #Computing nadir and peak using DTW and standardized temperature values
-    Standard_nadir_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == 4]
-    Standard_nadir_temp = min([Standard_smooth_temps[mapy] for mapx, mapy in  Standard_path if mapx == 4])
-    Standard_nadir_position = [i for i, e in enumerate(Standard_nadir_temp_list) if e == Standard_nadir_temp][-1]
-
-    Standard_nadir_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == 4]
-    Standard_nadir_day = Standard_nadir_day_list[Standard_nadir_position][1]
-    Standard_nadir_temp_actual = smooth_temps[Standard_nadir_day]
-
-    Standard_peak_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == 15]
-    Standard_peak_temp = max([Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == 15])
-    Standard_peak_position = [i for i, e in enumerate(Standard_peak_temp_list) if e == Standard_peak_temp][0]
-
-    Standard_peak_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == 15]
-    Standard_peak_day = Standard_peak_day_list[Standard_peak_position][1]
-    Standard_peak_temp_actual = smooth_temps[Standard_peak_day]
+    Standard_nadir_day, Standard_nadir_temp, Standard_nadir_temp_actual, Standard_peak_day, Standard_peak_temp, Standard_peak_temp_actual = tools.get_nadirs_and_peaks(Standard_smooth_temps, Standard_path, smooth_temps, model_cycle)
 
     #Nadir and Peak Validity Check
     temp_diffs = [smooth_temps[i+1] - smooth_temps[i] for i in range(len(smooth_temps)-1)]
@@ -151,8 +137,7 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
             "nadir_valid":nadir_valid, "peak_valid":peak_valid,
             "path_length":path_length, "warp_degree":warp_deg
         }
-    #"Cycle_Range":date_dur I took this out because it might not does not reflect neccesarily reflect the number of 
-    # data in a cycle. E.g. (user:20D10lQ18M, cycle:b852d110-de46-4e53-88b6-a36b8bbdd062)
+
     return data
 
 

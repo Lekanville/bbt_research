@@ -1,5 +1,5 @@
-#The first aspect of this scrip is obatined from https://github.com/fpetitjean/DBA/blob/master/DBA.py
-#The second aspect is written to save the aeraged model
+#The first aspect of this script is obatined from https://github.com/fpetitjean/DBA/blob/master/DBA.py
+#The second aspect is written to save the averaged model
 
 from __future__ import division
 import numpy as np

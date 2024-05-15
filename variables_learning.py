@@ -43,8 +43,10 @@ class Learning:
 
         ############################################################################################
     ### For Rule 14 (preprocess_quest rule) - 
-    ### 1. The first input is the cleaned questionnaire data - from Rule 7 (process_questionnaire) i.e process_quest_cleaned
-    ### 2. Specify the output file. This should be a CSV file
+    ### 1. The first input is the cleaned questionnaire data - from Rule 7 (process_questionnaire) i.e df_questionnaire_final.csv
+    ### 2. The second input is the output of the model cycle from rule 8 (model_cycle) i.e model_cycle.json
+    ### 3. The third input is the output of the cycle level features from Rule 9 (cycle_level_data) i.e. features_dtw_SS.csv
+    ### 4. Specify the output file. This should be a CSV file
         ############################################################################################"
     #get_BMI_input = "/projects/MRC-IEU/research/data/fertility_focus/ovusense/released/2022-11-30/data/uob-questionnaire/OvuSense_Cycle_Characteristics_Study-Survey-to_18NOV22_anon.xlsx"
     quest_preprocessed_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/df_questionnaire_ml.csv"
@@ -109,10 +111,14 @@ class Learning:
     }
 
     #rule 14 data
-    quest_preprocess_input = variables.process_quest["output_file_2"]
+    quest_preprocess_quest = variables.process_quest["output_file_2"]
+    quest_preprocess_model = variables.model_cycle_data["output_file"]
+    quest_preprocess_temps = variables.cycle_level_data["output_file"]
     quest_preprocessed_output = quest_preprocessed_output
-    preprocess_quest = {"input_file":quest_preprocess_input,
-                    "output_file":quest_preprocessed_output
+    preprocess_quest = {"input_quest":quest_preprocess_quest,
+                        "model_cycle":quest_preprocess_model,
+                        "input_temps":quest_preprocess_temps,
+                        "output_file":quest_preprocessed_output
     }
 
     #rule 15 data

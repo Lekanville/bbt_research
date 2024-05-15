@@ -34,8 +34,6 @@ def users_cycles_and_temps(INPUT_TEMPS, INPUT_CYCLES, MODEL_CYCLE):
     #read the temperatures dataset (from sel_crt_2)
     logger.info("loading the temperatures dataset")
     temp_sort = Frames(INPUT_TEMPS).read_temp() #read the temperatures
-    temp_sort["Mean_Temp"] = temp_sort["Mean_Temp"].apply(lambda x: int(x)) #convert data to integer type
-    temp_final = temp_sort[(temp_sort["Mean_Temp"] > 35000) & (temp_sort["Mean_Temp"] < 40000)] #ensures that true values are selected
     logger.info("temperatures dataset loaded")
 
     #read the cycles and questionnaire  dataset (from process_quest)
@@ -45,7 +43,8 @@ def users_cycles_and_temps(INPUT_TEMPS, INPUT_CYCLES, MODEL_CYCLE):
 
     #Group the temperatures by the user IDs and cycle IDs
     logger.info("grouping the temperatures dataset by User and Cycle IDs")   
-    group_temp = temp_final.groupby(["User ID", "Cycle ID"])
+    #group_temp = temp_final.groupby(["User ID", "Cycle ID"])
+    group_temp = temp_sort.groupby(["User ID", "Cycle ID"])
     logger.info("temperatures dataset grouped by User and Cycle IDs")   
 
     #Group the cycles by user IDs and cycle IDs
@@ -105,7 +104,15 @@ def compute_features(users):
 def save_data(extracted, OUTPUT):
     data = [i for ls in extracted for i in ls]
     df = pd.DataFrame(data)
+
+    #trim out outliers at the nadirs and peaks
+    logger.info("trimming out outliers at the nadirs and peaks")
+    df= tools.trimming_for_outliers(df)
+    logger.info("nadir and peak outliers trimmed out")
+
+    logger.info("saving the cycle level data")
     df.to_csv(OUTPUT)
+    logger.info("process complete")  
 
 if __name__ == "__main__":
     args = parser.parse_args() #get the args variables
@@ -115,9 +122,8 @@ if __name__ == "__main__":
     extracted = compute_features(users=users) #get the cycle level data
     logger.info("cycle level data computed")  
 
-    logger.info("saving the cycle level data")  
     save_data(extracted, args.output_file) #save the data
-    logger.info("process complete")  
+
 
 
 

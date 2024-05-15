@@ -46,6 +46,13 @@ def load_model_cycle(model_cycle):
     
     return(model_cycles)
 
+def save_model_cycle(model_cycle, OUTPUT):
+    try:
+        with open(OUTPUT, "w") as f:
+            json.dump(model_cycle, f)
+    except Exception as ex:
+        print("Error while saving object:", ex)
+
 #Plotting layout
 def fig_layout():
     return plt.figure()
@@ -103,7 +110,7 @@ def trimming_for_outliers(df):
                     (df["Standard_low_to_high_temp"] > 0) & #Trim out cycles with a negative high and low temp.
                                                                 #difference. This is peculiar of cycles that a near 
                                                                 #flat temperature reading at the nadir and peak positions
-                    ~(df["Date_Diff"].isnull())& #remove last cycles most of which are largely incomplete
+                    ~(df["Next Cycle Difference"].isnull())& #remove last cycles most of which are largely incomplete
                     (df["Data_Length"] < 101) #remove cycles with more than 100 days
                    ]
 
@@ -170,3 +177,50 @@ def clean_quest(df):
     
     df_new.reset_index(inplace = True, drop = True)
     return df_new
+
+def get_nadirs_and_peaks(std_temps_list, path, smooth_temps, model_cycle):
+    Standard_smooth_temps = std_temps_list
+    Standard_path = path
+    
+    #position of the least temperature on the model
+    mod_least_pos = [i for i, e in enumerate(model_cycle) if e == min(model_cycle)].pop()
+    
+    #position of the highest temperature on the model    
+    mod_high_pos = [i for i, e in enumerate(model_cycle) if e == max(model_cycle)].pop()
+    #Computing nadir and peak using DTW and standardized temperature values
+    
+    #The minimum temperature warped to the least of the model
+    Standard_nadir_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == mod_least_pos] 
+    Standard_nadir_temp = min(Standard_nadir_temp_list)
+    
+    #The position of the nadir among the warped leasts
+    Standard_nadir_position = [i for i, e in enumerate(Standard_nadir_temp_list) if e == Standard_nadir_temp][-1]
+    
+    #All positions warped to the least of the model
+    Standard_nadir_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == mod_least_pos]
+    
+    #Actual position of the nadir on cycle
+    Standard_nadir_day = Standard_nadir_day_list[Standard_nadir_position][1]
+    
+    #The actual nadir smooth temperature
+    Standard_nadir_temp_actual = smooth_temps[Standard_nadir_day]
+    
+    #The maximum temperature warped to the highest of the model
+    Standard_peak_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == mod_high_pos]
+    Standard_peak_temp = max(Standard_peak_temp_list)
+    
+    #The position of the peak among the warped highests    
+    Standard_peak_position = [i for i, e in enumerate(Standard_peak_temp_list) if e == Standard_peak_temp][0]
+
+    #All positions warped to the highest of the model
+    Standard_peak_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == mod_high_pos]
+    
+    #Actual position of the peak on cycle   
+    Standard_peak_day = Standard_peak_day_list[Standard_peak_position][1]
+    
+    #The actual peak smooth temperature   
+    Standard_peak_temp_actual = smooth_temps[Standard_peak_day]
+
+    results = (Standard_nadir_day, Standard_nadir_temp, Standard_nadir_temp_actual, 
+               Standard_peak_day, Standard_peak_temp, Standard_peak_temp_actual)
+    return (results)

@@ -86,7 +86,8 @@ def process_quest(INPUT, INPUT_CYCLES, OUTPUT, CLEANED_QUEST):
     #get the cycles processed from process cycles
     cycles = Frames(INPUT_CYCLES).the_cycles_temp_dates_duration()
 
-    #I need to do this later   #Select the relevant columns #I had to use df_ailments because of the updated PCOS column
+    #Select the relevant columns #I had to use df_ailments because the PCOS column here have included those
+    #who indicated the disease in the right PCOS column
     df_new = df_ailments[["User ID", "PCOS"]]
 
     #merge the questionnaire (df_ailments) with the cycle 

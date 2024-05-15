@@ -25,8 +25,9 @@ parser.add_argument('-o', '--output_file', type=str, required=True, help= 'The o
 
 def the_variables(INPUT, OUTPUT):
     temperatures = pd.read_csv(INPUT) #read the data
-    temperatures_trimmed_out = tools.trimming_for_outliers(temperatures) #trim out outliers at the nadirs and peaks
-    temperatures_pcos = temperatures_trimmed_out[temperatures_trimmed_out["PCOS"] != 2] #select users with known PCOS values
+    #temperatures_trimmed_out = tools.trimming_for_outliers(temperatures) #trim out outliers at the nadirs and peaks
+    #temperatures_pcos = temperatures_trimmed_out[temperatures_trimmed_out["PCOS"] != 2] #select users with known PCOS values
+    temperatures_pcos = temperatures[temperatures["PCOS"] != 2] #select users with known PCOS values
 
     dep_and_indep = temperatures_pcos[[
     "User", "Cycle", "Standard_smooth_temps", "Standard_distance", "Standard_nadir_day", "Standard_peak_day", 

@@ -44,8 +44,9 @@ def pre_processing(df):
     df_use = df.copy()
     
     #Taking out oulier values
-    df_pro = df_use[~(df_use["BMI"] == "188.1") & ~(df_use["Baby weight (Kg)"] == "28.1")]
-    
+    #df_pro = df_use[~(df_use["BMI"] == "188.1") & ~(df_use["Baby weight (Kg)"] == "28.1")]
+    df_pro = df_use
+
     median_BMI = np.median(df_pro[df_pro["BMI"] != "No response"]["BMI"].astype(float))
     median_sleep_hrs = np.median(df_pro[df_pro["Sleep Hours"] != "No response"]["Sleep Hours"].astype(float))
     median_baby_weight = np.median(df_pro[df_pro["Baby weight (Kg)"] != "No response"]["Baby weight (Kg)"].astype(float))
@@ -53,6 +54,7 @@ def pre_processing(df):
                   #(df_use["Age menstration started"] != "I have not had periods")]["Age menstration started"].astype(float))
     #max_menst_age = np.max(df_use[(df_use["Age menstration started"] != "I don't remember") & 
                   #(df_use["Age menstration started"] != "I have not had periods")]["Age menstration started"].astype(float))
+
 
     for i in range(len(df_pro)):
         #imputation for BMI

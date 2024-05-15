@@ -99,11 +99,13 @@ rule process_quest:
 
 rule model_cycle:
     input:
-        input_file = "model_cycle.sh"
+        input_quest = variables.model_cycle_data["input_quest"],
+        input_cycles = variables.model_cycle_data["input_cycles"],
+        input_temps = variables.model_cycle_data["input_temps"],
     output:
-        output_file = variables.cycle_level_data["model_cycle"]
+        output_file = variables.model_cycle_data["output_file"]
     shell:"""
-        sh '{input.input_file}'
+        python -m model_cycle_new -i '{input.input_quest}' -j '{input.input_cycles}' -k {input.input_temps} -o {output.output_file}
     """
 
 rule cycle_level_data:
@@ -162,11 +164,13 @@ rule user_level_learning:
 
 rule preprocess_quest:
     input: 
-        input_file = learning.preprocess_quest["input_file"]
+        input_quest = learning.preprocess_quest["input_quest"],
+        model_cycle = learning.preprocess_quest["model_cycle"],
+        input_temps = learning.preprocess_quest["input_temps"]
     output:
         output_file = learning.preprocess_quest["output_file"]
     shell:"""
-        python -m quest_preprocess -i {input.input_file} -o {output.output_file}
+        python -m quest_preprocess -i {input.input_quest} -j {input.model_cycle} -k {input.input_temps} -o {output.output_file}
     """
 
 rule quest_level_learning:
