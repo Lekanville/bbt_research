@@ -534,9 +534,10 @@ def plot_refs_cycles_standardized(data):
         std_smooth_temps = cycle_df["Standard_smooth_temps"].to_list()
         #cycle_pos = cycle_df["Cycle Position"].to_list()
         cycle_pos = cycle_df["Normal_Positions"].to_list()
-        end = cycle_df["Date_Diff"].unique()[0]
+        #end = cycle_df["Date_Diff"].unique()[0]
         
         #ax_1[j].plot(cycle_pos, std_mean_temps, "o", label = "Temperature")
+        #ax_1[j].plot(cycle_pos, std_smooth_temps, "o", label = "Temperature")
         ax_1[j].plot(cycle_pos, std_smooth_temps, "r", label = "Smooth", alpha=0.4)
         
         #missing = cycle_df[cycle_df["Missing_Day"] == True]
@@ -574,15 +575,18 @@ def plot_refs_cycles_averaged(data):
 
         pos_actual = range(len(avg_temps))
 
-        normalized = MinMaxScaler()
-        pos_normalized = normalized.fit_transform(np.array(pos_actual).reshape(-1, 1))
-        pos_normalized  = [i for j in pos_normalized for i in j]
+        #normalized = MinMaxScaler()
+        #pos_normalized = normalized.fit_transform(np.array(pos_actual).reshape(-1, 1))
+        #pos_normalized  = [i for j in pos_normalized for i in j]
+        pos_normalized = avg["normal_positions"]
 
         #cycle_pos = cycle_df["Normal_Positions"].to_list()
         #end = cycle_df["Date_Diff"].unique()[0]
         
         #ax_1[j].plot(cycle_pos, std_mean_temps, "o", label = "Temperature")
         #ax_1[j].plot(cycle_pos, std_smooth_temps, "r", label = "Smooth", alpha=0.4)
+
+        #ax_1[j].plot(pos_normalized, avg_temps, "o", label = "Data Points")
         ax_1[j].plot(pos_normalized, avg_temps, "r", label = "Smooth", alpha=0.4)
         #missing = cycle_df[cycle_df["Missing_Day"] == True]
         #if len(missing) > 0:
@@ -613,15 +617,17 @@ def plot_refs_cycles_final(data):
     model_cycle = model_data["model_cycle"]
     pos_actual = range(len(model_cycle))
     
-    normalized = MinMaxScaler()
-    pos_normalized = normalized.fit_transform(np.array(pos_actual).reshape(-1, 1))
-    pos_normalized  = [i for j in pos_normalized for i in j]
+    #normalized = MinMaxScaler()
+    #pos_normalized = normalized.fit_transform(np.array(pos_actual).reshape(-1, 1))
+    #pos_normalized  = [i for j in pos_normalized for i in j]
+    pos_normalized = model_data["normal_positions"]
 
     #cycle_pos = cycle_df["Normal_Positions"].to_list()
     #end = cycle_df["Date_Diff"].unique()[0]
     
     #ax_1[j].plot(cycle_pos, std_mean_temps, "o", label = "Temperature")
     #ax_1[j].plot(cycle_pos, std_smooth_temps, "r", label = "Smooth", alpha=0.4)
+    #ax.plot(pos_normalized, model_cycle, "o", label = "Data Points")
     ax.plot(pos_normalized, model_cycle, "r", label = "Reference Cycle", alpha=0.4)
     #missing = cycle_df[cycle_df["Missing_Day"] == True]
     #if len(missing) > 0:

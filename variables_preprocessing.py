@@ -86,9 +86,9 @@ class Variables:
         #############################################################################################
     ### For Rule 8 (model_cycle) - 
     ### 1. The first input is the questionnaire data (This is an excel file)
-    ### 2. The second input is the cycles data obatined from rule 6 (process_cycles) i.e. temp_dates_duration.csv
-    ### 3. The third input is the user daily temprtatures records obtained form rule 5 (sel_cr_2) i.e sel_cr_2.csv
-    ### 4. Specify the folder to save the outputs. Note that this is a file
+    ### 2. The second input is the cycles data obtained from rule 6 (process_cycles) i.e. temp_dates_duration.csv
+    ### 3. The third input is the user daily tempertatures records obtained form rule 5 (sel_cr_2) i.e sel_cr_2.csv
+    ### 4. Specify the file to save the outputs. Note that this is a file
         #############################################################################################
     model_cycle_quest_input_file = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/Olalekan_OvuSense_Cycle_Characteristics_Study-Survey-to_18NOV22_anon.xlsx"
     model_cycle_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/normal_cycle/model_cycle.json"

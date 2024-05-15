@@ -38,8 +38,9 @@ def get_model(QUEST, TEMPS_DUR, TEMPS, OUTPUT):
     selected_models_users = process_temps.select_models_questionnaire(quest_data, temp_df) #the users in which the models cycles were taken from
     model_temps, model_lenghts = process_temps.model_temps(selected_models_users, temp_df) #the model cycles with interpolated temperatures for missing days
     model_cycles = process_temps.filtering(temps_dur_df, model_lenghts) #the final model cycles
-    all_model_temps = process_temps.intepolate_offsets(model_temps, temps_dur_df, model_cycles,  OUTPUT_FOLDER) #Temperature data of the model cycles
-    averaged_ref = process_temps.ref_DBA_averaging(all_model_temps,  OUTPUT_FOLDER)
+    all_model_temps, all_model_padded = process_temps.intepolate_offsets(model_temps, temps_dur_df, model_cycles,  OUTPUT_FOLDER) #Temperature data of the model cycles
+    #averaged_ref = process_temps.ref_DBA_averaging(all_model_temps,  OUTPUT_FOLDER)
+    averaged_ref = process_temps.ref_DBA_averaging(all_model_padded,  OUTPUT_FOLDER)
 
     
     #final_out_file = os.path.join(OUTPUT, "model_cycle.json")
