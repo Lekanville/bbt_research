@@ -31,6 +31,7 @@ import matplotlib.pyplot as plt
 from scipy.signal import savgol_filter
 import argparse
 from classes.classes import Frames
+pd.options.mode.chained_assignment = None
 
 parser = argparse.ArgumentParser(description= "A script to process the cycles")
 parser.add_argument('-i', '--input_cycles', type=str, required=True, help= 'The folder of the input cycles datasets')
@@ -129,6 +130,31 @@ def process_cycles(INPUT_CYCLES, INPUT_TEMPS, OUTPUT):
             df.loc[i, "Offset"] =  int(str(x - y).split(" ")[0])
         return df
 
+    def cycle_completeness(df):
+        logger.info("================Cycle filtering started==================")
+        logger.info(f"There are {len(df)} initial cycles")
+
+        df_non_last = df[(df["Date_Diff"] != 'Indeterminate Last Cycle')]
+        logger.info(f"There are {len(df_non_last)} non last cycles")
+        df_non_last.reset_index(inplace = True, drop = True)
+
+        for i in range(len(df_non_last)):
+            df_non_last.loc[i, "Date_Diff"] = int(df_non_last.loc[i, "Date_Diff"])
+            if (df_non_last.loc[i, "Date_Diff"] !=  0.0):
+                df_non_last.loc[i, "cycle_compl"] = (df_non_last.loc[i, "Data_Dur"])/(df_non_last.loc[i, "Date_Diff"])
+            else:
+                df_non_last.loc[i, "cycle_compl"] = 0
+            # if df_non_last.loc[i, "Date_Diff"] < 1.0:
+            #     logger.info(df_non_last.loc[i, "Cycle ID"])
+
+        df_non_neg_offset = df_non_last[df_non_last["Offset"] >= 0]
+        logger.info(f"There are {len(df_non_neg_offset)} cycles with non negative offsets")
+
+        df_complete = df_non_neg_offset[df_non_neg_offset["cycle_compl"] >= 0.4]
+        logger.info(f"There are {len(df_complete)} cycles with 60 percent and greater completeness")
+        logger.info("================Cycle filtering ended==================")
+        return df_complete
+
     #routine to compute the duration of the temperature recordings
     def data_duration(df_temp, df_offsets):
         temp_dates = df_temp.groupby("Cycle ID").agg(Min_date = ("Date", "min"), Max_date = ("Date", "max")).reset_index()
@@ -139,7 +165,8 @@ def process_cycles(INPUT_CYCLES, INPUT_TEMPS, OUTPUT):
             #temp_dates["Data_Dur"] = temp_dates["Data_Dur"].apply(lambda x: int(x.split(" ")[0]))
             #temp_dates["Data_Dur"] = temp_dates["Data_Dur"].apply(lambda x: str(x).split(" ")[0])
 
-        dates_duration = pd.merge(temp_dates, df_offsets, left_on= "Cycle ID", right_on="Cycle ID", how = "inner")
+        df_cycles_full = pd.merge(temp_dates, df_offsets, left_on= "Cycle ID", right_on="Cycle ID", how = "inner")
+        dates_duration = cycle_completeness(df_cycles_full)
 
         return dates_duration
 

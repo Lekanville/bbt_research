@@ -69,15 +69,16 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     keep = user_cycles[user_cycles.index == cycle]
     date_dur = keep["Data_Dur"].values[0]#get the data duration of the cycle
     offset = int(keep["Offset"])#get the offset of the cycle
-    Date_D = keep["Date_Diff"].values#get the cycle length of the cycle
+    #Date_D = keep["Date_Diff"].values#get the cycle length of the cycle
+    Date_Diff = keep["Date_Diff"].values[0]
     #ovul = user_cycles[user_cycles.index == cycle.lower()]["Ovulation Day"]#get the ovulation date of the cycle
     ovul = user_cycles[user_cycles.index == cycle]["Ovulation Day"]#get the ovulation date of the cycle
     PCOS = keep["PCOS"].values[0]
 
-    if Date_D == "Indeterminate Last Cycle":
-        Date_Diff = ""#the last cycle
-    else:
-        Date_Diff = int(Date_D) #all cycles asides the last cycle    
+    # if Date_D == "Indeterminate Last Cycle":
+    #     Date_Diff = ""#the last cycle
+    # else:
+    #     Date_Diff = int(Date_D) #all cycles asides the last cycle    
 
     if str(ovul.values) == "[nan]":
         ovulation = ""#ovulation dates not found
@@ -98,28 +99,34 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     #model_cycle = load_model_cyle()['model']#the model cycle    
     smooth_temps = list(cycle_temp["Smooth_Temp"])#the smooth cycle temperatures
 
-    if  (Date_Diff != ""):
+    #if  (Date_Diff != ""):
 
-        if (offset < 0) & ((offset + len(smooth_temps)) < 0):
-            head = 0
-            tail = 0
-            smooth_temps_before = []
+    # if (offset < 0) & ((offset + len(smooth_temps)) < 0):
+    #     head = 0
+    #     tail = 0
+    #     smooth_temps_before = []
 
-        elif (offset < 0) & ((offset + len(smooth_temps)) > 0):
-            #tail = Date_Diff - (offset + len(smooth_temps))
-            smooth_temps_before = smooth_temps[abs(offset):]
-            head = 0
-            tail = Date_Diff - len(smooth_temps_before)
+    # elif (offset < 0) & ((offset + len(smooth_temps)) > 0):
+    #     #tail = Date_Diff - (offset + len(smooth_temps))
+    #     smooth_temps_before = smooth_temps[abs(offset):]
+    #     head = 0
+    #     tail = Date_Diff - len(smooth_temps_before)
 
-        elif (offset >= 0):
-            head = offset
-            tail = Date_Diff - (offset + len(smooth_temps))
-            smooth_temps_before = smooth_temps
+    # elif (offset >= 0):
+    head = offset
+    tail = Date_Diff - (offset + len(smooth_temps))
+    smooth_temps_before = smooth_temps
+    print(smooth_temps_before)
 
-        head_data = [np.nan]*head
-        tail_data = [np.nan]*tail     
+    head_data = [np.nan]*head
+    tail_data = [np.nan]*tail
+    print ("head: ", head)
+    print("head_data", head_data)
+    print ("tail: ", tail)
+    print("tail_data", tail_data)
 
-        smooth_temps_after = head_data + smooth_temps_before + tail_data #add head and tail missing records to the data
+    smooth_temps_after = head_data + smooth_temps_before + tail_data #add head and tail missing records to the data
+    print(smooth_temps_after)
 
         # if (offset >= 0) & (smooth_temps_after != Date_Diff):
         #     if len(smooth_temps_after) != Date_Diff :
@@ -136,8 +143,8 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
         #         print ("Smooth Temps before:", smooth_temps_before)
 
         
-    else:
-         smooth_temps_after =  smooth_temps
+    # else:
+    #      smooth_temps_after =  smooth_temps
     
     Expanded_smooth_temps = tools.get_expanded_values(smooth_temps_after)
 

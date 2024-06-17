@@ -182,7 +182,7 @@ def get_nadirs_and_peaks(std_temps_list, path, smooth_temps, model_cycle, cycle)
 
     Standard_smooth_temps = std_temps_list
     Standard_path = path
-
+    
     #The positions of the non NaN values on the cycle
     first = np.where(~np.isnan(Standard_smooth_temps))[0][0]
     last = np.where(~np.isnan(Standard_smooth_temps))[0][-1]
@@ -213,7 +213,7 @@ def get_nadirs_and_peaks(std_temps_list, path, smooth_temps, model_cycle, cycle)
     #Actual position of the nadir on cycle
     Standard_nadir_day = Standard_nadir_day_list[Standard_nadir_position][1]
     #The actual nadir smooth temperature
-    Standard_nadir_temp_actual = Standard_smooth_temps[Standard_nadir_day]
+    Standard_nadir_temp_actual = smooth_temps[Standard_nadir_day]
     
     #The maximum temperature warped to the highest of the model
     #the maximum value warped to the maximum of model
@@ -227,7 +227,7 @@ def get_nadirs_and_peaks(std_temps_list, path, smooth_temps, model_cycle, cycle)
     #Actual position of the peak on cycle 
     Standard_peak_day = Standard_peak_day_list[Standard_peak_position][1]
     #The actual peak smooth temperature  
-    Standard_peak_temp_actual = Standard_smooth_temps[Standard_peak_day]
+    Standard_peak_temp_actual = smooth_temps[Standard_peak_day]
 
     #position of the least temperature on the model
     #model_least_position = [i for i, e in enumerate(model_cycle) if e == min(model_cycle)].pop()
