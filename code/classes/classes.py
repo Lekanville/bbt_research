@@ -46,7 +46,8 @@ class Frames:
         temperatures = pd.concat(chunk_temperatures)
         temperatures["User ID"] = temperatures["prime"].apply(lambda x: x.split("_")[0])
         temp_sort = temperatures.sort_values(["Date", "Time"]).reset_index(drop = True)
-        temp_sort["Cycle ID"] = temp_sort["Cycle ID"].apply(lambda x: x.lower())
+        #temp_sort["Cycle ID"] = temp_sort["Cycle ID"].apply(lambda x: x.lower())
+        temp_sort["Cycle ID"] = temp_sort["Cycle ID"]
         
         temp_sort["Mean_Temp"] = temp_sort["Mean_Temp"].apply(lambda x: int(x)) #convert data to integer type
         temp_sort_final = temp_sort[(temp_sort["Mean_Temp"] > 35000) & (temp_sort["Mean_Temp"] < 40000)] #ensures that true values are selected

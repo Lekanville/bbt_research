@@ -65,7 +65,8 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     date_dur = keep["Data_Dur"].values[0]#get the data duration of the cycle
     offset = int(keep["Offset"])#get the offset of the cycle
     Date_D = keep["Date_Diff"].values#get the cycle length of the cycle
-    ovul = user_cycles[user_cycles.index == cycle.lower()]["Ovulation Day"]#get the ovulation date of the cycle
+    #ovul = user_cycles[user_cycles.index == cycle.lower()]["Ovulation Day"]#get the ovulation date of the cycle
+    ovul = user_cycles[user_cycles.index == cycle]["Ovulation Day"]#get the ovulation date of the cycle
     PCOS = keep["PCOS"].values[0]
 
     if Date_D == "Indeterminate Last Cycle":

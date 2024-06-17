@@ -12,7 +12,8 @@ OUT_FILE = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results
 temperatures = pd.read_csv(IN_FILE, usecols=["prime","Cycle ID","Start Time","Mean_Temp","Date","Time"])
 temperatures["User ID"] = temperatures["prime"].apply(lambda x: x.split("_")[0])
 temp_sort = temperatures.sort_values("Date").reset_index(drop = True)
-temp_sort["Cycle ID"] = temp_sort["Cycle ID"].apply(lambda x: x.lower())
+#temp_sort["Cycle ID"] = temp_sort["Cycle ID"].apply(lambda x: x.lower())
+temp_sort["Cycle ID"] = temp_sort["Cycle ID"]
 temp_sort["Mean_Temp"] = temp_sort["Mean_Temp"].apply(lambda x: int(x))
 temp_final = temp_sort[(temp_sort["Mean_Temp"] > 35000) & (temp_sort["Mean_Temp"] < 40000)]
 logger.info("Temperatures dataset loaded and sorted by date")
@@ -60,9 +61,12 @@ def plot_cycles():
                 a = inc[k].pop(0)
                 b = inc[k].pop(0)
 
-                offset = int(usr[usr.index == c.lower()]["Offset"])
-                Date_Diff = int(usr[usr.index == c.lower()]["Date_Diff"])
-                ovul = usr[usr.index == c.lower()]["Ovulation Day"]
+                #offset = int(usr[usr.index == c.lower()]["Offset"])
+                offset = int(usr[usr.index == c]["Offset"])
+                #Date_Diff = int(usr[usr.index == c.lower()]["Date_Diff"])
+                Date_Diff = int(usr[usr.index == c]["Date_Diff"])
+                #ovul = usr[usr.index == c.lower()]["Ovulation Day"]
+                ovul = usr[usr.index == c]["Ovulation Day"]
 
                 if str(ovul.values) != "[nan]":
                     ovulation = int(ovul)
@@ -96,9 +100,12 @@ def plot_cycles():
                 a = inc[k].pop(0)
                 b = inc[k].pop(0)
 
-                offset = int(usr[usr.index == c.lower()]["Offset"])
-                Date_Diff = int(usr[usr.index == c.lower()]["Date_Diff"])
-                ovul = usr[usr.index == c.lower()]["Ovulation Day"]
+                #offset = int(usr[usr.index == c.lower()]["Offset"])
+                offset = int(usr[usr.index == c]["Offset"])
+                #Date_Diff = int(usr[usr.index == c.lower()]["Date_Diff"])
+                Date_Diff = int(usr[usr.index == c]["Date_Diff"])
+                #ovul = usr[usr.index == c.()]["Ovulation Day"]
+                ovul = usr[usr.index == c]["Ovulation Day"]
 
                 if str(ovul.values) != "[nan]":
                     ovulation = int(ovul)

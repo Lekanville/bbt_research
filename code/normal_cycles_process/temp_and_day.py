@@ -190,7 +190,7 @@ def filtering(temps_dur, lenghts):
     return length_of_data        
 
 
-def intepolate_offsets(temps_model, temps_dur, cycles_models, output):
+def interpolate_offsets(temps_model, temps_dur, cycles_models, output):
     temps_model.rename({"key_0":"Date"}, axis = 1, inplace=True)
     temps_model["Date"] = pd.to_datetime(temps_model["Date"])
     all_model_temps = pd.DataFrame()
@@ -269,7 +269,7 @@ def intepolate_offsets(temps_model, temps_dur, cycles_models, output):
         Normal_Positions_df = pd.DataFrame(Normal_Positions, columns=["Normal_Positions"])
         cycle_df = pd.concat([cycle_df, Normal_Positions_df], axis = 1)
 
-        #Interpolate to have even number of points in each model cycle
+        #Interpolate to have equal number of points in each model cycle
         user = cycle_df["User ID"].unique()[0]
         cycle = cycle_df["Cycle ID"].unique()[0]
         Normal_Positions = cycle_df["Normal_Positions"]       
@@ -296,7 +296,7 @@ def intepolate_offsets(temps_model, temps_dur, cycles_models, output):
 def ref_DBA_averaging(all_model_temps, output):
     users = list(all_model_temps["User ID"].unique())
     individual_avarages = []
-    normal_positions = np.linspace(0,1,51)
+    #normal_positions = np.linspace(0,1,51)
 
 
     for user in users:
@@ -310,8 +310,8 @@ def ref_DBA_averaging(all_model_temps, output):
             cycle_temps = np.array(cycle_temps)
             user_cycles_temps.append(cycle_temps)
             
-        #user_temps = np.array(user_cycles_temps, dtype=object)
-        user_temps = np.array(user_cycles_temps)
+        user_temps = np.array(user_cycles_temps, dtype=object)
+        #user_temps = np.array(user_cycles_temps)
 
         if len(user_temps) > 1:
             user_averaged = DBA.performDBA(user_temps)
@@ -319,7 +319,8 @@ def ref_DBA_averaging(all_model_temps, output):
         else:
             user_averaged = [i for j in user_temps for i in j]
 
-        normal_positions = list(normal_positions)
+        normal_positions = list(np.linspace(0,1,len(user_averaged)))
+
         user_avg = {"User":user, "user_averaged":user_averaged, "normal_positions":normal_positions}
         individual_avarages.append(user_avg)
 
@@ -331,13 +332,20 @@ def ref_DBA_averaging(all_model_temps, output):
         avg_temps = avg["user_averaged"]
         to_average.append(np.array(avg_temps))
     
-    #to_average_final =  np.array(to_average,  dtype=object)
-    to_average_final =  np.array(to_average)
+    to_average_final =  np.array(to_average,  dtype=object)
+    #to_average_final =  np.array(to_average)
 
     model_cycle = DBA.performDBA(to_average_final)
     #print(model_cycle)
-    normal_positions = list(normal_positions)
-    model_cycle = {"model_cycle":list(model_cycle), "normal_positions":normal_positions}
+    Initial_Positions = list(np.linspace(0,1,len(model_cycle))) #normalized initial positions
+    #model_cycle = {"model_cycle":list(model_cycle), "normal_positions":normal_positions}
+
+    #Selecting 51 positions along the model cycle
+    to_pad = (np.linspace(0,1,51)) #positions to interpolate
+    model_cycle_interpolated = np.interp(to_pad, Initial_Positions, model_cycle)
+
+
+    model_cycle = {"model_cycle":list(model_cycle_interpolated), "normal_positions":list(to_pad)}
 
     return (model_cycle)
 

@@ -537,7 +537,7 @@ def plot_refs_cycles_standardized(data):
         #end = cycle_df["Date_Diff"].unique()[0]
         
         #ax_1[j].plot(cycle_pos, std_mean_temps, "o", label = "Temperature")
-        #ax_1[j].plot(cycle_pos, std_smooth_temps, "o", label = "Temperature")
+        ax_1[j].plot(cycle_pos, std_smooth_temps, "o", label = "Temperature")
         ax_1[j].plot(cycle_pos, std_smooth_temps, "r", label = "Smooth", alpha=0.4)
         
         #missing = cycle_df[cycle_df["Missing_Day"] == True]
@@ -586,7 +586,7 @@ def plot_refs_cycles_averaged(data):
         #ax_1[j].plot(cycle_pos, std_mean_temps, "o", label = "Temperature")
         #ax_1[j].plot(cycle_pos, std_smooth_temps, "r", label = "Smooth", alpha=0.4)
 
-        #ax_1[j].plot(pos_normalized, avg_temps, "o", label = "Data Points")
+        ax_1[j].plot(pos_normalized, avg_temps, "o", label = "Data Points")
         ax_1[j].plot(pos_normalized, avg_temps, "r", label = "Smooth", alpha=0.4)
         #missing = cycle_df[cycle_df["Missing_Day"] == True]
         #if len(missing) > 0:
@@ -627,7 +627,7 @@ def plot_refs_cycles_final(data):
     
     #ax_1[j].plot(cycle_pos, std_mean_temps, "o", label = "Temperature")
     #ax_1[j].plot(cycle_pos, std_smooth_temps, "r", label = "Smooth", alpha=0.4)
-    #ax.plot(pos_normalized, model_cycle, "o", label = "Data Points")
+    ax.plot(pos_normalized, model_cycle, "o", label = "Data Points")
     ax.plot(pos_normalized, model_cycle, "r", label = "Reference Cycle", alpha=0.4)
     #missing = cycle_df[cycle_df["Missing_Day"] == True]
     #if len(missing) > 0:

@@ -178,49 +178,185 @@ def clean_quest(df):
     df_new.reset_index(inplace = True, drop = True)
     return df_new
 
-def get_nadirs_and_peaks(std_temps_list, path, smooth_temps, model_cycle):
+def get_nadirs_and_peaks(std_temps_list, path, smooth_temps, model_cycle, cycle):
+
     Standard_smooth_temps = std_temps_list
     Standard_path = path
-    
-    #position of the least temperature on the model
-    mod_least_pos = [i for i, e in enumerate(model_cycle) if e == min(model_cycle)].pop()
-    
-    #position of the highest temperature on the model    
-    mod_high_pos = [i for i, e in enumerate(model_cycle) if e == max(model_cycle)].pop()
+
+    #The positions of the non NaN values on the cycle
+    first = np.where(~np.isnan(Standard_smooth_temps))[0][0]
+    last = np.where(~np.isnan(Standard_smooth_temps))[0][-1]
+
+    #Corresponding positions of the non NaN values on the model
+    model_cycle_part = model_cycle[first:last+1]
+
+    #The maximum and minimum positions of the model in retropect to the cycle
+    #The position of the least on the partial model cycle
+    model_least_position_on_partial = np.where(np.array(model_cycle_part) == min(model_cycle_part))[0][-1]
+    #The position of the least on the enite model cycle
+    model_least_position = np.where(np.array(model_cycle) == min(model_cycle_part))[0][-1]
+
+    #The other half of the model starting from the position of the least of the partial model cycle
+    model_cycle_part_other_half = model_cycle_part[model_least_position_on_partial:]
+    #The maximum of the model in rretropect to the partiial model cycle and the cycle to be warped
+    model_max_position = np.where(np.array(model_cycle) == max(model_cycle_part_other_half))[0][0]
+
     #Computing nadir and peak using DTW and standardized temperature values
-    
     #The minimum temperature warped to the least of the model
-    Standard_nadir_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == mod_least_pos] 
+    Standard_nadir_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == model_least_position ] 
     Standard_nadir_temp = min(Standard_nadir_temp_list)
-    
     #The position of the nadir among the warped leasts
     Standard_nadir_position = [i for i, e in enumerate(Standard_nadir_temp_list) if e == Standard_nadir_temp][-1]
-    
+
     #All positions warped to the least of the model
-    Standard_nadir_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == mod_least_pos]
-    
+    Standard_nadir_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == model_least_position]
     #Actual position of the nadir on cycle
     Standard_nadir_day = Standard_nadir_day_list[Standard_nadir_position][1]
-    
     #The actual nadir smooth temperature
-    Standard_nadir_temp_actual = smooth_temps[Standard_nadir_day]
+    Standard_nadir_temp_actual = Standard_smooth_temps[Standard_nadir_day]
     
     #The maximum temperature warped to the highest of the model
-    Standard_peak_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == mod_high_pos]
-    Standard_peak_temp = max(Standard_peak_temp_list)
-    
-    #The position of the peak among the warped highests    
+    #the maximum value warped to the maximum of model
+    Standard_peak_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == model_max_position] #All values warped to the maximum of model
+    Standard_peak_temp = max(Standard_peak_temp_list) #the maximum value warped to the maximum of model
+    #The position of the peak among the warped highests 
     Standard_peak_position = [i for i, e in enumerate(Standard_peak_temp_list) if e == Standard_peak_temp][0]
 
     #All positions warped to the highest of the model
-    Standard_peak_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == mod_high_pos]
+    Standard_peak_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == model_max_position]
+    #Actual position of the peak on cycle 
+    Standard_peak_day = Standard_peak_day_list[Standard_peak_position][1]
+    #The actual peak smooth temperature  
+    Standard_peak_temp_actual = Standard_smooth_temps[Standard_peak_day]
+
+    #position of the least temperature on the model
+    #model_least_position = [i for i, e in enumerate(model_cycle) if e == min(model_cycle)].pop()
+    
+    #position of the highest temperature on the model    
+    #model_max_position = [i for i, e in enumerate(model_cycle) if e == max(model_cycle)].pop()
+
+
+    #Computing nadir and peak using DTW and standardized temperature values
+    
+    #The minimum temperature warped to the least of the model
+    #Standard_nadir_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == model_least_position] 
+    #Standard_nadir_temp = min(Standard_nadir_temp_list)
+    
+    #The position of the nadir among the warped leasts
+    #Standard_nadir_position = [i for i, e in enumerate(Standard_nadir_temp_list) if e == Standard_nadir_temp][-1]
+    
+    #All positions warped to the least of the model
+    #Standard_nadir_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == model_least_position]
+    
+    #Actual position of the nadir on cycle
+    #Standard_nadir_day = Standard_nadir_day_list[Standard_nadir_position][1]
+    
+    #The actual nadir smooth temperature
+    #Standard_nadir_temp_actual = smooth_temps[Standard_nadir_day]
+    
+    #The maximum temperature warped to the highest of the model
+    #Standard_peak_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == model_max_position] #All values warped to the maximum of model
+    #Standard_peak_temp = max(Standard_peak_temp_list) #the maximum value warped to the maximum of model
+    #The position of the peak among the warped highests 
+    #    
+    # try:
+    #     Standard_peak_position = [i for i, e in enumerate(Standard_peak_temp_list) if e == Standard_peak_temp][0] #position of the maximum 
+    # except IndexError :
+    #     print ("*************************************")
+    #     print (cycle)
+    #     print (smooth_temps)
+    #All positions warped to the highest of the model
+    #Standard_peak_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == model_max_position] #Position of the maximum warps
     
     #Actual position of the peak on cycle   
-    Standard_peak_day = Standard_peak_day_list[Standard_peak_position][1]
+    #Standard_peak_day = Standard_peak_day_list[Standard_peak_position][1]
     
     #The actual peak smooth temperature   
-    Standard_peak_temp_actual = smooth_temps[Standard_peak_day]
+    #Standard_peak_temp_actual = smooth_temps[Standard_peak_day]
+
+    if str(Standard_peak_temp_actual) == "nan":
+        print ("Cycle: ", cycle)
+        print ("Temps: ", smooth_temps)
 
     results = (Standard_nadir_day, Standard_nadir_temp, Standard_nadir_temp_actual, 
                Standard_peak_day, Standard_peak_temp, Standard_peak_temp_actual)
     return (results)
+
+
+def other_dtw_values(best_path, paths_values, cycle_max_pos):
+    # Note: with_diff means that the computation is done between the maximum and minimum of multiple warps 
+    # at the tail ends
+    
+    least = max([x for x in best_path if x[1] == 0])
+    maximum = min([x for x in best_path if x[1] == cycle_max_pos])
+    # print (least, maximum)
+    
+    
+    # This gets the difference in dtw positions between the first and last one-on-one maps between the model 
+    # and the cycle
+    for i, j in enumerate(best_path):
+        #print (j)
+        if j == least:
+            index_least = i
+        if j == maximum:
+            index_max = i
+            
+    pos_count_with_diff = (index_max - index_least)/cycle_max_pos
+    ## print("The index after the initial multiple warps: ", index_least)
+    ## print("The index before the last multiple warps: ", index_max)
+    # print("The difference tail warp positions: ", diff)        
+    
+    
+    ## This is to test the equation for the length of the line
+    ## I feel this will be needed but Louise feels it isnt
+    curr_path = best_path[index_least:index_max+1]
+    y_axis = [i[0] for i in curr_path]
+    x_axis = [i[1] for i in curr_path]
+    path_length_with_diff = (length_of_line(y_axis, x_axis))/cycle_max_pos
+    ## print("The difference tail warp positions using curve equation: ", curve_diff)
+    
+    
+    least_path = [least[0]+1, least[1]+1]
+    maximum_path = [maximum[0]+1, maximum[1]+1]
+
+    
+    # This gets the difference in dtw costs between the first and last one-on-one maps between the model 
+    # and the cycle
+    least_path_x = least_path[0]
+    least_path_y = least_path[1]
+    maximum_path_x = maximum_path[0]
+    maximum_path_y = maximum_path[1]
+
+    least_cost = paths_values[least_path_x, least_path_y]
+    max_cost = paths_values[maximum_path_x, maximum_path_y]
+    cost_with_diff = (max_cost - least_cost)/cycle_max_pos
+    ## print([least_path_x, least_path_y], [maximum_path_x, maximum_path_y])
+    ## print(least_cost, max_cost)
+    
+    # print("The difference tail warp costs: ", cost_diff)
+    
+    return (pos_count_with_diff, path_length_with_diff, cost_with_diff)
+
+
+
+def get_expanded_values(smooth_temps):
+    len_values = len(smooth_temps)
+    x = np.linspace(0,1,len_values)
+    to_interp = np.linspace(0,1,51)
+    
+    first = np.where(~np.isnan(smooth_temps))[0][0]
+    last = np.where(~np.isnan(smooth_temps))[0][-1]
+    
+    x_val_first = x[first]
+    x_val_last = x[last]
+    
+    to_interp_index_first = np.where(to_interp>=x_val_first)[0][0]
+    to_interp_index_last = np.where(to_interp<=x_val_last)[0][-1]
+    
+    interpedSeq = list(np.interp(to_interp[to_interp_index_first:to_interp_index_last+1], x[first:last+1], smooth_temps[first:last+1]))
+    
+    first_part = list([np.nan]*(to_interp_index_first))
+    last_part = list([np.nan]*(len(to_interp) - (to_interp_index_last + 1)))
+    
+    final = first_part + interpedSeq + last_part
+    return (final)

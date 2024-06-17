@@ -52,7 +52,8 @@ def process_cycles(INPUT_CYCLES, INPUT_TEMPS, OUTPUT):
 
     logger.info("Datasets merged")
     cycles_sort = df.sort_values("Date").reset_index(drop = True)
-    cycles_sort["Cycle ID"] = cycles_sort["Cycle ID"].apply(lambda x: x.lower())
+    #cycles_sort["Cycle ID"] = cycles_sort["Cycle ID"].apply(lambda x: x.())
+    cycles_sort["Cycle ID"] = cycles_sort["Cycle ID"]
     logger.info("Cycles dataset loaded and sorted by date")
 
     #get cleaned temperatures from the workflow
@@ -134,9 +135,9 @@ def process_cycles(INPUT_CYCLES, INPUT_TEMPS, OUTPUT):
         temp_dates["Min_date"], temp_dates["Max_date"] = pd.to_datetime(temp_dates["Min_date"]), pd.to_datetime(temp_dates["Max_date"])
         
         for i in range(len(temp_dates)):
-            temp_dates.loc[i, "Data_Dur"] = (str(temp_dates.loc[i, "Max_date"] - temp_dates.loc[i, "Min_date"]))
+            temp_dates.loc[i, "Data_Dur"] = int(str(temp_dates.loc[i, "Max_date"] - temp_dates.loc[i, "Min_date"]).split(" ")[0]) + 1
             #temp_dates["Data_Dur"] = temp_dates["Data_Dur"].apply(lambda x: int(x.split(" ")[0]))
-            temp_dates["Data_Dur"] = temp_dates["Data_Dur"].apply(lambda x: str(x).split(" ")[0])
+            #temp_dates["Data_Dur"] = temp_dates["Data_Dur"].apply(lambda x: str(x).split(" ")[0])
 
         dates_duration = pd.merge(temp_dates, df_offsets, left_on= "Cycle ID", right_on="Cycle ID", how = "inner")
 

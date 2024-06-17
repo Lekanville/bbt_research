@@ -97,7 +97,7 @@ class Variables:
         #############################################################################################
     ### For Rule 9 (cycle_level_data) - 
     ### 1. The first input is the temperature data set - the output of the "sel_cr_2" rule (rule 5)
-    ### 2. The second input is the cycles dataset with PCOS column - One of the outputs of the "process_questionnaire" rule (rule 7)
+    ### 2. The second input is the cycles dataset with PCOS column - One of the outputs of the "process_questionnaire (temp_dates_duration_pcos.csv)" rule (rule 7)
     ### 3. The location of the model cycle - output of rule 8  
     ### 4. Specify the ouput file. Can be anywhere but the same folder as the previous rule is 
     ###     reccommended. Note that is is a CSV file    
