@@ -116,17 +116,17 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     head = offset
     tail = Date_Diff - (offset + len(smooth_temps))
     smooth_temps_before = smooth_temps
-    print(smooth_temps_before)
+    # print(smooth_temps_before)
 
     head_data = [np.nan]*head
     tail_data = [np.nan]*tail
-    print ("head: ", head)
-    print("head_data", head_data)
-    print ("tail: ", tail)
-    print("tail_data", tail_data)
+    # print ("head: ", head)
+    # print("head_data", head_data)
+    # print ("tail: ", tail)
+    # print("tail_data", tail_data)
 
     smooth_temps_after = head_data + smooth_temps_before + tail_data #add head and tail missing records to the data
-    print(smooth_temps_after)
+    # print(smooth_temps_after)
 
         # if (offset >= 0) & (smooth_temps_after != Date_Diff):
         #     if len(smooth_temps_after) != Date_Diff :
@@ -147,6 +147,7 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     #      smooth_temps_after =  smooth_temps
     
     Expanded_smooth_temps = tools.get_expanded_values(smooth_temps_after)
+    # print(Expanded_smooth_temps)
 
     #standardizing the smooth values    
     scalerStandard = StandardScaler()
@@ -182,15 +183,24 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
         d, Standard_path_values, Standard_path = dtw_m.warping_paths(np.array(Standard_model_cycle), np.array(Standard_smooth_temps), return_optimal_warping_path=True)
         Standard_distance = "{0:.2f}".format(d)
 
-    cycle_max_pos = len(Standard_smooth_temps) - 1
+    if len(np.where(~(np.isnan(Standard_smooth_temps)))[0]) > 0 :
+        cycle_least_pos = np.where(~(np.isnan(Standard_smooth_temps)))[0][0]
+        cycle_max_pos = np.where(~(np.isnan(Standard_smooth_temps)))[0][-1]
 
-    #Getting the length of warping line and warping amount
-    path_x_axis = [x[0] for x in Standard_path]
-    path_y_axis = [x[1] for x in Standard_path]
-    initial_path_length = tools.length_of_line(path_y_axis, path_x_axis)
-    pos_count_with_diff, path_length_with_diff, cost_with_diff = tools.other_dtw_values(Standard_path, Standard_path_values, cycle_max_pos)
-    #warp_deg = tools.warp_degree(path_y_axis, path_x_axis) Louise said we should remove this
+        #Getting the length of warping line and warping amount
+        path_x_axis = [x[0] for x in Standard_path]
+        path_y_axis = [x[1] for x in Standard_path]
+        initial_path_length = tools.length_of_line(path_y_axis, path_x_axis)
+        pos_count_with_diff, path_length_with_diff, cost_with_diff = tools.other_dtw_values(
+            Standard_path, Standard_path_values, cycle_least_pos, cycle_max_pos
+            )
+        #warp_deg = tools.warp_degree(path_y_axis, path_x_axis) Louise said we should remove this
 
+    else:
+        initial_path_length = np.nan
+        pos_count_with_diff = np.nan
+        path_length_with_diff = np.nan
+        cost_with_diff = np.nan
 
     # print("Cycle ID", cycle)
     # print("Smooth Temps", smooth_temps)
@@ -210,19 +220,24 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
         )
 
     #Nadir and Peak Validity Check
-    temp_diffs = [smooth_temps[i+1] - smooth_temps[i] for i in range(len(smooth_temps)-1)]
-    lower_curve_list = temp_diffs[:Standard_nadir_day]
-    top_curve_list = temp_diffs[Standard_peak_day:]
+    if (~(np.isnan(Standard_nadir_day)) & ~(np.isnan(Standard_peak_day))):
+        temp_diffs = [smooth_temps[i+1] - smooth_temps[i] for i in range(len(smooth_temps)-1)]
+        lower_curve_list = temp_diffs[:Standard_nadir_day]
+        top_curve_list = temp_diffs[Standard_peak_day:]
 
-    nadir_valid = any(i < 0 for i in lower_curve_list)
-    peak_valid = any(i < 0 for i in top_curve_list)
+        nadir_valid = any(i < 0 for i in lower_curve_list)
+        peak_valid = any(i < 0 for i in top_curve_list)
 
-    #Time from nadir to peak using Standard Scaling
-    Standard_nadir_to_peak = Standard_peak_day - Standard_nadir_day
+        #Time from nadir to peak using Standard Scaling
+        Standard_nadir_to_peak = Standard_peak_day - Standard_nadir_day
 
-    #Difference between lowest and highest temperature using Standard Scaling
-    Standard_low_to_high_temp = Standard_peak_temp_actual - Standard_nadir_temp_actual
-
+        #Difference between lowest and highest temperature using Standard Scaling
+        Standard_low_to_high_temp = Standard_peak_temp_actual - Standard_nadir_temp_actual
+    else:
+        nadir_valid = np.nan
+        peak_valid = np.nan
+        Standard_nadir_to_peak = np.nan
+        Standard_low_to_high_temp = np.nan
     #we create a dictionary of the results for each cycle
     data = {"User":user, "Cycle":cycle, "Temps":temps, "Smooth_Temp":smooth_temps, "Smooth_Temp_with_NAs": smooth_temps_after,
             "Ovulation Day":ovulation, "Next Cycle Difference":Date_Diff, "Offset":offset, "PCOS":PCOS,

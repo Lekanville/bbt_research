@@ -9,6 +9,7 @@
 #and the cycle lengths (and related data) are then comupted
 #############################################################################################
 
+import os
 import numpy as np
 import pandas as pd
 from loguru import logger
@@ -74,7 +75,6 @@ def independent_variables(user):
         actual_temp_vals = extract.actual_day(group_temp, user, cycle)
         days = {"Days":list(actual_temp_vals.index)}
 
-        ##
         if len(days["Days"]) > 9: #This has to be done because removing missing days will reduce some cycle lengths
             missing_days = list(actual_temp_vals[actual_temp_vals["Missing_Day"] == True]["Mean_Temp"].index)
             missing_days_temps = list(actual_temp_vals[actual_temp_vals["Missing_Day"] == True]["Mean_Temp"])
@@ -104,6 +104,11 @@ def compute_features(users):
 def save_data(extracted, OUTPUT):
     data = [i for ls in extracted for i in ls]
     df = pd.DataFrame(data)
+
+    #Save intermediate data
+    folder= "/".join(OUTPUT.split("/")[0:-1])
+    interm_df = os.path.join(folder, "features_dtw_SS_interm.csv")
+    df.to_csv(interm_df)
 
     #trim out outliers at the nadirs and peaks
     logger.info("trimming out outliers at the nadirs and peaks")

@@ -1,6 +1,8 @@
 import json
 import numpy as np
 import pandas as pd
+from loguru import logger
+pd.options.mode.chained_assignment = None
 
 #My generic algorithm for getting all users in a multi-index
 def get_users(grouped_data):
@@ -88,6 +90,15 @@ def users_btw_3_and_10(cycles):
 
 #This algorithm takes out outliers for a normalized data
 def trimming_for_outliers(df):
+    logger.info("================Cycle filtering using derived features started==================")
+    counts = dict(df["PCOS"].value_counts())
+    logger.info(f"Total cycle length before trimmimg: {counts}")
+
+    #1. nan Nadir days
+    df = df[~(pd.isnull(df["Standard_nadir_day"]))] #Trim out cycles with nadirs null nadirs. This is typical of long cycles lenghts without much 
+    counts = dict(df["PCOS"].value_counts())   #temperature records
+    logger.info(f"The length after cleaning out null nadirs: {counts}")
+
     #Trimming value for peak day
     peak_day_mean = float("{0:.2f}".format(np.mean(df["Standard_peak_day"].values))) #the mean of the peak days
     peak_day_std = float("{0:.2f}".format(np.std(df["Standard_peak_day"].values))) #the standard deviation of the peak days
@@ -99,21 +110,73 @@ def trimming_for_outliers(df):
     nadir_temp_trim_left = nadir_temp_mean-(3*nadir_temp_std) #trim nadir temps upto 3 times std before the mean
     nadir_temp_trim_right = nadir_temp_mean+(3*nadir_temp_std) #trim nadir temps upto 3 times std after the mean
 
-    df = df[(df["Standard_nadir_day"] <= 50) & #Trim out cycles with nadirs greater than 50 
-                    (df["Standard_peak_day"] <= peak_day_trim) & #Trim out cycles with peaks greater than trim 
-                    (df["Standard_nadir_day"] != df["Standard_peak_day"]) & #Trim out cycles with nadirs 
-                                                                                    #equalling peaks. This is peculiar
-                                                                                    #of cycles that are basically 
-                                                                                    #descends
-                    (df["Standard_nadir_temp_actual"] > nadir_temp_trim_left) &
-                    (df["Standard_nadir_temp_actual"] < nadir_temp_trim_right) &
-                    (df["Standard_low_to_high_temp"] > 0) & #Trim out cycles with a negative high and low temp.
-                                                                #difference. This is peculiar of cycles that a near 
-                                                                #flat temperature reading at the nadir and peak positions
-                    ~(df["Next Cycle Difference"].isnull())& #remove last cycles most of which are largely incomplete
-                    (df["Data_Length"] < 101) #remove cycles with more than 100 days
-                   ]
+    #Trimming value for Cycle length
+    mean_length = float("{0:.2f}".format(np.mean(df["Data_Length"].values))) #mean of the data length
+    std_length = float("{0:.2f}".format(np.std(df["Data_Length"].values))) #std of the data length
+    length_trim_left = mean_length-(3*std_length)
+    length_trim_right = mean_length+(3*std_length)
 
+    
+    #cycles with more than 9 data records
+    #first convert the days to a proper list
+    # df["Days"] = df["Days"].apply(lambda x: list(map(int, (x.replace("[", "").replace("]", "").split(","))))) 
+    # df["Len_Days"] = df["Days"].apply(lambda x: len(x))
+    # df = df[df["Len_Days"] > 9]
+    # counts = dict(df["PCOS"].value_counts())
+    # logger(f"The length after cleaning out cycles with lengths less than 10: {counts}")
+
+    #2. Nadirs more than 50 - same
+    # df = df[(df["Standard_nadir_day"] <= 50)] #Trim out cycles with nadirs greater than 50
+    # counts = dict(df["PCOS"].value_counts())
+    # logger.info(f"The length after cleaning out cycles with nadirs greater than 50: {counts}")
+    
+    #3. Upper outlier peaks days - same
+    # df = df[(df["Standard_peak_day"] <= peak_day_trim)] #Trim out cycles with peaks greater than trim 
+    # counts = dict(df["PCOS"].value_counts())
+    # logger.info(f"The length after cleaning out upper oulier peaks: {counts}")
+
+    #4. Nadirs equalling peaks
+    df = df[(df["Standard_nadir_day"] != df["Standard_peak_day"])] #Trim out cycles with nadirs equalling peaks. This is peculiar
+    counts = dict(df["PCOS"].value_counts())        #of cycles that are basically descends
+    logger.info(f"The length after cleaning out cycles having nadirs equalling peaks: {counts}")       
+
+    #5. Lower outlier nadir temps
+    # df = df[(df["Standard_nadir_temp_actual"] > nadir_temp_trim_left)]
+    # counts = dict(df["PCOS"].value_counts())
+    # logger.info(f"The length after cleaning out lower outlier nadir temps: {counts}")
+
+    #6. Upper outlier nadir temps
+    # df = df[(df["Standard_nadir_temp_actual"] < nadir_temp_trim_right)]
+    # counts = dict(df["PCOS"].value_counts())
+    # logger.info(f"The length after cleaning out upper outlier nadir temps: {counts}")
+
+    #7. Negative high to low temperatures
+    # df = df[(df["Standard_low_to_high_temp"] > 0)] #Trim out cycles with a negative high and low temp. difference. This is peculiar of 
+    # counts = dict(df["PCOS"].value_counts()) #cycles that a near flat temperature reading at the nadir and peak positions
+    # logger.info(f"The length after cleaning out negative high and low temp: {counts}")
+
+
+    #8. Negative high to low Difference in Nadir and Peak Days
+    df = df[(df["Standard_nadir_to_peak"] > 0)] #Trim out cycles with a negative high and low temp. difference. This is peculiar of 
+    counts = dict(df["PCOS"].value_counts()) #cycles that a near flat temperature reading at the nadir and peak positions
+    logger.info(f"The length after cleaning out negative Difference in Nadir and Peak Days: {counts}")
+
+    #9. Non last cycles
+    # df = df[~(df["Next Cycle Difference"].isnull())] #remove last cycles most of which are largely incomplete
+    # counts = dict(df["PCOS"].value_counts())
+    # logger.info(f"The non last cycles: {counts}") 
+
+    #10. Data lenghts more than 100
+    # df = df[(df["Data_Length"] < 101)] #remove cycles with more than 100 days
+    # counts = dict(df["PCOS"].value_counts())
+    # logger.info(f"The length after cleaning data lengths that are more than 100: {counts}")
+    
+    #11.
+    df = df[(df["Data_Length"] >= length_trim_left) & (df["Data_Length"] <= length_trim_right)] #Trim out cycles lenght outliers. 
+    counts = dict(df["PCOS"].value_counts())
+    logger.info(f"The length after cleaning out cycles with outlier data lengths: {counts}")
+
+    logger.info("================Cycle filtering using derived features ended==================")
     return df
 
 #This algorithm takes out outliers for a normalized data
@@ -182,112 +245,123 @@ def get_nadirs_and_peaks(std_temps_list, path, smooth_temps, model_cycle, cycle)
 
     Standard_smooth_temps = std_temps_list
     Standard_path = path
-    
-    #The positions of the non NaN values on the cycle
-    first = np.where(~np.isnan(Standard_smooth_temps))[0][0]
-    last = np.where(~np.isnan(Standard_smooth_temps))[0][-1]
 
-    #Corresponding positions of the non NaN values on the model
-    model_cycle_part = model_cycle[first:last+1]
+    if len(np.where(~(np.isnan(Standard_smooth_temps)))[0]) > 0 :
 
-    #The maximum and minimum positions of the model in retropect to the cycle
-    #The position of the least on the partial model cycle
-    model_least_position_on_partial = np.where(np.array(model_cycle_part) == min(model_cycle_part))[0][-1]
-    #The position of the least on the enite model cycle
-    model_least_position = np.where(np.array(model_cycle) == min(model_cycle_part))[0][-1]
+        #The positions of the non NaN values on the cycle
+        first = np.where(~np.isnan(Standard_smooth_temps))[0][0]
+        last = np.where(~np.isnan(Standard_smooth_temps))[0][-1]
 
-    #The other half of the model starting from the position of the least of the partial model cycle
-    model_cycle_part_other_half = model_cycle_part[model_least_position_on_partial:]
-    #The maximum of the model in rretropect to the partiial model cycle and the cycle to be warped
-    model_max_position = np.where(np.array(model_cycle) == max(model_cycle_part_other_half))[0][0]
+        #Corresponding positions of the non NaN values on the model
+        model_cycle_part = model_cycle[first:last+1]
 
-    #Computing nadir and peak using DTW and standardized temperature values
-    #The minimum temperature warped to the least of the model
-    Standard_nadir_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == model_least_position ] 
-    Standard_nadir_temp = min(Standard_nadir_temp_list)
-    #The position of the nadir among the warped leasts
-    Standard_nadir_position = [i for i, e in enumerate(Standard_nadir_temp_list) if e == Standard_nadir_temp][-1]
+        #The maximum and minimum positions of the model in retropect to the cycle
+        #The position of the least on the partial model cycle
+        model_least_position_on_partial = np.where(np.array(model_cycle_part) == min(model_cycle_part))[0][-1]
+        #The position of the least on the enite model cycle
+        model_least_position = np.where(np.array(model_cycle) == min(model_cycle_part))[0][0]
 
-    #All positions warped to the least of the model
-    Standard_nadir_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == model_least_position]
-    #Actual position of the nadir on cycle
-    Standard_nadir_day = Standard_nadir_day_list[Standard_nadir_position][1]
-    #The actual nadir smooth temperature
-    Standard_nadir_temp_actual = smooth_temps[Standard_nadir_day]
-    
-    #The maximum temperature warped to the highest of the model
-    #the maximum value warped to the maximum of model
-    Standard_peak_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == model_max_position] #All values warped to the maximum of model
-    Standard_peak_temp = max(Standard_peak_temp_list) #the maximum value warped to the maximum of model
-    #The position of the peak among the warped highests 
-    Standard_peak_position = [i for i, e in enumerate(Standard_peak_temp_list) if e == Standard_peak_temp][0]
+        #The other half of the model starting from the position of the least of the partial model cycle
+        model_cycle_part_other_half = model_cycle_part[model_least_position_on_partial:]
+        #The maximum of the model in rretropect to the partiial model cycle and the cycle to be warped
+        model_max_position = np.where(np.array(model_cycle) == max(model_cycle_part_other_half))[0][0]
 
-    #All positions warped to the highest of the model
-    Standard_peak_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == model_max_position]
-    #Actual position of the peak on cycle 
-    Standard_peak_day = Standard_peak_day_list[Standard_peak_position][1]
-    #The actual peak smooth temperature  
-    Standard_peak_temp_actual = smooth_temps[Standard_peak_day]
+        #Computing nadir and peak using DTW and standardized temperature values
+        #The minimum temperature warped to the least of the model
+        Standard_nadir_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == model_least_position ] 
+        Standard_nadir_temp = min(Standard_nadir_temp_list)
+        # print(Standard_nadir_temp)
+        #The position of the nadir among the warped leasts
+        Standard_nadir_position = [i for i, e in enumerate(Standard_nadir_temp_list) if e == Standard_nadir_temp][-1]
 
-    #position of the least temperature on the model
-    #model_least_position = [i for i, e in enumerate(model_cycle) if e == min(model_cycle)].pop()
-    
-    #position of the highest temperature on the model    
-    #model_max_position = [i for i, e in enumerate(model_cycle) if e == max(model_cycle)].pop()
+        #All positions warped to the least of the model
+        Standard_nadir_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == model_least_position]
+        #Actual position of the nadir on cycle
+        Standard_nadir_day = Standard_nadir_day_list[Standard_nadir_position][1]
+        #The actual nadir smooth temperature
+        Standard_nadir_temp_actual = smooth_temps[Standard_nadir_day]
+        
+        #The maximum temperature warped to the highest of the model
+        #the maximum value warped to the maximum of model
+        Standard_peak_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == model_max_position] #All values warped to the maximum of model
+        Standard_peak_temp = max(Standard_peak_temp_list) #the maximum value warped to the maximum of model
+        #The position of the peak among the warped highests 
+        Standard_peak_position = [i for i, e in enumerate(Standard_peak_temp_list) if e == Standard_peak_temp][0]
+
+        #All positions warped to the highest of the model
+        Standard_peak_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == model_max_position]
+        #Actual position of the peak on cycle 
+        Standard_peak_day = Standard_peak_day_list[Standard_peak_position][1]
+        #The actual peak smooth temperature  
+        Standard_peak_temp_actual = smooth_temps[Standard_peak_day]
+
+        #position of the least temperature on the model
+        #model_least_position = [i for i, e in enumerate(model_cycle) if e == min(model_cycle)].pop()
+        
+        #position of the highest temperature on the model    
+        #model_max_position = [i for i, e in enumerate(model_cycle) if e == max(model_cycle)].pop()
 
 
-    #Computing nadir and peak using DTW and standardized temperature values
-    
-    #The minimum temperature warped to the least of the model
-    #Standard_nadir_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == model_least_position] 
-    #Standard_nadir_temp = min(Standard_nadir_temp_list)
-    
-    #The position of the nadir among the warped leasts
-    #Standard_nadir_position = [i for i, e in enumerate(Standard_nadir_temp_list) if e == Standard_nadir_temp][-1]
-    
-    #All positions warped to the least of the model
-    #Standard_nadir_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == model_least_position]
-    
-    #Actual position of the nadir on cycle
-    #Standard_nadir_day = Standard_nadir_day_list[Standard_nadir_position][1]
-    
-    #The actual nadir smooth temperature
-    #Standard_nadir_temp_actual = smooth_temps[Standard_nadir_day]
-    
-    #The maximum temperature warped to the highest of the model
-    #Standard_peak_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == model_max_position] #All values warped to the maximum of model
-    #Standard_peak_temp = max(Standard_peak_temp_list) #the maximum value warped to the maximum of model
-    #The position of the peak among the warped highests 
-    #    
-    # try:
-    #     Standard_peak_position = [i for i, e in enumerate(Standard_peak_temp_list) if e == Standard_peak_temp][0] #position of the maximum 
-    # except IndexError :
-    #     print ("*************************************")
-    #     print (cycle)
-    #     print (smooth_temps)
-    #All positions warped to the highest of the model
-    #Standard_peak_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == model_max_position] #Position of the maximum warps
-    
-    #Actual position of the peak on cycle   
-    #Standard_peak_day = Standard_peak_day_list[Standard_peak_position][1]
-    
-    #The actual peak smooth temperature   
-    #Standard_peak_temp_actual = smooth_temps[Standard_peak_day]
+        #Computing nadir and peak using DTW and standardized temperature values
+        
+        #The minimum temperature warped to the least of the model
+        #Standard_nadir_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == model_least_position] 
+        #Standard_nadir_temp = min(Standard_nadir_temp_list)
+        
+        #The position of the nadir among the warped leasts
+        #Standard_nadir_position = [i for i, e in enumerate(Standard_nadir_temp_list) if e == Standard_nadir_temp][-1]
+        
+        #All positions warped to the least of the model
+        #Standard_nadir_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == model_least_position]
+        
+        #Actual position of the nadir on cycle
+        #Standard_nadir_day = Standard_nadir_day_list[Standard_nadir_position][1]
+        
+        #The actual nadir smooth temperature
+        #Standard_nadir_temp_actual = smooth_temps[Standard_nadir_day]
+        
+        #The maximum temperature warped to the highest of the model
+        #Standard_peak_temp_list = [Standard_smooth_temps[mapy] for mapx, mapy in Standard_path if mapx == model_max_position] #All values warped to the maximum of model
+        #Standard_peak_temp = max(Standard_peak_temp_list) #the maximum value warped to the maximum of model
+        #The position of the peak among the warped highests 
+        #    
+        # try:
+        #     Standard_peak_position = [i for i, e in enumerate(Standard_peak_temp_list) if e == Standard_peak_temp][0] #position of the maximum 
+        # except IndexError :
+        #     print ("*************************************")
+        #     print (cycle)
+        #     print (smooth_temps)
+        #All positions warped to the highest of the model
+        #Standard_peak_day_list = [[mapx, mapy] for mapx, mapy in Standard_path if mapx == model_max_position] #Position of the maximum warps
+        
+        #Actual position of the peak on cycle   
+        #Standard_peak_day = Standard_peak_day_list[Standard_peak_position][1]
+        
+        #The actual peak smooth temperature   
+        #Standard_peak_temp_actual = smooth_temps[Standard_peak_day]
 
-    if str(Standard_peak_temp_actual) == "nan":
-        print ("Cycle: ", cycle)
-        print ("Temps: ", smooth_temps)
+        if str(Standard_peak_temp_actual) == "nan":
+            print ("Cycle: ", cycle)
+            print ("Temps: ", smooth_temps)
+
+    else:
+        Standard_nadir_day = np.nan
+        Standard_nadir_temp = np.nan
+        Standard_nadir_temp_actual = np.nan
+        Standard_peak_day = np.nan
+        Standard_peak_temp = np.nan
+        Standard_peak_temp_actual = np.nan
 
     results = (Standard_nadir_day, Standard_nadir_temp, Standard_nadir_temp_actual, 
-               Standard_peak_day, Standard_peak_temp, Standard_peak_temp_actual)
+                Standard_peak_day, Standard_peak_temp, Standard_peak_temp_actual)
     return (results)
 
 
-def other_dtw_values(best_path, paths_values, cycle_max_pos):
+def other_dtw_values(best_path, paths_values, cycle_least_pos, cycle_max_pos):
     # Note: with_diff means that the computation is done between the maximum and minimum of multiple warps 
     # at the tail ends
     
-    least = max([x for x in best_path if x[1] == 0])
+    least = max([x for x in best_path if x[1] == cycle_least_pos])
     maximum = min([x for x in best_path if x[1] == cycle_max_pos])
     # print (least, maximum)
     
@@ -360,3 +434,33 @@ def get_expanded_values(smooth_temps):
     
     final = first_part + interpedSeq + last_part
     return (final)
+
+
+def cycle_completeness(df):
+        logger.info("================Cycle filtering started==================")
+        logger.info(f"The initial set of cycles: {len(df)}")
+
+        df_non_last = df[(df["Date_Diff"] != 'Indeterminate Last Cycle')]
+        counts = dict(df_non_last["PCOS"].value_counts())
+        logger.info(f"Non last cycles: {counts}")
+        df_non_last.reset_index(inplace = True, drop = True)
+
+        for i in range(len(df_non_last)):
+            df_non_last.loc[i, "Date_Diff"] = int(df_non_last.loc[i, "Date_Diff"])
+            if (df_non_last.loc[i, "Date_Diff"] !=  0.0):
+                df_non_last.loc[i, "cycle_compl"] = (df_non_last.loc[i, "Data_Dur"])/(df_non_last.loc[i, "Date_Diff"])
+            else:
+                df_non_last.loc[i, "cycle_compl"] = 0
+            # if df_non_last.loc[i, "Date_Diff"] < 1.0:
+            #     logger.info(df_non_last.loc[i, "Cycle ID"])
+
+        df_non_neg_offset = df_non_last[df_non_last["Offset"] >= 0]
+        counts = dict(df_non_neg_offset["PCOS"].value_counts())
+        logger.info(f"Non negative offsets: {counts}")
+
+        df_complete = df_non_neg_offset[df_non_neg_offset["cycle_compl"] >= 0.4]
+        counts = dict(df_complete["PCOS"].value_counts())
+        logger.info(f"The complete cycles: {counts}")
+        logger.info("================Cycle filtering ended==================")
+
+        return df_complete
