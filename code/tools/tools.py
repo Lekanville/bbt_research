@@ -375,7 +375,7 @@ def other_dtw_values(best_path, paths_values, cycle_least_pos, cycle_max_pos):
         if j == maximum:
             index_max = i
             
-    pos_count_with_diff = (index_max - index_least)/cycle_max_pos
+    pos_count_with_diff = (index_max - index_least)/((cycle_max_pos - cycle_least_pos) + 1) # + 1 caters for the index
     ## print("The index after the initial multiple warps: ", index_least)
     ## print("The index before the last multiple warps: ", index_max)
     # print("The difference tail warp positions: ", diff)        
@@ -386,7 +386,7 @@ def other_dtw_values(best_path, paths_values, cycle_least_pos, cycle_max_pos):
     curr_path = best_path[index_least:index_max+1]
     y_axis = [i[0] for i in curr_path]
     x_axis = [i[1] for i in curr_path]
-    path_length_with_diff = (length_of_line(y_axis, x_axis))/cycle_max_pos
+    path_length_with_diff = (length_of_line(y_axis, x_axis))/((cycle_max_pos - cycle_least_pos) + 1) # + 1 caters for the index
     ## print("The difference tail warp positions using curve equation: ", curve_diff)
     
     
@@ -403,7 +403,7 @@ def other_dtw_values(best_path, paths_values, cycle_least_pos, cycle_max_pos):
 
     least_cost = paths_values[least_path_x, least_path_y]
     max_cost = paths_values[maximum_path_x, maximum_path_y]
-    cost_with_diff = (max_cost - least_cost)/cycle_max_pos
+    cost_with_diff = (max_cost - least_cost)/((cycle_max_pos - cycle_least_pos) + 1) # + 1 caters for the index
     ## print([least_path_x, least_path_y], [maximum_path_x, maximum_path_y])
     ## print(least_cost, max_cost)
     
@@ -437,30 +437,41 @@ def get_expanded_values(smooth_temps):
 
 
 def cycle_completeness(df):
-        logger.info("================Cycle filtering started==================")
-        logger.info(f"The initial set of cycles: {len(df)}")
+    logger.info("================Cycle filtering started==================")
+    logger.info(f"The initial set of cycles: {len(df)}")
 
-        df_non_last = df[(df["Date_Diff"] != 'Indeterminate Last Cycle')]
-        counts = dict(df_non_last["PCOS"].value_counts())
-        logger.info(f"Non last cycles: {counts}")
-        df_non_last.reset_index(inplace = True, drop = True)
+    df_non_last = df[(df["Date_Diff"] != 'Indeterminate Last Cycle')]
+    counts = dict(df_non_last["PCOS"].value_counts())
+    logger.info(f"Non last cycles: {counts}")
+    df_non_last.reset_index(inplace = True, drop = True)
 
-        for i in range(len(df_non_last)):
-            df_non_last.loc[i, "Date_Diff"] = int(df_non_last.loc[i, "Date_Diff"])
-            if (df_non_last.loc[i, "Date_Diff"] !=  0.0):
-                df_non_last.loc[i, "cycle_compl"] = (df_non_last.loc[i, "Data_Dur"])/(df_non_last.loc[i, "Date_Diff"])
-            else:
-                df_non_last.loc[i, "cycle_compl"] = 0
-            # if df_non_last.loc[i, "Date_Diff"] < 1.0:
-            #     logger.info(df_non_last.loc[i, "Cycle ID"])
+    for i in range(len(df_non_last)):
+        df_non_last.loc[i, "Date_Diff"] = int(df_non_last.loc[i, "Date_Diff"])
+        if (df_non_last.loc[i, "Date_Diff"] !=  0.0):
+            df_non_last.loc[i, "cycle_compl"] = (df_non_last.loc[i, "Data_Dur"])/(df_non_last.loc[i, "Date_Diff"])
+        else:
+            df_non_last.loc[i, "cycle_compl"] = 0
+        # if df_non_last.loc[i, "Date_Diff"] < 1.0:
+        #     logger.info(df_non_last.loc[i, "Cycle ID"])
 
-        df_non_neg_offset = df_non_last[df_non_last["Offset"] >= 0]
-        counts = dict(df_non_neg_offset["PCOS"].value_counts())
-        logger.info(f"Non negative offsets: {counts}")
+    df_non_neg_offset = df_non_last[df_non_last["Offset"] >= 0]
+    counts = dict(df_non_neg_offset["PCOS"].value_counts())
+    logger.info(f"Non negative offsets: {counts}")
 
-        df_complete = df_non_neg_offset[df_non_neg_offset["cycle_compl"] >= 0.4]
-        counts = dict(df_complete["PCOS"].value_counts())
-        logger.info(f"The complete cycles: {counts}")
-        logger.info("================Cycle filtering ended==================")
+    df_complete = df_non_neg_offset[df_non_neg_offset["cycle_compl"] >= 0.4]
+    counts = dict(df_complete["PCOS"].value_counts())
+    logger.info(f"The complete cycles: {counts}")
+    logger.info("================Cycle filtering ended==================")
 
-        return df_complete
+    return df_complete
+
+def clean_expanded(vals):
+    y = [i for i in vals if i != ""]
+    cleaned_vals = []
+    for i in y:
+        if i == "nan":
+            cleaned_vals.append(np.nan)
+        else:
+            cleaned_vals.append(float(i))
+    
+    return cleaned_vals

@@ -3,6 +3,7 @@ import pandas as pd
 import os
 from loguru import logger
 import glob
+import tools.tools as tools
 
 class Frames:
     def __init__(self, df):
@@ -57,7 +58,7 @@ class Frames:
     def read_cycles_and_pcos(self):
         INPUT_CYCLES_PCOS = self.df
         cycles = pd.read_csv(
-            INPUT_CYCLES_PCOS, usecols = ["Cycle ID", "Data_Dur", "Date_x", "User ID_y", "Offset", "Date_Diff", "Ovulation Day", "PCOS"]
+            INPUT_CYCLES_PCOS, usecols = ["Cycle ID", "Data_Dur", "Date_x", "User ID_y", "Offset", "Date_Diff", "Ovulation Day", "PCOS", "cycle_compl"]
             )
         cycles = cycles.sort_values("Date_x")
         return cycles
@@ -86,3 +87,12 @@ class Frames:
         events_df = events_df.sort_values("Date").reset_index(drop = True)
         period_events = events_df[events_df["Event Type"] == "period"]
         return (period_events)
+    
+    def model_users(self):
+        MODEL_CYCLE = self.df
+        MODEL_LOC_SPLIT = MODEL_CYCLE.split("/")
+        MODEL_LOC = "/".join(MODEL_LOC_SPLIT[0:-1])
+        MODEL_CYCLES_FILE = os.path.join(MODEL_LOC,"individual_averages.json")
+        MODEL_CYCLES = tools.load_model_cycle(MODEL_CYCLES_FILE)
+        MODEL_USERS = [model[i]["User"] for i, j in enumerate(model)]
+        return (MODEL_CYCLE)

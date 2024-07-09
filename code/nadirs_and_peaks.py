@@ -87,7 +87,13 @@ def independent_variables(user):
             ################Length of the Curve###############
             curve_distance = extract.curve_by_length(nad_and_peak)
 
-            cycle_est = dict(nad_and_peak, **curve_distance, **days, **missing)
+            ################Change Point Detection###############
+            change_point = extract.change_point_detection(nad_and_peak)
+
+            ################Temperature Rise over Periods###############
+            temp_rise = extract.temp_rise(nad_and_peak)
+
+            cycle_est = dict(nad_and_peak, **curve_distance, **days, **missing, **change_point, **temp_rise)
             #cycle_est = dict(nad_and_peak, **days, **missing)
 
             results.append(cycle_est)
@@ -106,9 +112,9 @@ def save_data(extracted, OUTPUT):
     df = pd.DataFrame(data)
 
     #Save intermediate data
-    folder= "/".join(OUTPUT.split("/")[0:-1])
-    interm_df = os.path.join(folder, "features_dtw_SS_interm.csv")
-    df.to_csv(interm_df)
+    # folder= "/".join(OUTPUT.split("/")[0:-1])
+    # interm_df = os.path.join(folder, "features_dtw_SS_interm.csv")
+    # df.to_csv(interm_df)
 
     #trim out outliers at the nadirs and peaks
     logger.info("trimming out outliers at the nadirs and peaks")

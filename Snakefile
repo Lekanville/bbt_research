@@ -121,13 +121,14 @@ rule cycle_level_data:
 
 rule get_learning_variables:
     input: 
-        #input_temps = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/features_dtw_MM.csv"
-        input_temps = learning.get_learning_variables["input_file"]
+        input_temps = learning.get_learning_variables["input_temps"],
+        input_quest = learning.get_learning_variables["input_quest"],
+        model_cycle = learning.get_learning_variables["model_cycle"]
     output:
-        output_file = learning.get_learning_variables["output_file"]
-        #python -m learning_variables_MM -i {input.input_temps} -o {output.output_file}
+        output_temps = learning.get_learning_variables["output_file_temps"],
+        output_quest = learning.get_learning_variables["output_file_quest"]
     shell:"""
-        python -m learning_variables -i {input.input_temps} -o {output.output_file}
+        python -m learning_variables -i {input.input_temps} -j {input.input_quest} -k {input.model_cycle} -o {output.output_temps} -p {output.output_quest}
     """
 
 rule cycle_level_learning:

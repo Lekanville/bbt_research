@@ -7,10 +7,14 @@ class Learning:
         ############################################################################################
     ### For Rule 10 (get_learning_variables) - 
     ### 1. The first input is the file containing the preprocessed data - the output of 
-    ### cycle_level_data (rule 9)                                                                    
-    ### 2. Specify the output file to save the cycle-level variables
+    ### cycle_level_data (rule 9)
+    ### 2. The second input is the cleaned questionnaire data - from Rule 7 (process_questionnaire) i.e df_questionnaire_final.csv
+    ### 3. The third input is the output of the model cycle from rule 8 (model_cycle) i.e model_cycle.json                                                                  
+    ### 4. The first output file is to save the cycle-level variables
+    ### 5. The second output file is to save the questionnaire variables
         ############################################################################################"
-    get_learning_variables_output =  "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/features_learning.csv"
+    get_learning_variables_output_temps =  "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/features_learning.csv"
+    get_learning_variables_output_quest = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/df_questionnaire_ml.csv"
     #get_learning_variables_output =  "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/features_learning_MM.csv"
 
         ############################################################################################
@@ -49,7 +53,7 @@ class Learning:
     ### 4. Specify the output file. This should be a CSV file
         ############################################################################################"
     #get_BMI_input = "/projects/MRC-IEU/research/data/fertility_focus/ovusense/released/2022-11-30/data/uob-questionnaire/OvuSense_Cycle_Characteristics_Study-Survey-to_18NOV22_anon.xlsx"
-    quest_preprocessed_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/df_questionnaire_ml.csv"
+    #quest_preprocessed_output = "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/df_questionnaire_ml.csv"
 
         ############################################################################################
     ### For Rule 15 (quest_level_learning) - 
@@ -78,9 +82,15 @@ class Learning:
 #######################################You do not need to edit aything beyond this point#######################################
     #rule 10 data
     get_learning_variables_input_file = variables.cycle_level_data["output_file"]
-    get_learning_variables_output_file = get_learning_variables_output
-    get_learning_variables = {"input_file":get_learning_variables_input_file,
-                    "output_file": get_learning_variables_output_file
+    get_learning_variables_quest = variables.process_quest["output_file_2"]
+    get_learning_variables_model = variables.model_cycle_data["output_file"]
+    get_learning_variables_output_file_temps = get_learning_variables_output_temps
+    get_learning_variables_output_file_quest = get_learning_variables_output_quest
+    get_learning_variables = {"input_temps":get_learning_variables_input_file,
+                                "input_quest":get_learning_variables_quest,
+                                "model_cycle":get_learning_variables_model,
+                                "output_file_temps": get_learning_variables_output_file_temps,
+                                "output_file_quest": get_learning_variables_output_file_quest
     }
 
     #rule 11 data

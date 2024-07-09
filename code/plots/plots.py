@@ -136,17 +136,19 @@ def plot_nadir_peak_StandardScaler(u, data):
     len_cycles = len(user_cycles)
     
     fig = fig_layout()
-    fig, ax = plt.subplots(figsize=(7*len_cycles, 5), nrows=1, ncols=len_cycles)
-    fig, ax_1 = plt.subplots(figsize=(6*len_cycles, 5), nrows=1, ncols=len_cycles)
+    fig, ax = plt.subplots(figsize=(6*len_cycles, 5), nrows=1, ncols=len_cycles)
+    #fig, ax_1 = plt.subplots(figsize=(6*len_cycles, 5), nrows=1, ncols=len_cycles)
     j = 0
     k = 0
 
     for c in user_cycles.index:
         model_cycle_array = user_cycles[user_cycles.index == c]["Standard_model_cycle"]
-        Standard_model_cycle = list(map(float, model_cycle_array[0].replace("[", "").replace("]", "").split("\n ")))
+        Standard_model_cycle = list(map(float, model_cycle_array[0].replace("[", "").replace("]", "").split(", ")))
         
         Standard_smooth_array = user_cycles[user_cycles.index == c]["Standard_smooth_temps"]
-        Standard_smooth_temps = list(map(float, Standard_smooth_array[0].replace("[", "").replace("]", "").split("\n ")))
+        #Standard_smooth_temps = list(map(float, Standard_smooth_array[0].replace("[", "").replace("]", "").split("\n ")))
+        x = Standard_smooth_array[0].replace("[", "").replace("]", "").replace("\n", "").split(" ")
+        Standard_smooth_temps = tools.clean_expanded(x)
         
         Standard_path = user_cycles[user_cycles.index == c]["Standard_path"].values[0]
         Standard_path = list(map(int, Standard_path.replace("[", "").replace("]", "").replace("(", "").replace(")", "").split(", ")))
@@ -156,10 +158,12 @@ def plot_nadir_peak_StandardScaler(u, data):
         Curve_Length =  str("{0:.2f}".format(user_cycles[user_cycles.index == c]["Curve_Length"].values[0]))
         
         lower_day = user_cycles[user_cycles.index == c]["Standard_nadir_day"].values[0]
-        lower_smooth = float(user_cycles[user_cycles.index == c]["Standard_nadir_temp"].values[0].replace("[", "").replace("]", ""))
+        #lower_smooth = float(user_cycles[user_cycles.index == c]["Standard_nadir_temp"].values[0].replace("[", "").replace("]", ""))
+        lower_smooth = user_cycles[user_cycles.index == c]["Standard_nadir_temp"].values[0]
         
         upper_day = user_cycles[user_cycles.index == c]["Standard_peak_day"].values[0]
-        upper_smooth = float(user_cycles[user_cycles.index == c]["Standard_peak_temp"].values[0].replace("[", "").replace("]", ""))
+        #upper_smooth = float(user_cycles[user_cycles.index == c]["Standard_peak_temp"].values[0].replace("[", "").replace("]", ""))
+        upper_smooth = user_cycles[user_cycles.index == c]["Standard_peak_temp"].values[0]
         
         for [map_x, map_y] in Standard_path:
             ax[j].plot([map_x, map_y], [Standard_model_cycle[map_x], Standard_smooth_temps[map_y]], "--k", linewidth=1, alpha = 0.5)
@@ -173,6 +177,7 @@ def plot_nadir_peak_StandardScaler(u, data):
         ax[j].plot(upper_day, upper_smooth, label = "Standard_Peak_Smooth", marker="o", markersize=20,
             markerfacecolor="red", markeredgecolor="green",  markeredgewidth=2, alpha=0.5)
 
+        
         ax[j].set_xlabel('Cycle Day')
         ax[j].set_ylabel(u+' Temp(°C)')
         ax[j].set_title(c+"\n Dtw Distance:"+ Standard_distance + " Curve_Length:"+Curve_Length)
@@ -180,30 +185,32 @@ def plot_nadir_peak_StandardScaler(u, data):
         plt.tight_layout()
         #j+=1
         
-        plt.savefig(u+'.png')
         
-        temps = list(map(float, user_cycles[user_cycles.index == c]["Smooth_Temp"].values[0].replace("[", "").replace("]", "").split(", ")))
-        Days = list(map(float, user_cycles[user_cycles.index == c]["Days"].values[0].replace("[", "").replace("]", "").split(", ")))
+        # x = list(map(float, user_cycles[user_cycles.index == c]["Expanded_smooth_temps"].values[0].replace("[", "").replace("]", "").split(", ")))
+        # Expanded_temps = tools.clean_expanded(x)
+        # #Days = list(map(float, user_cycles[user_cycles.index == c]["Days"].values[0].replace("[", "").replace("]", "").split(", ")))
         
-        lower_smooth_actual = user_cycles[user_cycles.index == c]["Standard_nadir_temp_actual"].values[0]
-        upper_smooth_actual = user_cycles[user_cycles.index == c]["Standard_peak_temp_actual"].values[0]
+        # lower_smooth_actual = user_cycles[user_cycles.index == c]["Standard_nadir_temp_actual"].values[0]
+        # upper_smooth_actual = user_cycles[user_cycles.index == c]["Standard_peak_temp_actual"].values[0]
         
-        ax_1[j].plot(Days,temps, "-ro", label = "Standard Cycle Temp", linewidth=2, markersize = 5, markerfacecolor = "skyblue", markeredgecolor = "skyblue")        
-        
-        ax_1[j].plot(lower_day, lower_smooth_actual, label = "Standard_Nadir_Smooth_Actual", marker="o", markersize=20,
-            markerfacecolor="yellow", markeredgecolor="green",  markeredgewidth=2, alpha=0.5)
+        # #ax_1[j].plot(Days,temps, "-ro", label = "Standard Cycle Temp", linewidth=2, markersize = 5, markerfacecolor = "skyblue", markeredgecolor = "skyblue")        
+        # ax_1[j].plot(Expanded_temps, "-ro", label = "Standard Cycle Temp", linewidth=2, markersize = 5, markerfacecolor = "skyblue", markeredgecolor = "skyblue") 
 
-        ax_1[j].plot(upper_day, upper_smooth_actual, label = "Standard_Peak_Smooth_Actual", marker="o", markersize=20,
-            markerfacecolor="red", markeredgecolor="green",  markeredgewidth=2, alpha=0.5)
+        # ax_1[j].plot(lower_day, lower_smooth_actual, label = "Standard_Nadir_Smooth_Actual", marker="o", markersize=20,
+        #     markerfacecolor="yellow", markeredgecolor="green",  markeredgewidth=2, alpha=0.5)
+
+        # ax_1[j].plot(upper_day, upper_smooth_actual, label = "Standard_Peak_Smooth_Actual", marker="o", markersize=20,
+        #     markerfacecolor="red", markeredgecolor="green",  markeredgewidth=2, alpha=0.5)
         
-        ax_1[j].set_xlabel('Cycle Day')
-        ax_1[j].set_ylabel(u+' Temp(°C)')
-        ax_1[j].set_title(c+"\n Dtw Distance:"+ Standard_distance + " Curve_Length:"+Curve_Length)
-        ax_1[j].legend(loc=0)
-        plt.tight_layout()
+        # ax_1[j].set_xlim(0)
+        # ax_1[j].set_xlabel('Cycle Day')
+        # ax_1[j].set_ylabel(u+' Temp(°C)')
+        # ax_1[j].set_title(c+"\n Dtw Distance:"+ Standard_distance + " Curve_Length:"+Curve_Length)
+        # ax_1[j].legend(loc=0)
+        # plt.tight_layout()
         
         j+=1
-
+    plt.savefig(u+'.png')
 
 #Plot all cycles for various users in a embedded list eg [{"user":"iiii","ref_cycles":"jjjj"}, {"user":"xxxx","ref_cycles":"yyyy"}]
 def plot_refs(ref_users, data):

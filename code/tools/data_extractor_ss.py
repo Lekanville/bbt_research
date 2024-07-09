@@ -22,6 +22,7 @@ import pandas as pd
 from scipy.signal import savgol_filter
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from tqdm import tqdm
+import ruptures as rpt
 
 import tools.tools as tools
 
@@ -71,6 +72,7 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     offset = int(keep["Offset"])#get the offset of the cycle
     #Date_D = keep["Date_Diff"].values#get the cycle length of the cycle
     Date_Diff = keep["Date_Diff"].values[0]
+    cycle_compl = keep['cycle_compl'].values[0]
     #ovul = user_cycles[user_cycles.index == cycle.lower()]["Ovulation Day"]#get the ovulation date of the cycle
     ovul = user_cycles[user_cycles.index == cycle]["Ovulation Day"]#get the ovulation date of the cycle
     PCOS = keep["PCOS"].values[0]
@@ -238,9 +240,10 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
         peak_valid = np.nan
         Standard_nadir_to_peak = np.nan
         Standard_low_to_high_temp = np.nan
+
     #we create a dictionary of the results for each cycle
     data = {"User":user, "Cycle":cycle, "Temps":temps, "Smooth_Temp":smooth_temps, "Smooth_Temp_with_NAs": smooth_temps_after,
-            "Ovulation Day":ovulation, "Next Cycle Difference":Date_Diff, "Offset":offset, "PCOS":PCOS,
+            "Ovulation Day":ovulation, "Next Cycle Difference":Date_Diff, "Offset":offset, "PCOS":PCOS, "Cycle Completeness":cycle_compl,
 
             "Standard_model_cycle":Standard_model_cycle, "Standard_smooth_temps":Standard_smooth_temps, "Expanded_smooth_temps": Expanded_smooth_temps,
             "Standard_distance":Standard_distance, "Standard_path":Standard_path, 
@@ -268,4 +271,57 @@ def curve_by_length(nad_and_peak):
     distance = {"Curve_Length":curve_length, "Data_Length":data_length, "Curve_by_Data":curve_by_data}
 
     return distance
+
+
+# Change Point Detection
+def change_point_detection(nad_and_peak):
+    offset = nad_and_peak["Offset"]
+    cycle = np.array(nad_and_peak["Smooth_Temp"])
+
+    model = "l1"
+    algo = rpt.Dynp(model=model, min_size=3, jump=1).fit(cycle)
+    my_bkps = algo.predict(n_bkps=1)
+    
+    #change point on the recorded temps
+    cp_point = my_bkps[0]
+    
+    #actual change point using the offset
+    actual_cp = cp_point+offset
+    
+    #Difference in the mean before and after the offset
+    mean_before = np.sum(cycle[0:cp_point])
+    mean_after = np.sum(cycle[cp_point:])
+    
+    cp_mean_diff = mean_after - mean_before
+    
+    cp_values = {"Change Point Day":actual_cp, "Change Point Mean Diff":cp_mean_diff}
+
+    #return (cp_point, actual_cp, cp_mean_diff)
+    return (cp_values)
+
+#Largest rise in 3 and 4 day periods
+def temp_rise(nad_and_peak):
+    offset = nad_and_peak["Offset"]
+    cycle = nad_and_peak["Smooth_Temp"]
+    vals = {}
+    
+    periods = [2, 3]
+    
+    #for each of the x-day period changes
+    for j in periods:
+        vals_of_periods = []
+        
+        for i in range(len(cycle) - j):
+            diff = cycle[i+j] - cycle[i]
+            vals_of_periods.append(diff)
+
+        max_of_periods = max(vals_of_periods)
+        max_two_periods_pos = vals_of_periods.index(max_of_periods) + offset
+        
+        vals[f"max_of_{j}_periods"] = max_of_periods
+        vals[f"max_pos_of_{j}_periods"] = max_two_periods_pos
+    
+    
+    return (vals)
+
 

@@ -4,12 +4,13 @@ import pandas as pd
 #getting and defining row and columns missingness levels
 def get_missing(df):
     df_values = df.copy()
-    
+    cols = list(df_values.columns)
+
     #for the rows
     df_values["Missing"] = ""
     for i in range(len(df_values)):
         count = 0
-        for j in list(df_values.columns):
+        for j in cols:
             if (df_values.loc[i,j] == "Prefer not to answer") | \
             (df_values.loc[i,j] == "No response") | \
             (df_values.loc[i,j] == "Do not know") | \
@@ -18,23 +19,23 @@ def get_missing(df):
             pd.isnull(df_values.loc[i,j]):
                 count+=1
         df_values.loc[i,"Missing"] = count
-    df_values = df_values[df_values["Missing"] < 11] #taking out users with more than 10 missing values
+    df_values = df_values[df_values["Missing"] < 5] #taking out users with more than 3 missing values
     
     #for the columns
-    column_data = []
-    for i in list(df_values.columns):
-        column_missing = \
-        len(df_values[(df_values[i] == "Prefer not to answer") | \
-        (df_values[i] =="No response") | \
-        (df_values[i] =="Do not know") | \
-        (df_values[i] =="Don't remember") | \
-        (df_values[i] =="I don't remember") | \
-        (pd.isnull(df_values[i]))])
+    # column_data = []
+    # for i in list(df_values.columns):
+    #     column_missing = \
+    #     len(df_values[(df_values[i] == "Prefer not to answer") | \
+    #     (df_values[i] =="No response") | \
+    #     (df_values[i] =="Do not know") | \
+    #     (df_values[i] =="Don't remember") | \
+    #     (df_values[i] =="I don't remember") | \
+    #     (pd.isnull(df_values[i]))])
 
-        column_data.append(column_missing)
+    #     column_data.append(column_missing)
         
-    data = {"Field":list(df_values.columns), "Number Missing":column_data}
-    columns_miss = pd.DataFrame(data, columns = ["Field", "Number Missing"])
+    # data = {"Field":list(df_values.columns), "Number Missing":column_data}
+    # columns_miss = pd.DataFrame(data, columns = ["Field", "Number Missing"])
     
     #return(df_values, columns_miss)
     return(df_values)
@@ -108,4 +109,32 @@ def pre_processing(df):
         else:
             df_pro.iloc[i, 16] = "No response"
     
+    return df_pro
+
+
+
+#This was redone for only BMI preprocessing and defining categories ("BMI", "Regular Smoker", "Age menstration started", "Period in last 3 months", "Regular periods", 
+# "Heavy periods", "Painful periods)
+
+def pre_processing_redone(df):
+    df_pro = df.copy()
+    
+    median_BMI = np.median(df_pro[df_pro["BMI"] != "No response"]["BMI"].astype(float))
+    median_menst_age = np.median(df_pro[(df_pro["Age menstration started"] != "No response") &
+                                (df_pro["Age menstration started"] != "I don't remember")]["Age menstration started"].astype(int))
+
+
+    for i in range(len(df_pro)):
+        #imputation for BMI
+        if df_pro.loc[i, "BMI"] == "No response":
+            df_pro.loc[i, "BMI"] = median_BMI
+
+            
+        #imputation for menstruation age
+        if df_pro.loc[i, "Age menstration started"] == "No response":
+            df_pro.loc[i, "Age menstration started"] =  median_menst_age
+
+        elif df_pro.loc[i, "Age menstration started"] == "I don't remember":
+            df_pro.loc[i, "Age menstration started"] =  median_menst_age
+
     return df_pro
