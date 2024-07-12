@@ -11,12 +11,23 @@ class Frames:
         
     def recode_pcos(self):
         the_df = self.df
-        for i in range(len(the_df)):
-            if the_df.iloc[i, 678] == "Polycystic Ovarian Syndrome (PCOS)":
-                the_df.iloc[i, 678] = 1
 
+        for i in range(len(the_df)):
+            if (the_df.loc[i, "PCOS"] == "Polycystic Ovarian Syndrome (PCOS)"): # One person indicated PCOS but didnt answer
+                the_df.loc[i, "PCOS"] = 1                                     # "Yes" to infertility
+
+            elif (the_df.loc[i, "Have you ever gone to a doctor because you thought you were infertile?"] == "Yes") \
+            & (the_df.loc[i, "PCOS"] != "Polycystic Ovarian Syndrome (PCOS)"):
+                the_df.loc[i, "PCOS"] = 0 # Those that answered yes to infertility but do not have PCOS
+            
+            elif (the_df.loc[i, "Have you ever gone to a doctor because you thought you were infertile?"] == "No"):
+                the_df.loc[i, "PCOS"] = 0 # Some answered "No" to infertility in the "Yes" column
+                
+            elif (the_df.loc[i, "Unnamed: 676"] == "No"):
+                the_df.loc[i, "PCOS"] = 0 # Those that indicated "No to infertility"
+                
             else:
-                the_df.iloc[i, 678] = 0
+                the_df.loc[i, "PCOS"] = 2 # Those with no response to infertility question
         return the_df
 
     def the_cycles_temp_dates_duration(self):
@@ -93,6 +104,6 @@ class Frames:
         MODEL_LOC_SPLIT = MODEL_CYCLE.split("/")
         MODEL_LOC = "/".join(MODEL_LOC_SPLIT[0:-1])
         MODEL_CYCLES_FILE = os.path.join(MODEL_LOC,"individual_averages.json")
-        MODEL_CYCLES = tools.load_model_cycle(MODEL_CYCLES_FILE)
-        MODEL_USERS = [model[i]["User"] for i, j in enumerate(model)]
-        return (MODEL_CYCLE)
+        THE_MODEL_CYCLES = tools.load_model_cycle(MODEL_CYCLES_FILE)
+        MODEL_USERS = [ THE_MODEL_CYCLES[i]["User"] for i, j in enumerate(THE_MODEL_CYCLES)]
+        return (MODEL_USERS)

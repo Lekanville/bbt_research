@@ -99,7 +99,7 @@ def process_quest(INPUT, INPUT_CYCLES, OUTPUT, CLEANED_QUEST):
 
     for i in range(len(temp_dates_duration_pcos)):
         if pd.isnull(temp_dates_duration_pcos['PCOS'][i]):
-            temp_dates_duration_pcos.loc[i,'PCOS'] = 2
+            temp_dates_duration_pcos.loc[i,'PCOS'] = 3
     
     #Get Complete cycles
     temp_dates_duration_pcos = tools.cycle_completeness(temp_dates_duration_pcos)

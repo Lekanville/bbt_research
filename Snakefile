@@ -163,16 +163,16 @@ rule user_level_learning:
         python -m user_level_learning -i {input.input_variables} -k {params.input_splits} -o {output.output_file}
     """
 
-rule preprocess_quest:
-    input: 
-        input_quest = learning.preprocess_quest["input_quest"],
-        model_cycle = learning.preprocess_quest["model_cycle"],
-        input_temps = learning.preprocess_quest["input_temps"]
-    output:
-        output_file = learning.preprocess_quest["output_file"]
-    shell:"""
-        python -m quest_preprocess -i {input.input_quest} -j {input.model_cycle} -k {input.input_temps} -o {output.output_file}
-    """
+# rule preprocess_quest:
+#     input: 
+#         input_quest = learning.preprocess_quest["input_quest"],
+#         model_cycle = learning.preprocess_quest["model_cycle"],
+#         input_temps = learning.preprocess_quest["input_temps"]
+#     output:
+#         output_file = learning.preprocess_quest["output_file"]
+#     shell:"""
+#         python -m quest_preprocess -i {input.input_quest} -j {input.model_cycle} -k {input.input_temps} -o {output.output_file}
+#     """
 
 rule quest_level_learning:
     input: 

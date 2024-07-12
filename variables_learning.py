@@ -7,7 +7,7 @@ class Learning:
         ############################################################################################
     ### For Rule 10 (get_learning_variables) - 
     ### 1. The first input is the file containing the preprocessed data - the output of 
-    ### cycle_level_data (rule 9)
+    ### cycle_level_data (rule 9) i.e. features_dtw_SS.csv
     ### 2. The second input is the cleaned questionnaire data - from Rule 7 (process_questionnaire) i.e df_questionnaire_final.csv
     ### 3. The third input is the output of the model cycle from rule 8 (model_cycle) i.e model_cycle.json                                                                  
     ### 4. The first output file is to save the cycle-level variables
@@ -94,7 +94,7 @@ class Learning:
     }
 
     #rule 11 data
-    cycle_level_learning_input_file = get_learning_variables_output_file
+    cycle_level_learning_input_file = get_learning_variables_output_file_temps
     cycle_level_learning_output_folder = cycle_level_learning_results
     #cycle_level_learning_output_log = cycle_level_learning_output_folder + "log"
     cycle_level_learning_number_of_k_splits = cycle_level_learning_number_of_k_splits
@@ -105,7 +105,7 @@ class Learning:
     }
 
     #rule 12 data
-    user_level_variables_input_file = get_learning_variables_output_file
+    user_level_variables_input_file = get_learning_variables_output_file_temps
     user_level_variables_output = user_level_variables_output
     user_level_variables = {"input_file":user_level_variables_input_file,
                                     "output_file":user_level_variables_output}
@@ -121,18 +121,18 @@ class Learning:
     }
 
     #rule 14 data
-    quest_preprocess_quest = variables.process_quest["output_file_2"]
-    quest_preprocess_model = variables.model_cycle_data["output_file"]
-    quest_preprocess_temps = variables.cycle_level_data["output_file"]
-    quest_preprocessed_output = quest_preprocessed_output
-    preprocess_quest = {"input_quest":quest_preprocess_quest,
-                        "model_cycle":quest_preprocess_model,
-                        "input_temps":quest_preprocess_temps,
-                        "output_file":quest_preprocessed_output
-    }
+    # quest_preprocess_quest = variables.process_quest["output_file_2"]
+    # quest_preprocess_model = variables.model_cycle_data["output_file"]
+    # quest_preprocess_temps = variables.cycle_level_data["output_file"]
+    # quest_preprocessed_output = quest_preprocessed_output
+    # preprocess_quest = {"input_quest":quest_preprocess_quest,
+    #                     "model_cycle":quest_preprocess_model,
+    #                     "input_temps":quest_preprocess_temps,
+    #                     "output_file":quest_preprocessed_output
+    # }
 
     #rule 15 data
-    quest_level_learning_input_file = quest_preprocessed_output
+    quest_level_learning_input_file = get_learning_variables_output_quest
     quest_level_learning_output_folder = quest_level_learning_results
     quest_level_learning_number_of_k_splits = quest_level_learning_number_of_k_splits
     quest_level_learning = {"input_file":quest_level_learning_input_file,
@@ -143,7 +143,7 @@ class Learning:
 
     #rule 16 data
     user_and_quest_level_learning_input_file_1 = user_level_variables_output
-    user_and_quest_level_learning_input_file_2 = quest_preprocessed_output
+    user_and_quest_level_learning_input_file_2 = get_learning_variables_output_quest
     user_and_quest_level_learning_output_folder = user_and_quest_level_learning_results
     user_and_quest_level_learning_number_of_k_splits = user_and_quest_level_learning_number_of_k_splits
     user_and_quest_level_learning = {"input_file_1":user_and_quest_level_learning_input_file_1,

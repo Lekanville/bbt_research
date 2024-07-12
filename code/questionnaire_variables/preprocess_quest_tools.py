@@ -19,7 +19,7 @@ def get_missing(df):
             pd.isnull(df_values.loc[i,j]):
                 count+=1
         df_values.loc[i,"Missing"] = count
-    df_values = df_values[df_values["Missing"] < 5] #taking out users with more than 3 missing values
+    df_values = df_values[df_values["Missing"] < 5] #taking out users with more than 5 missing values
     
     #for the columns
     # column_data = []
