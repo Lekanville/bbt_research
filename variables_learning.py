@@ -25,7 +25,7 @@ class Learning:
     ###  3. Specify the number of k-splits
         ############################################################################################"
     cycle_level_learning_results =  "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/cycle_learning_results/"
-    cycle_level_learning_number_of_k_splits =  10
+    cycle_level_learning_number_of_k_splits =  5
 
         ############################################################################################
     ### For Rule 12 (user_level_variables) - 
@@ -43,7 +43,7 @@ class Learning:
     ##  3. Specify the number of k-splits
         ############################################################################################"
     user_level_learning_results =  "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/user_learning_results/"
-    user_level_learning_number_of_k_splits =  10
+    user_level_learning_number_of_k_splits =  5
 
         ############################################################################################
     ### For Rule 14 (preprocess_quest rule) - 
@@ -63,7 +63,7 @@ class Learning:
     ##  3. Specify the number of k-splits
         ############################################################################################"
     quest_level_learning_results =  "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/quest_learning_results/"
-    quest_level_learning_number_of_k_splits =  10
+    quest_level_learning_number_of_k_splits =  5
 
 
         ############################################################################################
@@ -76,7 +76,7 @@ class Learning:
     ##  4. Specify the number of k-splits
         ############################################################################################"
     user_and_quest_level_learning_results =  "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/user_and_quest_learning_results/"
-    user_and_quest_level_learning_number_of_k_splits =  10
+    user_and_quest_level_learning_number_of_k_splits =  5
 
 
 #######################################You do not need to edit aything beyond this point#######################################

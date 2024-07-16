@@ -30,7 +30,7 @@ def user_level_learning(INPUT_1, INPUT_2, SPLITS, OUTPUT):
     logger.info("Reading user level variables for learning")
     df_user_level_features = pd.read_csv(INPUT_1) 
     logger.info("Dataset read")
-    df_user_level = df_user_level_features.drop(["Unnamed: 0", "PCOS"], axis = 1)
+    df_user_level = df_user_level_features.drop(["PCOS"], axis = 1)
     print("The length of the user level data dataframe is", len(df_user_level))
 
     logger.info("Reading questionnaire level variables for learning")
@@ -62,25 +62,25 @@ def user_level_learning(INPUT_1, INPUT_2, SPLITS, OUTPUT):
     logger.info("Performing Random Forest Classification")
     rfc_model = classifier_roc_cross_val("User and Quest Level", "RFC", df_for_learning, OUTPUT)
     #RFC variable importance
-    plot_importance("User and Quest Level", "RFC Model Importance", rfc_model.feature_importances_, OUTPUT)
+    plot_importance("User and Quest Level", "RFC Model Importance", rfc_model, OUTPUT)
 
     #SVM classifier
     logger.info("Performing Support Vector Machine Classification")
     svm_model = classifier_roc_cross_val("User and Quest Level", "SVM", df_for_learning, OUTPUT)
     #SVM variable importance
-    plot_importance("User and Quest Level", "SVM Model Importance", svm_model.coef_[0], OUTPUT)
+    plot_importance("User and Quest Level", "SVM Model Importance", svm_model, OUTPUT)
 
     #LogReg classifier
     logger.info("Performing Logistic Regression")
     logreg_model = classifier_roc_cross_val("User and Quest Level", "LogReg", df_for_learning, OUTPUT)
     #LogReg variable importance
-    plot_importance("User and Quest Level", "LogReg Model Importance", logreg_model.coef_[0], OUTPUT)
+    plot_importance("User and Quest Level", "LogReg Model Importance", logreg_model, OUTPUT)
 
     #DT classifier
-    logger.info("Performing Decsion Tree Classification")
-    dt_model = classifier_roc_cross_val("User and Quest Level", "DT", df_for_learning, OUTPUT)
-    #LogReg variable importance
-    plot_importance("User and Quest Level", "DT Model Importance", dt_model.feature_importances_, OUTPUT)
+    # logger.info("Performing Decsion Tree Classification")
+    # dt_model = classifier_roc_cross_val("User and Quest Level", "DT", df_for_learning, OUTPUT)
+    # #LogReg variable importance
+    # plot_importance("User and Quest Level", "DT Model Importance", dt_model.feature_importances_, OUTPUT)
 
 if __name__ == "__main__":
     args = parser.parse_args()

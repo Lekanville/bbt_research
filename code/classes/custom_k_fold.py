@@ -18,107 +18,81 @@ class CustomKFold:
         self.level = level
 
         if level == "Cycle Level":
-            self.independent_variables = ["Standard_distance","Standard_nadir_day","Standard_peak_day","Standard_nadir_temp_actual",
-                            "Standard_peak_temp_actual","Standard_nadir_to_peak","Standard_low_to_high_temp",
-                            "path_length","warp_degree","Curve_Length","Data_Length","Curve_by_Data"]
+            self.independent_variables = ['Data_Length','Next Cycle Difference','Cycle Completeness','Curve_by_Data','max_of_2_periods',
+                                            'max_pos_of_2_periods','max_of_3_periods','max_pos_of_3_periods','Change Point Day','Change Point Mean Diff',
+                                            'cost_with_diff','path_length_with_diff','Standard_nadir_day','Standard_peak_day','Standard_nadir_temp_actual',
+                                            'Standard_peak_temp_actual','Standard_nadir_to_peak','Standard_low_to_high_temp']
         
         elif level == "User Level":
             self.independent_variables = ['med_pair_distances','med_pair_lengths',
-                                
-                                'min_dist_to_model','min_nadir_days','min_peak_days','min_nadir_temps',
-                                'min_peak_temps','min_nadirs_to_peaks','min_low_to_high_temps',
-                                'min_path_length_to_model','min_warp_degree_with_model','min_Curve_Lengths',
-                                'min_Data_Lengths','min_Curves_by_Data',
-                                
-                                'max_dist_to_model','max_nadir_days','max_peak_days','max_nadir_temps',
-                                'max_peak_temps','max_nadirs_to_peaks','max_low_to_high_temps',
-                                'max_path_length_to_model','max_warp_degree_with_model','max_Curve_Lengths',
-                                'max_Data_Lengths','max_Curves_by_Data',
-                                
-                                'med_dist_to_model','med_nadir_days','med_peak_days','med_nadir_temps',
-                                'med_peak_temps','med_nadirs_to_peaks','med_low_to_high_temps',
-                                'med_path_length_to_model','med_warp_degree_with_model','med_Curve_Lengths',
-                                'med_Data_Lengths','med_Curves_by_Data',
-                                
-                                'rge_dist_to_model','rge_nadir_days','rge_peak_days','rge_nadir_temps',
-                                'rge_peak_temps','rge_nadirs_to_peaks','rge_low_to_high_temps',
-                                'rge_path_length_to_model','rge_warp_degree_with_model','rge_Curve_Lengths',
-                                'rge_Data_Lengths','rge_Curves_by_Data']
+            
+                                            'min_Data_Length','min_Cycle_Length','min_Cycle_Completeness','min_Curve_by_Data','min_Max_of_2_Periods',
+                                            'min_Max_Pos_of_2_Periods','min_Max_of_3_Periods','min_Max_Pos_of_3_Periods','min_Change_Point_Day',
+                                            'min_Change_Point_Mean_Diff','min_Path_Length_with_Diff','min_Standard_Nadir_Day','min_Standard_Peak_Day',
+                                            'min_Standard_Nadir_Temp_Actual','min_Standard_Peak_Temp_Actual','min_Nadir_to_Peak','min_Low_to_High_Temp',
+                                            'min_Cost_with_Diff',
+                                            
+                                            'max_Data_Length','max_Cycle_Length','max_Cycle_Completeness','max_Curve_by_Data','max_Max_of_2_Periods',
+                                            'max_Max_Pos_of_2_Periods','max_Max_of_3_Periods','max_Max_Pos_of_3_Periods','max_Change_Point_Day',
+                                            'max_Change_Point_Mean_Diff','max_Path_Length_with_Diff','max_Standard_Nadir_Day','max_Standard_Peak_Day',
+                                            'max_Standard_Nadir_Temp_Actual','max_Standard_Peak_Temp_Actual','max_Nadir_to_Peak','max_Low_to_High_Temp',
+                                            'max_Cost_with_Diff',
+                                            
+                                            'med_Data_Length','med_Cycle_Length','med_Cycle_Completeness','med_Curve_by_Data','med_Max_of_2_Periods',
+                                            'med_Max_Pos_of_2_Periods','med_Max_of_3_Periods','med_Max_Pos_of_3_Periods','med_Change_Point_Day',
+                                            'med_Change_Point_Mean_Diff','med_Path_Length_with_Diff','med_Standard_Nadir_Day','med_Standard_Peak_Day',
+                                            'med_Standard_Nadir_Temp_Actual','med_Standard_Peak_Temp_Actual','med_Nadir_to_Peak','med_Low_to_High_Temp',
+                                            'med_Cost_with_Diff',
+                                            
+                                            'rge_Data_Length','rge_Cycle_Length','rge_Cycle_Completeness','rge_Curve_by_Data','rge_Max_of_2_Periods',
+                                            'rge_Max_Pos_of_2_Periods','rge_Max_of_3_Periods','rge_Max_Pos_of_3_Periods','rge_Change_Point_Day',
+                                            'rge_Change_Point_Mean_Diff','rge_Path_Length_with_Diff','rge_Standard_Nadir_Day','rge_Standard_Peak_Day',
+                                            'rge_Standard_Nadir_Temp_Actual','rge_Standard_Peak_Temp_Actual','rge_Nadir_to_Peak','rge_Low_to_High_Temp',
+                                            'rge_Cost_with_Diff']
 
         elif level == "Questionnaire Level":
-            self.independent_variables = ["BMI", "Sleep Hours", "Regular Smoker_Prefer not to answer", "Regular Smoker_Yes", 
-                 "Night Sleep Troubles_Sometimes", "Night Sleep Troubles_Usually", 
-                 "Unintentional Day Sleep_Never/ rarely", "Unintentional Day Sleep_Often", 
-                 "Unintentional Day Sleep_Prefer not to answer", "Unintentional Day Sleep_Sometimes",
-                 "When Active_Definitely an 'evening' person", "When Active_Do not know", 
-                 "When Active_More a 'morning' than 'evening' person", 
-                 "When Active_More an 'evening' than 'morning' person",
-                 "When Active_Prefer not to answer", "Currently Pregnant_Prefer not to answer", 
-                 "Currently Pregnant_Yes", "Time before current preg_6-11 months", 
-                 "Time before current preg_Less than 6 months", "Time before current preg_No response", 
-                 "Previous Pregancies_10.0", "Previous Pregancies_2.0", "Previous Pregancies_3.0",
-                 "Previous Pregancies_4.0", "Previous Pregancies_5.0", "Previous Pregancies_6.0", 
-                 "Previous Pregancies_7.0", "Previous Pregancies_8.0", "Previous Pregancies_9.0",
-                 "Previous Pregancies_No response", "Time before one preg_6-11 months",
-                 "Time before one preg_Don't remember", "Time before one preg_Less than 6 months",
-                 "Time before one preg_No response", "Time before one preg_Pregnancy wasn't planned",
-                 "Live birth_No response", "Live birth_Prefer not to answer", "Live birth_Yes", 
-                 "Baby weight (Kg)_Normal weight baby", "Baby weight (Kg)_Overweight baby", 
-                 "Baby weight (Kg)_Underweight baby", "Age menstration started_I don't remember",
-                 "Age menstration started_I have not had periods", "Age menstration started_Late Menstruation Age",
-                 "Age menstration started_Normal Menstruation Age",
-                 "Age menstration started_Very Late Menstruation Age", "Period in last 3 months_No response", 
-                 "Period in last 3 months_Yes", "Acceptable?_No response", "Acceptable?_Yes", 
-                 "Regular periods_No response", "Regular periods_Yes", "Heavy periods_Moderately", 
-                 "Heavy periods_No response", "Heavy periods_Not at all", "Heavy periods_Very",
-                 "Painful periods_Moderately", "Painful periods_No response", "Painful periods_Not at all", 
-                 "Painful periods_Very"]
+            self.independent_variables = ['BMI','Age menstration started',
+                                            'Regular Smoker_Prefer not to answer','Regular Smoker_Yes',
+                                            'Period in last 3 months_Yes',
+                                            'Regular periods_No response','Regular periods_Yes',
+                                            'Heavy periods_Moderately','Heavy periods_Not at all','Heavy periods_Very',
+                                            'Painful periods_Moderately','Painful periods_Not at all','Painful periods_Very']
 
         elif level == "User and Quest Level":
-            self.independent_variables = ['BMI', 'Sleep Hours', 'Regular Smoker_Prefer not to answer', 
-                 'Regular Smoker_Yes', 'Night Sleep Troubles_Sometimes', 'Night Sleep Troubles_Usually',
-                 'Unintentional Day Sleep_Never/ rarely', 'Unintentional Day Sleep_Often', 
-                 'Unintentional Day Sleep_Prefer not to answer', 'Unintentional Day Sleep_Sometimes',
-                 "When Active_Definitely an 'evening' person", 'When Active_Do not know', 
-                 "When Active_More a 'morning' than 'evening' person", 
-                 "When Active_More an 'evening' than 'morning' person", 'When Active_Prefer not to answer',
-                 'Currently Pregnant_Prefer not to answer', 'Currently Pregnant_Yes',
-                 'Time before current preg_6-11 months', 'Time before current preg_Less than 6 months',
-                 'Time before current preg_No response', 'Previous Pregancies_10.0', 'Previous Pregancies_2.0',
-                 'Previous Pregancies_3.0', 'Previous Pregancies_4.0', 'Previous Pregancies_5.0', 
-                 'Previous Pregancies_6.0', 'Previous Pregancies_7.0', 'Previous Pregancies_8.0', 
-                 'Previous Pregancies_9.0', 'Previous Pregancies_No response', 'Time before one preg_6-11 months',
-                 "Time before one preg_Don't remember", 'Time before one preg_Less than 6 months', 
-                 'Time before one preg_No response', "Time before one preg_Pregnancy wasn't planned", 
-                 'Live birth_No response', 'Live birth_Prefer not to answer', 'Live birth_Yes', 
-                 'Baby weight (Kg)_Normal weight baby', 'Baby weight (Kg)_Overweight baby', 
-                 'Baby weight (Kg)_Underweight baby', "Age menstration started_I don't remember", 
-                 'Age menstration started_I have not had periods', 'Age menstration started_Late Menstruation Age',
-                 'Age menstration started_Normal Menstruation Age', 
-                 'Age menstration started_Very Late Menstruation Age',
-                 'Period in last 3 months_No response', 'Period in last 3 months_Yes', 'Acceptable?_No response',
-                 'Acceptable?_Yes', 'Regular periods_No response', 'Regular periods_Yes', 
-                 'Heavy periods_Moderately', 'Heavy periods_No response', 'Heavy periods_Not at all', 
-                 'Heavy periods_Very', 'Painful periods_Moderately', 'Painful periods_No response', 
-                 'Painful periods_Not at all', 'Painful periods_Very',
-                 'med_pair_distances', 'med_pair_lengths', 'min_dist_to_model', 'min_nadir_days', 'min_peak_days',
-                 'min_nadir_temps', 'min_peak_temps', 'min_nadirs_to_peaks', 'min_low_to_high_temps', 
-                 'min_path_length_to_model', 'min_warp_degree_with_model', 'min_Curve_Lengths', 'min_Data_Lengths',
-                 'min_Curves_by_Data', 'max_dist_to_model', 'max_nadir_days', 'max_peak_days', 'max_nadir_temps',
-                 'max_peak_temps', 'max_nadirs_to_peaks', 'max_low_to_high_temps', 'max_path_length_to_model', 
-                 'max_warp_degree_with_model', 'max_Curve_Lengths', 'max_Data_Lengths', 'max_Curves_by_Data', 
-                 'med_dist_to_model', 'med_nadir_days', 'med_peak_days', 'med_nadir_temps', 'med_peak_temps', 
-                 'med_nadirs_to_peaks', 'med_low_to_high_temps', 'med_path_length_to_model', 
-                 'med_warp_degree_with_model', 'med_Curve_Lengths', 'med_Data_Lengths', 'med_Curves_by_Data', 
-                 'rge_dist_to_model', 'rge_nadir_days', 'rge_peak_days', 'rge_nadir_temps', 'rge_peak_temps', 
-                 'rge_nadirs_to_peaks', 'rge_low_to_high_temps', 'rge_path_length_to_model', 
-                 'rge_warp_degree_with_model', 'rge_Curve_Lengths', 'rge_Data_Lengths','rge_Curves_by_Data']
-                 
-            """self.independent_variables = ['max_Data_Lengths', 'max_dist_to_model', 'max_path_length_to_model', 'med_Data_Lengths', 'med_nadir_days',
-                'med_nadirs_to_peaks', 'med_path_length_to_model', 'med_peak_days', 'min_Curve_Lengths', 'rge_dist_to_model',
-                'rge_low_to_high_temps', 'BMI', 'Baby weight (Kg)_Normal weight baby', 'Baby weight (Kg)_Overweight baby',
-                'Baby weight (Kg)_Underweight baby', 'Live birth_Yes', 'Night Sleep Troubles_Sometimes',
-                'Painful periods_Moderately', 'Regular periods_Yes', 'Sleep Hours','Time before one preg_Less than 6 months']"""
+            self.independent_variables = ['BMI','Age menstration started',
+                                            'Regular Smoker_Prefer not to answer','Regular Smoker_Yes',
+                                            'Period in last 3 months_Yes',
+                                            'Regular periods_No response','Regular periods_Yes',
+                                            'Heavy periods_Moderately','Heavy periods_Not at all','Heavy periods_Very',
+                                            'Painful periods_Moderately','Painful periods_Not at all','Painful periods_Very',
+
+                                         'med_pair_distances','med_pair_lengths',
+            
+                                            'min_Data_Length','min_Cycle_Length','min_Cycle_Completeness','min_Curve_by_Data','min_Max_of_2_Periods',
+                                            'min_Max_Pos_of_2_Periods','min_Max_of_3_Periods','min_Max_Pos_of_3_Periods','min_Change_Point_Day',
+                                            'min_Change_Point_Mean_Diff','min_Path_Length_with_Diff','min_Standard_Nadir_Day','min_Standard_Peak_Day',
+                                            'min_Standard_Nadir_Temp_Actual','min_Standard_Peak_Temp_Actual','min_Nadir_to_Peak','min_Low_to_High_Temp',
+                                            'min_Cost_with_Diff',
+                                            
+                                            'max_Data_Length','max_Cycle_Length','max_Cycle_Completeness','max_Curve_by_Data','max_Max_of_2_Periods',
+                                            'max_Max_Pos_of_2_Periods','max_Max_of_3_Periods','max_Max_Pos_of_3_Periods','max_Change_Point_Day',
+                                            'max_Change_Point_Mean_Diff','max_Path_Length_with_Diff','max_Standard_Nadir_Day','max_Standard_Peak_Day',
+                                            'max_Standard_Nadir_Temp_Actual','max_Standard_Peak_Temp_Actual','max_Nadir_to_Peak','max_Low_to_High_Temp',
+                                            'max_Cost_with_Diff',
+                                            
+                                            'med_Data_Length','med_Cycle_Length','med_Cycle_Completeness','med_Curve_by_Data','med_Max_of_2_Periods',
+                                            'med_Max_Pos_of_2_Periods','med_Max_of_3_Periods','med_Max_Pos_of_3_Periods','med_Change_Point_Day',
+                                            'med_Change_Point_Mean_Diff','med_Path_Length_with_Diff','med_Standard_Nadir_Day','med_Standard_Peak_Day',
+                                            'med_Standard_Nadir_Temp_Actual','med_Standard_Peak_Temp_Actual','med_Nadir_to_Peak','med_Low_to_High_Temp',
+                                            'med_Cost_with_Diff',
+                                            
+                                            'rge_Data_Length','rge_Cycle_Length','rge_Cycle_Completeness','rge_Curve_by_Data','rge_Max_of_2_Periods',
+                                            'rge_Max_Pos_of_2_Periods','rge_Max_of_3_Periods','rge_Max_Pos_of_3_Periods','rge_Change_Point_Day',
+                                            'rge_Change_Point_Mean_Diff','rge_Path_Length_with_Diff','rge_Standard_Nadir_Day','rge_Standard_Peak_Day',
+                                            'rge_Standard_Nadir_Temp_Actual','rge_Standard_Peak_Temp_Actual','rge_Nadir_to_Peak','rge_Low_to_High_Temp',
+                                            'rge_Cost_with_Diff'   
+                                            
+                                            ]
 
         self.dependent_variable = "PCOS"
         

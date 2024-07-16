@@ -104,7 +104,7 @@ def the_variables(INPUT_TEMPS, INPUT_QUEST, MODEL_CYCLE, OUTPUT_TEMPS, OUTPUT_QU
 
     #select the independent and non-indepent variables
     dep_and_indep = final_temp_df[[
-    "User", "Cycle", "Standard_smooth_temps", "Data_Length", "Next Cycle Difference", "Cycle Completeness", "Curve_by_Data", 
+    "User", "Cycle", "Standard_smooth_temps", "Smooth_Temp", "Data_Length", "Next Cycle Difference", "Cycle Completeness", "Curve_by_Data", 
     "max_of_2_periods", "max_pos_of_2_periods", "max_of_3_periods", "max_pos_of_3_periods", 
     "Change Point Day", "Change Point Mean Diff", 
     "cost_with_diff", "path_length_with_diff", "Standard_nadir_day", "Standard_peak_day", 

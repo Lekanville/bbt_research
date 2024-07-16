@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from loguru import logger
 import matplotlib.pyplot as plt
 from sklearn.metrics import RocCurveDisplay, auc, roc_curve
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score   
@@ -14,6 +15,7 @@ def classifier_roc_cross_val(level, classifier_name, df, OUTPUT_FOLDER):
     tprs = []
     aucs = []
     accs = []
+    imp = []
 
     mean_fpr = np.linspace(0, 1, 100)
 
@@ -44,7 +46,14 @@ def classifier_roc_cross_val(level, classifier_name, df, OUTPUT_FOLDER):
         interp_tpr[0] = 0.0
         tprs.append(interp_tpr)
         aucs.append(viz.roc_auc)
-        
+
+        if classifier_name == "RFC":
+            imp.append(classifier.feature_importances_)
+        elif classifier_name == "SVM":
+            imp.append(classifier.coef_[0])
+        elif classifier_name == "LogReg":
+            imp.append(classifier.coef_[0])
+
 
     mean_tpr = np.mean(tprs, axis=0)
     mean_tpr[-1] = 1.0
@@ -81,10 +90,18 @@ def classifier_roc_cross_val(level, classifier_name, df, OUTPUT_FOLDER):
         ylabel="True Positive Rate",
         title=f"Mean ROC curve with variability-"+level+" "+classifier_name,
     )
+    
+    logger.info("Importances at each fold")
+    print (imp)
+
+    mean_imp = np.mean(imp, axis=0)
+    logger.info("Mean of the Importances for the fold")
+    print (mean_imp)
+
     ax.axis("square")
     ax.legend(loc="lower right")
     name_and_ext = "_".join(level.split(" "))+".png"
     filename = classifier_name+"_"+ name_and_ext
     plt.savefig(os.path.join(OUTPUT_FOLDER, filename))
 
-    return classifier
+    return mean_imp

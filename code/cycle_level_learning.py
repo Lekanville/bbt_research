@@ -52,25 +52,25 @@ def cycle_level_learning(INPUT, SPLITS, OUTPUT):
     logger.info("Performing Random Forest Classification")
     rfc_model = classifier_roc_cross_val("Cycle Level", "RFC", df_for_learning, OUTPUT)
     #RFC variable importance
-    plot_importance("Cycle Level", "RFC Model Importance", rfc_model.feature_importances_, OUTPUT)
+    plot_importance("Cycle Level", "RFC Model Importance", rfc_model, OUTPUT)
 
     #SVM classifier
     logger.info("Performing Support Vector Machine Classification")
     svm_model = classifier_roc_cross_val("Cycle Level", "SVM", df_for_learning, OUTPUT)
     #SVM variable importance
-    plot_importance("Cycle Level", "SVM Model Importance", svm_model.coef_[0], OUTPUT)
+    plot_importance("Cycle Level", "SVM Model Importance", svm_model, OUTPUT)
 
     #LogReg classifier
     logger.info("Performing Logistic Regression")
     logreg_model = classifier_roc_cross_val("Cycle Level", "LogReg", df_for_learning, OUTPUT)
     #LogReg variable importance
-    plot_importance("Cycle Level", "LogReg Model Importance", logreg_model.coef_[0], OUTPUT)
+    plot_importance("Cycle Level", "LogReg Model Importance", logreg_model, OUTPUT)
 
     #DT classifier
-    logger.info("Performing Decsion Tree Classification")
-    dt_model = classifier_roc_cross_val("Cycle Level", "DT", df_for_learning, OUTPUT)
-    #LogReg variable importance
-    plot_importance("Cycle Level", "DT Model Importance", dt_model.feature_importances_, OUTPUT)
+    # logger.info("Performing Decsion Tree Classification")
+    # dt_model = classifier_roc_cross_val("Cycle Level", "DT", df_for_learning, OUTPUT)
+    # #LogReg variable importance
+    # plot_importance("Cycle Level", "DT Model Importance", dt_model.feature_importances_, OUTPUT)
 
 if __name__ == "__main__":
     args = parser.parse_args()
