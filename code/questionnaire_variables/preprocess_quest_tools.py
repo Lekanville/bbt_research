@@ -122,7 +122,8 @@ def pre_processing_redone(df):
     median_BMI = np.median(df_pro[df_pro["BMI"] != "No response"]["BMI"].astype(float))
     median_menst_age = np.median(df_pro[(df_pro["Age menstration started"] != "No response") &
                                 (df_pro["Age menstration started"] != "I don't remember")]["Age menstration started"].astype(int))
-
+    mode_regular_smoker = df_pro["Regular Smoker"].mode().values[0]
+    mode_regular_periods = df_pro["Regular periods"].mode().values[0]
 
     for i in range(len(df_pro)):
         #imputation for BMI
@@ -130,11 +131,81 @@ def pre_processing_redone(df):
             df_pro.loc[i, "BMI"] = median_BMI
 
             
-        #imputation for menstruation age
+        #imputation for Menstruation Age
         if df_pro.loc[i, "Age menstration started"] == "No response":
             df_pro.loc[i, "Age menstration started"] =  median_menst_age
 
         elif df_pro.loc[i, "Age menstration started"] == "I don't remember":
             df_pro.loc[i, "Age menstration started"] =  median_menst_age
 
+        #imputation for Regular Smoker
+        if df_pro.loc[i, "Regular Smoker"] == "Prefer not to answer":
+            df_pro.loc[i, "Regular Smoker"] =  mode_regular_smoker
+
+        #imputation for Regular Periods
+        if df_pro.loc[i, "Regular periods"] == "No response":
+            df_pro.loc[i, "Regular periods"] =  mode_regular_periods
+
     return df_pro
+
+
+#I may need this because Louise asks that we imput for each of the folds. 
+def pre_processing_redone_imputation(df_train, df_test):
+        
+    median_BMI = np.median(df_train[df_train["BMI"] != "No response"]["BMI"].astype(float))
+    median_menst_age = np.median(df_train[(df_train["Age menstration started"] != "No response") &
+                                (df_train["Age menstration started"] != "I don't remember")]["Age menstration started"].astype(int))
+    mode_regular_smoker = df_train["Regular Smoker"].mode().values[0]
+    mode_regular_periods = df_train["Regular periods"].mode().values[0]
+
+    #for the training data
+    for i in range(len(df_train)):
+        #imputation for BMI
+        if df_train.loc[i, "BMI"] == "No response":
+            df_train.loc[i, "BMI"] = median_BMI
+ 
+        #imputation for Menstruation Age
+        if df_train.loc[i, "Age menstration started"] == "No response":
+            df_train.loc[i, "Age menstration started"] =  median_menst_age
+
+        elif df_train.loc[i, "Age menstration started"] == "I don't remember":
+            df_train.loc[i, "Age menstration started"] =  median_menst_age
+
+        #imputation for Regular Smoker
+        if df_train.loc[i, "Regular Smoker"] == "Prefer not to answer":
+            df_train.loc[i, "Regular Smoker"] =  mode_regular_smoker
+
+        #imputation for Regular Periods
+        if df_train.loc[i, "Regular periods"] == "No response":
+            df_train.loc[i, "Regular periods"] =  mode_regular_periods
+
+    #for the testing data
+    for i in range(len(df_test)):
+        #imputation for BMI
+        if df_test.loc[i, "BMI"] == "No response":
+            df_test.loc[i, "BMI"] = median_BMI
+
+        #imputation for Menstruation Age
+        if df_test.loc[i, "Age menstration started"] == "No response":
+            df_test.loc[i, "Age menstration started"] =  median_menst_age
+
+        elif df_test.loc[i, "Age menstration started"] == "I don't remember":
+            df_test.loc[i, "Age menstration started"] =  median_menst_age
+
+        #imputation for Regular Smoker
+        if df_test.loc[i, "Regular Smoker"] == "Prefer not to answer":
+            df_testn.loc[i, "Regular Smoker"] =  mode_regular_smoker
+
+        #imputation for Regular Periods
+        if df_test.loc[i, "Regular periods"] == "No response":
+            df_test.loc[i, "Regular periods"] =  mode_regular_periods
+
+    dummies_train = pd.get_dummies(df_train[["Regular Smoker", "Period in last 3 months", "Regular periods", "Heavy periods", "Painful periods"]], drop_first=True)
+    df_init_train = df_train[["User", "BMI", "Age menstration started", "PCOS"]]
+    final_quest_ml_train = pd.concat([df_init_train, dummies_train], axis = 1)
+
+    dummies_test = pd.get_dummies(df_test[["Regular Smoker", "Period in last 3 months", "Regular periods", "Heavy periods", "Painful periods"]], drop_first=True)
+    df_init_test = df_test[["User", "BMI", "Age menstration started", "PCOS"]]
+    final_quest_ml_test = pd.concat([df_init_test, dummies_test], axis = 1)
+
+    return (final_quest_ml_train, final_quest_ml_test)

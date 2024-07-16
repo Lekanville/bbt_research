@@ -41,17 +41,17 @@ def plot_importance(level, title, model_importance, OUTPUT_FOLDER):
 
     elif level == "Questionnaire Level":
         data = ['BMI','Age menstration started',
-                'Regular Smoker_Prefer not to answer','Regular Smoker_Yes',
+                'Regular Smoker_Yes',
                 'Period in last 3 months_Yes',
-                'Regular periods_No response','Regular periods_Yes',
+                'Regular periods_Yes',
                 'Heavy periods_Moderately','Heavy periods_Not at all','Heavy periods_Very',
                 'Painful periods_Moderately','Painful periods_Not at all','Painful periods_Very']
 
     elif level == "User and Quest Level":
         data = ['BMI','Age menstration started',
-                'Regular Smoker_Prefer not to answer','Regular Smoker_Yes',
+                'Regular Smoker_Yes',
                 'Period in last 3 months_Yes',
-                'Regular periods_No response','Regular periods_Yes',
+                'Regular periods_Yes',
                 'Heavy periods_Moderately','Heavy periods_Not at all','Heavy periods_Very',
                 'Painful periods_Moderately','Painful periods_Not at all','Painful periods_Very',
 
