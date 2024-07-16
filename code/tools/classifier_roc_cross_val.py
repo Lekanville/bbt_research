@@ -91,12 +91,19 @@ def classifier_roc_cross_val(level, classifier_name, df, OUTPUT_FOLDER):
         title=f"Mean ROC curve with variability-"+level+" "+classifier_name,
     )
     
-    logger.info("Importances at each fold")
-    print (imp)
+    logger.info("Accuracies at each fold")
+    print(accs)
+
+    logger.info("Mean of the Fold Accuracies")
+    mean_acc = np.mean(accs)
+    print(mean_acc)
+
+    #logger.info("Importances at each fold")
+    #print (imp)
 
     mean_imp = np.mean(imp, axis=0)
-    logger.info("Mean of the Importances for the fold")
-    print (mean_imp)
+    #logger.info("Mean of the Importances for the fold")
+    #print (mean_imp)
 
     ax.axis("square")
     ax.legend(loc="lower right")
