@@ -440,27 +440,36 @@ def cycle_completeness(df):
     logger.info("================Cycle filtering started==================")
     logger.info(f"The initial set of cycles: {len(df)}")
 
+    #1. Non-last cycles
     df_non_last = df[(df["Date_Diff"] != 'Indeterminate Last Cycle')]
     counts = dict(df_non_last["PCOS"].value_counts())
+    counts_users = dict(df_non_last["User ID"].value_counts())
     logger.info(f"Non last cycles: {counts}")
-    df_non_last.reset_index(inplace = True, drop = True)
+    logger.info(f"Number of Users: {counts_users}")
 
-    for i in range(len(df_non_last)):
-        df_non_last.loc[i, "Date_Diff"] = int(df_non_last.loc[i, "Date_Diff"])
-        if (df_non_last.loc[i, "Date_Diff"] !=  0.0):
-            df_non_last.loc[i, "cycle_compl"] = (df_non_last.loc[i, "Data_Dur"])/(df_non_last.loc[i, "Date_Diff"])
+    #2. Non-negative offsets
+    df_non_neg_offset = df_non_last[df_non_last["Offset"] >= 0]
+    counts = dict(df_non_neg_offset["PCOS"].value_counts())
+    counts_users = dict(df_non_neg_offset["User ID"].value_counts())
+    logger.info(f"Non negative offsets: {counts}")
+    logger.info(f"Number of Users: {counts_users}")
+    df_non_neg_offset.reset_index(inplace = True, drop = True)
+
+    for i in range(len(df_non_neg_offset)):
+        df_non_neg_offset.loc[i, "Date_Diff"] = int(df_non_neg_offset.loc[i, "Date_Diff"])
+        if (df_non_neg_offset.loc[i, "Date_Diff"] !=  0.0):
+           df_non_neg_offset.loc[i, "cycle_compl"] = (df_non_neg_offset.loc[i, "Data_Dur"])/(df_non_neg_offset.loc[i, "Date_Diff"])
         else:
-            df_non_last.loc[i, "cycle_compl"] = 0
+            df_non_neg_offset.loc[i, "cycle_compl"] = 0
         # if df_non_last.loc[i, "Date_Diff"] < 1.0:
         #     logger.info(df_non_last.loc[i, "Cycle ID"])
 
-    df_non_neg_offset = df_non_last[df_non_last["Offset"] >= 0]
-    counts = dict(df_non_neg_offset["PCOS"].value_counts())
-    logger.info(f"Non negative offsets: {counts}")
-
+    #3. Cycle completeness
     df_complete = df_non_neg_offset[df_non_neg_offset["cycle_compl"] >= 0.4]
     counts = dict(df_complete["PCOS"].value_counts())
+    counts_users = dict(df_complete["User ID"].value_counts())
     logger.info(f"The complete cycles: {counts}")
+    logger.info(f"Number of Users: {counts_users}")
     logger.info("================Cycle filtering ended==================")
 
     return df_complete

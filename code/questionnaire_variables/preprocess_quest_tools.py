@@ -120,8 +120,12 @@ def pre_processing_redone(df):
     df_pro = df.copy()
     
     median_BMI = np.median(df_pro[df_pro["BMI"] != "No response"]["BMI"].astype(float))
-    median_menst_age = np.median(df_pro[(df_pro["Age menstration started"] != "No response") &
-                                (df_pro["Age menstration started"] != "I don't remember")]["Age menstration started"].astype(int))
+
+    median_menst_age = np.median(df_pro[(df_pro["Age menstration started"] != "No response") & (df_pro["Age menstration started"] != "I don't remember") & 
+                                (df_pro["Age menstration started"] != "I have not had periods")]["Age menstration started"].astype(int))
+    # max_menst_age = np.max(df_pro[(df_pro["Age menstration started"] != "No response") & (df_pro["Age menstration started"] != "I don't remember") & 
+    #                             (df_pro["Age menstration started"] != "I have not had periods")]["Age menstration started"].astype(int))
+
     mode_regular_smoker = df_pro["Regular Smoker"].mode().values[0]
     mode_regular_periods = df_pro["Regular periods"].mode().values[0]
 
@@ -130,13 +134,15 @@ def pre_processing_redone(df):
         if df_pro.loc[i, "BMI"] == "No response":
             df_pro.loc[i, "BMI"] = median_BMI
 
-            
         #imputation for Menstruation Age
         if df_pro.loc[i, "Age menstration started"] == "No response":
             df_pro.loc[i, "Age menstration started"] =  median_menst_age
 
         elif df_pro.loc[i, "Age menstration started"] == "I don't remember":
             df_pro.loc[i, "Age menstration started"] =  median_menst_age
+
+        # elif df_pro.loc[i, "Age menstration started"] == "I have not had periods":
+        #     df_pro.loc[i, "Age menstration started"] =  max_menst_age
 
         #imputation for Regular Smoker
         if df_pro.loc[i, "Regular Smoker"] == "Prefer not to answer":

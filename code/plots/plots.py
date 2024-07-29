@@ -10,10 +10,285 @@ import tools.tools as tools
 def fig_layout():
     return plt.figure()
 
+
+#A single cycle with origine temperatures (No interpolation). Use the features dataset
+def plot_single_actual_preprocess(cycle, data):
+    #use the processed temperatures from features_dtw_SS
+    chunk_temperatures = pd.read_csv(data, chunksize=5000)
+    features = pd.concat(chunk_temperatures)
+
+    offset = features[features["Cycle"] == cycle]["Offset"]
+    end = features[features["Cycle"] == cycle]["Next Cycle Difference"].values[0]
+
+    interp_temp = features[features["Cycle"] == cycle]["Temps"].values[0]
+    interp_temp = list(map(float, (interp_temp.replace("[", "").replace("]", "").split(", "))))
+
+    days = features[features["Cycle"] == cycle]["Days"].values[0]
+    days = list(map(float, (days.replace("[", "").replace("]", "").split(", "))))
+
+    missing_temps_str = features[features["Cycle"] == cycle]["Missing_Days_Temp"].values[0]
+    missing_temps_split = missing_temps_str.replace("[", "").replace("]", "").split(", ")
+
+    fig = plt.figure()
+    ax = fig.add_axes([0,0, 1, 1])
+
+    if missing_temps_split != ['']:
+        missing_days = features[features["Cycle"] == cycle]["Missing_Days"].values[0]
+        missing_days = list(map(float, (missing_days.replace("[", "").replace("]", "").split(", "))))
+
+        actual_days = [i for i in days if i not in missing_days]
+        actual_temps = [j for i,j in enumerate(interp_temp) if i in actual_days]
+
+    else:
+        actual_days = days
+        actual_temps = interp_temp
+
+    xaxis = [i+offset for i in actual_days]
+    
+    ax.plot(xaxis, actual_temps, "o", label = "Temperature Values")
+    ax.axvline(x = 0, color = "b", label = "Cycle Start Day")
+    ax.axvline(x = end, color = "r", label = "Next Cycle Start Day")
+
+    #plt.xlim(0, end+1)
+    ax.set_xlabel('Cycle Day')
+    ax.set_ylabel('Temp(°C)')
+    ax.set_title('Initial Cycle showing the Daily Mean Temperatures')
+    ax.legend(loc=0)
+
+    plt.show()
+
+#All cycles for a user. Use the features dataset
+
+#A single cycle. Use the features dataset
+def plot_single_interp_preprocess(cycle, data):
+    #use the processed temperatures from features_dtw_SS
+    chunk_temperatures = pd.read_csv(data, chunksize=5000)
+    features = pd.concat(chunk_temperatures)
+
+    offset = features[features["Cycle"] == cycle]["Offset"]
+    end = features[features["Cycle"] == cycle]["Next Cycle Difference"].values[0]
+
+    interp_temp = features[features["Cycle"] == cycle]["Temps"].values[0]
+    interp_temp = list(map(float, (interp_temp.replace("[", "").replace("]", "").split(", "))))
+
+    days = features[features["Cycle"] == cycle]["Days"].values[0]
+    days = list(map(float, (days.replace("[", "").replace("]", "").split(", "))))
+
+    missing_temps_str = features[features["Cycle"] == cycle]["Missing_Days_Temp"].values[0]
+    missing_temps_split = missing_temps_str.replace("[", "").replace("]", "").split(", ")
+
+    fig = plt.figure()
+    ax = fig.add_axes([0,0, 1, 1])
+
+    if missing_temps_split != ['']:
+        missing_days = features[features["Cycle"] == cycle]["Missing_Days"].values[0]
+        missing_days = list(map(float, (missing_days.replace("[", "").replace("]", "").split(", "))))
+
+        actual_days = [i for i in days if i not in missing_days]
+        actual_temps = [j for i,j in enumerate(interp_temp) if i in actual_days]
+
+        missing_temps = [float(x) for x in missing_temps_split]
+        xaxis_missing = [i+offset for i in missing_days]
+
+        ax.plot(xaxis_missing, missing_temps, "o", color = "red", label = "Interpolated Value")
+    else:
+        actual_days = days
+        actual_temps = interp_temp
+
+    xaxis = [i+offset for i in actual_days]
+    
+    ax.plot(xaxis, actual_temps, "o", label = "Temperature Values")
+    ax.axvline(x = 0, color = "b", label = "Cycle Start Day")
+    ax.axvline(x = end, color = "r", label = "Next Cycle Start Day")
+
+    #plt.xlim(0, end+1)
+    ax.set_xlabel('Cycle Day')
+    ax.set_ylabel('Temp(°C)')
+    ax.set_title('Cycle with Imputation for Missing Data')
+    ax.legend(loc=0)
+
+    plt.show()
+
+
+def plot_single_smooth_preprocess(cycle, data):
+    #use the processed temperatures from features_dtw_SS
+    chunk_temperatures = pd.read_csv(data, chunksize=5000)
+    features = pd.concat(chunk_temperatures)
+
+    offset = features[features["Cycle"] == cycle]["Offset"]
+    #end = features[features["Cycle"] == cycle]["Next Cycle Difference"].values[0]
+
+    interp_temp = features[features["Cycle"] == cycle]["Temps"].values[0]
+    interp_temp = list(map(float, (interp_temp.replace("[", "").replace("]", "").split(", "))))
+
+    days = features[features["Cycle"] == cycle]["Days"].values[0]
+    days = list(map(float, (days.replace("[", "").replace("]", "").split(", "))))
+
+    missing_temps_str = features[features["Cycle"] == cycle]["Missing_Days_Temp"].values[0]
+    missing_temps_split = missing_temps_str.replace("[", "").replace("]", "").split(", ")
+
+    smooth_temps = features[features["Cycle"] == cycle]["Smooth_Temp"].values[0]
+    smooth_temps = list(map(float, (smooth_temps.replace("[", "").replace("]", "").split(", "))))
+
+    fig = plt.figure()
+    ax = fig.add_axes([0,0, 1, 1])
+
+    if missing_temps_split != ['']:
+        missing_days = features[features["Cycle"] == cycle]["Missing_Days"].values[0]
+        missing_days = list(map(float, (missing_days.replace("[", "").replace("]", "").split(", "))))
+
+        actual_days = [i for i in days if i not in missing_days]
+        actual_temps = [j for i,j in enumerate(interp_temp) if i in actual_days]
+
+        missing_temps = [float(x) for x in missing_temps_split]
+        xaxis_missing = [i+offset for i in missing_days]
+
+        ax.plot(xaxis_missing, missing_temps, "o", color = "red", label = "Interpolated Value")
+    else:
+        actual_days = days
+        actual_temps = interp_temp
+
+    xaxis = [i+offset for i in actual_days]
+    xaxis_interp = [i+offset for i in days]
+    
+    ax.plot(xaxis, actual_temps, "o", label = "Temperature Values")
+    ax.plot(xaxis_interp, smooth_temps, "r", label = "Smooth Values")
+    #ax.axvline(x = 0, color = "b", label = "Cycle Start Day")
+    #ax.axvline(x = end, color = "r", label = "Next Cycle Start Day")
+
+    #plt.xlim(0, end+1)
+    ax.set_xlabel('Cycle Day')
+    ax.set_ylabel('Temp(°C)')
+    ax.set_title('Smooth Temperatures across the Cycle')
+    ax.legend(loc=0)
+
+    plt.show()
+
+
+def plot_single_expanded_preprocess(cycle, data):
+    #use the processed temperatures from features_dtw_SS
+    chunk_temperatures = pd.read_csv(data, chunksize=5000)
+    features = pd.concat(chunk_temperatures)
+
+    #offset = features[features["Cycle"] == cycle]["Offset"]
+    #end = features[features["Cycle"] == cycle]["Next Cycle Difference"].values[0]
+
+    interp_exp_temp = features[features["Cycle"] == cycle]["Expanded_smooth_temps"].values[0]
+    interp_exp_temp = interp_exp_temp.replace("[", "").replace("[", "").replace("]", "").split(", ")
+    interp_exp_temp = tools.clean_expanded(interp_exp_temp)
+
+    #days = features[features["Cycle"] == cycle]["Days"].values[0]
+    #days = list(map(float, (days.replace("[", "").replace("]", "").split(", "))))
+
+    xaxis = list(range(len(interp_exp_temp)))
+    #xaxis = [i+offset for i in days]
+    
+
+    #missing_temps_str = features[features["Cycle"] == cycle]["Missing_Days_Temp"].values[0]
+    #missing_temps_split = missing_temps_str.replace("[", "").replace("]", "").split(", ")
+
+    #smooth_temps = features[features["Cycle"] == cycle]["Smooth_Temp"].values[0]
+    #smooth_temps = list(map(float, (smooth_temps.replace("[", "").replace("]", "").split(", "))))
+
+    fig = plt.figure()
+    ax = fig.add_axes([0,0, 1, 1])
+
+    ax.plot(xaxis, interp_exp_temp, "o", label = "Extracted Data Points")
+    ax.plot(xaxis, interp_exp_temp, "r")
+    #ax.axvline(x = 0, color = "b", label = "Cycle Start Day")
+    #ax.axvline(x = end, color = "r", label = "Next Cycle Start Day")
+
+    # if missing_temps_split != ['']:
+    #     missing_days = features[features["Cycle"] == cycle]["Missing_Days"].values[0]
+    #     missing_days = list(map(float, (missing_days.replace("[", "").replace("]", "").split(", "))))
+
+    #     actual_days = [i for i in days if i not in missing_days]
+    #     actual_temps = [j for i,j in enumerate(interp_temp) if i in actual_days]
+
+    #     missing_temps = [float(x) for x in missing_temps_split]
+    #     xaxis_missing = [i+offset for i in missing_days]
+
+    #     ax.plot(xaxis_missing, missing_temps, "o", color = "red", label = "Interpolated Value")
+    # else:
+    #     actual_days = days
+    #     actual_temps = interp_temp
+
+
+
+    #plt.xlim(0, end+1)
+    ax.set_xlabel('Cycle Day')
+    ax.set_ylabel('Temp(°C)')
+    ax.set_title('The Normalized Cycle Length')
+    ax.legend(loc=0)
+
+    plt.show()
+
+
+def plot_single_standardized_preprocess(cycle, data):
+    #use the processed temperatures from features_dtw_SS
+    chunk_temperatures = pd.read_csv(data, chunksize=5000)
+    features = pd.concat(chunk_temperatures)
+
+    #offset = features[features["Cycle"] == cycle]["Offset"]
+    #end = features[features["Cycle"] == cycle]["Next Cycle Difference"].values[0]
+
+    interp_std_temp = features[features["Cycle"] == cycle]["Standard_smooth_temps"].values[0]
+    interp_std_temp = interp_std_temp.replace("[", "").replace("]", "").replace("\n", "").split(" ")
+    interp_std_temp = tools.clean_expanded(interp_std_temp)
+
+    #days = features[features["Cycle"] == cycle]["Days"].values[0]
+    #days = list(map(float, (days.replace("[", "").replace("]", "").split(", "))))
+
+    #xaxis = np.linspace(0,1, len(interp_std_temp))
+    #xaxis = [i+offset for i in days]
+    
+
+    #missing_temps_str = features[features["Cycle"] == cycle]["Missing_Days_Temp"].values[0]
+    #missing_temps_split = missing_temps_str.replace("[", "").replace("]", "").split(", ")
+
+    #smooth_temps = features[features["Cycle"] == cycle]["Smooth_Temp"].values[0]
+    #smooth_temps = list(map(float, (smooth_temps.replace("[", "").replace("]", "").split(", "))))
+
+    fig = plt.figure()
+    ax = fig.add_axes([0,0, 1, 1])
+
+    #ax.plot(xaxis, interp_std_temp, "o")
+    #ax.plot(xaxis, interp_std_temp, "r", label = "Standardised Data Points")
+    ax.plot(interp_std_temp, "r", label = "Standardised Data Points")
+
+    #ax.axvline(x = 0, color = "b", label = "Cycle Start Day")
+    #ax.axvline(x = end, color = "r", label = "Next Cycle Start Day")
+
+    # if missing_temps_split != ['']:
+    #     missing_days = features[features["Cycle"] == cycle]["Missing_Days"].values[0]
+    #     missing_days = list(map(float, (missing_days.replace("[", "").replace("]", "").split(", "))))
+
+    #     actual_days = [i for i in days if i not in missing_days]
+    #     actual_temps = [j for i,j in enumerate(interp_temp) if i in actual_days]
+
+    #     missing_temps = [float(x) for x in missing_temps_split]
+    #     xaxis_missing = [i+offset for i in missing_days]
+
+    #     ax.plot(xaxis_missing, missing_temps, "o", color = "red", label = "Interpolated Value")
+    # else:
+    #     actual_days = days
+    #     actual_temps = interp_temp
+
+
+
+    #plt.xlim(0, end+1)
+    ax.set_xlabel('Cycle Day')
+    ax.set_ylabel('Temp(°C)')
+    ax.set_title('The Proccessed Standardised Cycle')
+    ax.legend(loc=0)
+
+    plt.show()
+
+
 #A single cycle. Use the features dataset
 def plot_single(cycle, data):
     #use the processed temperatures from features_dtw_SS
-    chunks = pd.read_csv(data, chunksize=5000)
+    chunk_temperatures = pd.read_csv(data, chunksize=5000)
     features = pd.concat(chunk_temperatures)
 
     offset = features[features["Cycle"] == cycle]["Offset"]
@@ -32,8 +307,8 @@ def plot_single(cycle, data):
 
     fig = plt.figure()
     ax = fig.add_axes([0,0, 1, 1])
-    ax.plot(xaxis, actual_temps, "o", label = "Temperature")
-    ax.plot(xaxis, smooth_temps, "r", label = "Smooth")
+    ax.plot(xaxis, actual_temps, "o", label = "Temperature Values")
+    ax.plot(xaxis, smooth_temps, "r", label = "Smooth Values")
 
 
     missing_temps_str = features[features["Cycle"] == cycle]["Missing_Days_Temp"].values[0]
@@ -559,8 +834,8 @@ def plot_refs_cycles_standardized(data):
         #ax_1[j].axvline(x = end, color = "r", label = "Indicated End Day")
         
         ax_1[j].set_xlabel('Cycle Day')
-        ax_1[j].set_ylabel('Temp(°C)')
-        ax_1[j].set_title('Standardizing the Smooth Temperatures')
+        ax_1[j].set_ylabel('Standardised Tempeprature')
+        ax_1[j].set_title('Standardising the Smooth Temperatures')
         ax_1[j].legend(loc=0)
         
         plt.tight_layout()
@@ -593,7 +868,7 @@ def plot_refs_cycles_averaged(data):
         #ax_1[j].plot(cycle_pos, std_mean_temps, "o", label = "Temperature")
         #ax_1[j].plot(cycle_pos, std_smooth_temps, "r", label = "Smooth", alpha=0.4)
 
-        ax_1[j].plot(pos_normalized, avg_temps, "o", label = "Data Points")
+        #ax_1[j].plot(pos_normalized, avg_temps, "o", label = "Data Points")
         ax_1[j].plot(pos_normalized, avg_temps, "r", label = "Smooth", alpha=0.4)
         #missing = cycle_df[cycle_df["Missing_Day"] == True]
         #if len(missing) > 0:
@@ -607,8 +882,8 @@ def plot_refs_cycles_averaged(data):
         #ax_1[j].axvline(x = end, color = "r", label = "Indicated End Day")
         
         ax_1[j].set_xlabel('Cycle Day')
-        ax_1[j].set_ylabel('Temp(°C)')
-        ax_1[j].set_title('User Reference Average ')
+        ax_1[j].set_ylabel('Standardised Tempeprature')
+        ax_1[j].set_title('User-Specific Average')
         ax_1[j].legend(loc=0)
         
         plt.tight_layout()
@@ -634,7 +909,7 @@ def plot_refs_cycles_final(data):
     
     #ax_1[j].plot(cycle_pos, std_mean_temps, "o", label = "Temperature")
     #ax_1[j].plot(cycle_pos, std_smooth_temps, "r", label = "Smooth", alpha=0.4)
-    ax.plot(pos_normalized, model_cycle, "o", label = "Data Points")
+    #ax.plot(pos_normalized, model_cycle, "o", label = "Data Points")
     ax.plot(pos_normalized, model_cycle, "r", label = "Reference Cycle", alpha=0.4)
     #missing = cycle_df[cycle_df["Missing_Day"] == True]
     #if len(missing) > 0:
@@ -648,8 +923,8 @@ def plot_refs_cycles_final(data):
     #ax_1[j].axvline(x = end, color = "r", label = "Indicated End Day")
     
     ax.set_xlabel('Cycle Day')
-    ax.set_ylabel('Temp(°C)')
-    ax.set_title('Average Model Cycle')
+    ax.set_ylabel('Standardised Tempeprature')
+    ax.set_title('The Model Cycle')
     ax.legend(loc=0)
     
     #plt.tight_layout()

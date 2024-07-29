@@ -69,13 +69,20 @@ def the_variables(INPUT_TEMPS, INPUT_QUEST, MODEL_CYCLE, OUTPUT_TEMPS, OUTPUT_QU
     # "nadir_valid", "peak_valid", "path_length", "warp_degree", "Curve_Length", "Data_Length", "Curve_by_Data", "PCOS"    
     # ]]
 
-    #5. Questionnaire Missingness (first get users with more thna 3 cycles from temps, then get users with less than 3 missing questionnaire varibles 
+    #5. Questionnaire Missingness (first get users with more than 3 cycles from temps, then get users with less than 3 missing questionnaire varibles 
     # from "BMI", "Regular Smoker", "Age menstration started", "Period in last 3 months", "Regular periods", "Heavy periods", "Painful periods) and preprocessing
 
     df_quest = quest[quest["User ID"].isin(more_than_3_list)][["User ID", "BMI", "Regular Smoker", "Age menstration started", "Period in last 3 months", "Regular periods", \
                                                        "Heavy periods", "Painful periods", "PCOS"]].reset_index(drop = True)
+    
+    #6. Users that have had at least a mentruation
+    had_menstruation = df_quest[df_quest["Age menstration started"] != "I have not had periods"]
+    had_menstruation.reset_index(inplace = True)
+    counts = had_menstruation["User ID"].nunique()
+    logger.info(f"Users that had menstruation in the past: {counts}")
+    
     #missingness in the questionnaire variables
-    df_missingness = preprocess.get_missing(df_quest).reset_index(drop = True)
+    df_missingness = preprocess.get_missing(had_menstruation).reset_index(drop = True)
     
     #preprocessing and defining categories
     df_preprocessed = preprocess.pre_processing_redone(df_missingness)
@@ -100,7 +107,7 @@ def the_variables(INPUT_TEMPS, INPUT_QUEST, MODEL_CYCLE, OUTPUT_TEMPS, OUTPUT_QU
     logger.info(f"Final users in temperatures data: {counts}")
     counts = dict(final_temp_df["PCOS"].value_counts())
     logger.info(f"Final Cycles Distribution: {counts}")
-    logger.info("================User Finished==================")
+    logger.info("================User Selection Started==================")
 
     #select the independent and non-indepent variables
     dep_and_indep = final_temp_df[[

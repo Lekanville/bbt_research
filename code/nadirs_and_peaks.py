@@ -117,9 +117,9 @@ def save_data(extracted, OUTPUT):
     # df.to_csv(interm_df)
 
     #trim out outliers at the nadirs and peaks
-    logger.info("trimming out outliers at the nadirs and peaks")
-    df= tools.trimming_for_outliers(df)
-    logger.info("nadir and peak outliers trimmed out")
+    #logger.info("trimming out outliers at the nadirs and peaks")
+    #df= tools.trimming_for_outliers(df)
+    #logger.info("nadir and peak outliers trimmed out")
 
     logger.info("saving the cycle level data")
     df.to_csv(OUTPUT)
