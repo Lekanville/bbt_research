@@ -443,18 +443,20 @@ def plot_nadir_peak_StandardScaler(u, data):
         for [map_x, map_y] in Standard_path:
             ax[j].plot([map_x, map_y], [Standard_model_cycle[map_x], Standard_smooth_temps[map_y]], "--k", linewidth=1, alpha = 0.5)
         
-        ax[j].plot(Standard_smooth_temps, "-ro", label = "Standard Cycle Temp", linewidth=2, markersize = 5, markerfacecolor = "skyblue", markeredgecolor = "skyblue")
-        ax[j].plot(Standard_model_cycle, "-bo", label = "Standard Model Temp", linewidth=2, markersize =5, markerfacecolor = "lightcoral", markeredgecolor = "lightcoral")
+        ax[j].plot(Standard_smooth_temps, "-ro", label = "User Cycle", linewidth=2, markersize = 5, markerfacecolor = "skyblue", markeredgecolor = "skyblue")
+        ax[j].plot(Standard_model_cycle, "-bo", label = "Reference Cycle", linewidth=2, markersize =5, markerfacecolor = "lightcoral", markeredgecolor = "lightcoral")
         
-        ax[j].plot(lower_day, lower_smooth, label = "Standard_Nadir_Smooth", marker="o", markersize=20,
+        ax[j].plot(lower_day, lower_smooth, label = "Nadir", marker="o", markersize=20,
             markerfacecolor="yellow", markeredgecolor="green",  markeredgewidth=2, alpha=0.5)
 
-        ax[j].plot(upper_day, upper_smooth, label = "Standard_Peak_Smooth", marker="o", markersize=20,
+        ax[j].plot(upper_day, upper_smooth, label = "Peak", marker="o", markersize=20,
             markerfacecolor="red", markeredgecolor="green",  markeredgewidth=2, alpha=0.5)
 
         
-        ax[j].set_xlabel('Cycle Day')
-        ax[j].set_ylabel(u+' Temp(°C)')
+        #ax[j].set_xlabel('Cycle Day')
+        #ax[j].set_ylabel(u+' Temp(°C)')
+        ax[j].set_xlabel('Normalised Cycle Day')
+        ax[j].set_ylabel('Standardised Temperature')
         ax[j].set_title(c+"\n Dtw Distance:"+ Standard_distance + " Curve_Length:"+Curve_Length)
         ax[j].legend(loc=0)
         plt.tight_layout()
