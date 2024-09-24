@@ -245,26 +245,37 @@ def get_nadirs_and_peaks(std_temps_list, path, smooth_temps, model_cycle, cycle)
 
     Standard_smooth_temps = std_temps_list
     Standard_path = path
+    model_cycle = model_cycle
 
     if len(np.where(~(np.isnan(Standard_smooth_temps)))[0]) > 0 :
 
         #The positions of the non NaN values on the cycle
         first = np.where(~np.isnan(Standard_smooth_temps))[0][0]
         last = np.where(~np.isnan(Standard_smooth_temps))[0][-1]
+        
+        #The position of the least on the entire model cycle
+        model_least_position = np.where(np.array(model_cycle) == min(model_cycle))[0][0]
 
+        #The other half of the model after least of the model cycle
+        model_cycle_other_half = model_cycle[model_least_position:]
+
+        #The position of the maximum on the entire model cycle
+        model_max_position = np.where(np.array(model_cycle) == max(model_cycle_other_half))[0][0]
+
+        #This was don using DTW with missigness. We have reverted to the regular DTW.
         #Corresponding positions of the non NaN values on the model
-        model_cycle_part = model_cycle[first:last+1]
+        #model_cycle_part = model_cycle[first:last+1]
 
         #The maximum and minimum positions of the model in retropect to the cycle
         #The position of the least on the partial model cycle
-        model_least_position_on_partial = np.where(np.array(model_cycle_part) == min(model_cycle_part))[0][-1]
+        #model_least_position_on_partial = np.where(np.array(model_cycle_part) == min(model_cycle_part))[0][-1]
         #The position of the least on the enite model cycle
-        model_least_position = np.where(np.array(model_cycle) == min(model_cycle_part))[0][0]
+        #model_least_position = np.where(np.array(model_cycle) == min(model_cycle_part))[0][0]
 
         #The other half of the model starting from the position of the least of the partial model cycle
-        model_cycle_part_other_half = model_cycle_part[model_least_position_on_partial:]
-        #The maximum of the model in rretropect to the partiial model cycle and the cycle to be warped
-        model_max_position = np.where(np.array(model_cycle) == max(model_cycle_part_other_half))[0][0]
+        #model_cycle_part_other_half = model_cycle_part[model_least_position_on_partial:]
+        #The maximum of the model in retropect to the partial model cycle and the cycle to be warped
+        #model_max_position = np.where(np.array(model_cycle) == max(model_cycle_part_other_half))[0][0]
 
         #Computing nadir and peak using DTW and standardized temperature values
         #The minimum temperature warped to the least of the model

@@ -32,12 +32,15 @@ parser.add_argument('-p', '--output_quest', type=str, required=True, help= 'The 
 def the_variables(INPUT_TEMPS, INPUT_QUEST, MODEL_CYCLE, OUTPUT_TEMPS, OUTPUT_QUEST):
     temperatures = pd.read_csv(INPUT_TEMPS) #read the data
     #temperatures_trimmed_out = tools.trimming_for_outliers(temperatures) #trim out outliers at the nadirs and peaks
+    ## If I do not use the trimming above, ceycles with more than 9 days will be the length of the temperatures df##
+
     #temperatures_pcos = temperatures_trimmed_out[temperatures_trimmed_out["PCOS"] != 2] #select users with known PCOS values
 
     quest = pd.read_csv(INPUT_QUEST)
 
     logger.info("================User Selection Started==================")
 
+    #From temperature data
     #1. Total Users with Questionnaire and Temperature Data
     temperatures_with_quest = temperatures[temperatures["PCOS"] != 3] 
     counts = temperatures_with_quest["User"].nunique()
@@ -71,7 +74,8 @@ def the_variables(INPUT_TEMPS, INPUT_QUEST, MODEL_CYCLE, OUTPUT_TEMPS, OUTPUT_QU
 
     #5. Questionnaire Missingness (first get users with more than 3 cycles from temps, then get users with less than 3 missing questionnaire varibles 
     # from "BMI", "Regular Smoker", "Age menstration started", "Period in last 3 months", "Regular periods", "Heavy periods", "Painful periods) and preprocessing
-
+    
+    #From questionnaire data
     df_quest = quest[quest["User ID"].isin(more_than_3_list)][["User ID", "BMI", "Regular Smoker", "Age menstration started", "Period in last 3 months", "Regular periods", \
                                                        "Heavy periods", "Painful periods", "PCOS"]].reset_index(drop = True)
     
@@ -81,10 +85,10 @@ def the_variables(INPUT_TEMPS, INPUT_QUEST, MODEL_CYCLE, OUTPUT_TEMPS, OUTPUT_QU
     counts = had_menstruation["User ID"].nunique()
     logger.info(f"Users that had menstruation in the past: {counts}")
     
-    #missingness in the questionnaire variables
+    #missingness in the questionnaire variables (take out users with more than 5 missing values)
     df_missingness = preprocess.get_missing(had_menstruation).reset_index(drop = True)
     
-    #preprocessing and defining categories
+    #preprocessing and defining categories (missing values imputted to here)
     df_preprocessed = preprocess.pre_processing_redone(df_missingness)
 
     #Get dummy variables
@@ -97,16 +101,20 @@ def the_variables(INPUT_TEMPS, INPUT_QUEST, MODEL_CYCLE, OUTPUT_TEMPS, OUTPUT_QU
     user_counts = dict(final_quest_ml["PCOS"].value_counts())
     logger.info(f"Final Users Distribution: {user_counts}")
 
-    #list cleaned from questionnaire
+    #list of users cleaned from questionnaire
     quest_list = final_quest_ml["User"].to_list()
 
     # Obtain the questionnare list from the temperature df
     final_temp_df = more_than_3_df[more_than_3_df["User"].isin(quest_list)]
     counts = final_temp_df["User"].nunique()
-
     logger.info(f"Final users in temperatures data: {counts}")
+    
     counts = dict(final_temp_df["PCOS"].value_counts())
     logger.info(f"Final Cycles Distribution: {counts}")
+
+    #An intermediate dataset of the cleaned users dataset for examination of features
+    final_temp_df.to_csv("/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/final_user_list_before_3_sampling.csv", index=False)
+
     logger.info("================User Selection Started==================")
 
     #select the independent and non-indepent variables

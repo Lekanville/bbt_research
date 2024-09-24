@@ -30,8 +30,8 @@ import tools.tools as tools
 from dtaidistance import dtw
 
 #DTW with missing values
-import dtw_missing.dtw_missing as dtw_m
-import dtw_missing.dtw_missing_visualisation as dtw_m_vis
+#import dtw_missing.dtw_missing as dtw_m
+#import dtw_missing.dtw_missing_visualisation as dtw_m_vis
 
 def actual_day(group_temp, user, cycle):
     #Computing the actual recording day while considering missing temperature days
@@ -127,7 +127,7 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     # print ("tail: ", tail)
     # print("tail_data", tail_data)
 
-    smooth_temps_after = head_data + smooth_temps_before + tail_data #add head and tail missing records to the data
+    smooth_temps_with_missing_head_and_tail = head_data + smooth_temps_before + tail_data #add head and tail missing records to the data
     # print(smooth_temps_after)
 
         # if (offset >= 0) & (smooth_temps_after != Date_Diff):
@@ -148,7 +148,8 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     # else:
     #      smooth_temps_after =  smooth_temps
     
-    Expanded_smooth_temps = tools.get_expanded_values(smooth_temps_after)
+    Expanded_smooth_temps = tools.get_expanded_values(smooth_temps_with_missing_head_and_tail)
+    Expanded_smooth_temps_not_null = [e for e in Expanded_smooth_temps if ~np.isnan(e)]
     # print(Expanded_smooth_temps)
 
     #standardizing the smooth values    
@@ -157,7 +158,7 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     #Standard_model_cycle = scalerStandard.fit_transform(np.array(model_cycle).reshape(-1, 1))
     Standard_model_cycle = model_cycle
 
-    Standard_smooth_temps_initial = scalerStandard.fit_transform(np.array(Expanded_smooth_temps).reshape(-1, 1))
+    Standard_smooth_temps_initial = scalerStandard.fit_transform(np.array(Expanded_smooth_temps_not_null).reshape(-1, 1))
     Standard_smooth_temps = Standard_smooth_temps_initial.reshape(-1)
     #interpolate standardized cycle temperatures to obtain 51 points inclusive of missing head and tail values
     #1. First get the missing head and tail values
@@ -174,7 +175,10 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
 
     #for those with zero or positive offsets, the DTW with missigness algorithm is used
     if (offset >= 0):
-        d, Standard_path_values, Standard_path = dtw_m.warping_paths(np.array(Standard_model_cycle), np.array(Standard_smooth_temps), return_optimal_warping_path=True)
+        # d, Standard_path_values, Standard_path = dtw_m.warping_paths(np.array(Standard_model_cycle), np.array(Standard_smooth_temps), return_optimal_warping_path=True)
+        # Standard_distance = "{0:.2f}".format(d)
+        Standard_path = dtw.warping_path(Standard_model_cycle, Standard_smooth_temps)
+        d, Standard_path_values = dtw.warping_paths(np.array(Standard_model_cycle), np.array(Standard_smooth_temps))
         Standard_distance = "{0:.2f}".format(d)
     
     #for those with negative offsets, the regular DTW was used just to avoid errors with the data return. We will not use them in the analysis
@@ -182,7 +186,8 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
         # Standard_path = dtw.warping_path(Standard_model_cycle, Standard_smooth_temps)
         # Standard_distance = "{0:.2f}".format(dtw.distance(Standard_model_cycle, Standard_smooth_temps))
         # d, Standard_path_values = dtw.warping_paths(Standard_model_cycle, Standard_smooth_temps)
-        d, Standard_path_values, Standard_path = dtw_m.warping_paths(np.array(Standard_model_cycle), np.array(Standard_smooth_temps), return_optimal_warping_path=True)
+        Standard_path = dtw.warping_path(Standard_model_cycle, Standard_smooth_temps)
+        d, Standard_path_values = dtw.warping_paths(np.array(Standard_model_cycle), np.array(Standard_smooth_temps))
         Standard_distance = "{0:.2f}".format(d)
 
     if len(np.where(~(np.isnan(Standard_smooth_temps)))[0]) > 0 :
@@ -190,9 +195,12 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
         cycle_max_pos = np.where(~(np.isnan(Standard_smooth_temps)))[0][-1]
 
         #Getting the length of warping line and warping amount
+        ##The initial one i did
         path_x_axis = [x[0] for x in Standard_path]
         path_y_axis = [x[1] for x in Standard_path]
         initial_path_length = tools.length_of_line(path_y_axis, path_x_axis)
+
+        ##This considers many to one points at the head and tails of the cycles
         pos_count_with_diff, path_length_with_diff, cost_with_diff = tools.other_dtw_values(
             Standard_path, Standard_path_values, cycle_least_pos, cycle_max_pos
             )
@@ -218,12 +226,12 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     #Computing nadir and peak using DTW and standardized temperature values
     #Standard_nadir_day, Standard_nadir_temp, Standard_nadir_temp_actual, Standard_peak_day, Standard_peak_temp, Standard_peak_temp_actual = tools.get_nadirs_and_peaks(Standard_smooth_temps, Standard_path, smooth_temps, model_cycle)
     Standard_nadir_day, Standard_nadir_temp, Standard_nadir_temp_actual, Standard_peak_day, Standard_peak_temp, Standard_peak_temp_actual = tools.get_nadirs_and_peaks(
-        Standard_smooth_temps, Standard_path, Expanded_smooth_temps, model_cycle, cycle
+        Standard_smooth_temps, Standard_path, Expanded_smooth_temps_not_null, model_cycle, cycle
         )
 
     #Nadir and Peak Validity Check
     if (~(np.isnan(Standard_nadir_day)) & ~(np.isnan(Standard_peak_day))):
-        temp_diffs = [smooth_temps[i+1] - smooth_temps[i] for i in range(len(smooth_temps)-1)]
+        temp_diffs = [Expanded_smooth_temps_not_null[i+1] - Expanded_smooth_temps_not_null[i] for i in range(len(Expanded_smooth_temps_not_null)-1)]
         lower_curve_list = temp_diffs[:Standard_nadir_day]
         top_curve_list = temp_diffs[Standard_peak_day:]
 
@@ -242,7 +250,7 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
         Standard_low_to_high_temp = np.nan
 
     #we create a dictionary of the results for each cycle
-    data = {"User":user, "Cycle":cycle, "Temps":temps, "Smooth_Temp":smooth_temps, "Smooth_Temp_with_NAs": smooth_temps_after,
+    data = {"User":user, "Cycle":cycle, "Temps":temps, "Smooth_Temp":smooth_temps, "Smooth_Temp_with_NAs": smooth_temps_with_missing_head_and_tail,
             "Ovulation Day":ovulation, "Next Cycle Difference":Date_Diff, "Offset":offset, "PCOS":PCOS, "Cycle Completeness":cycle_compl,
 
             "Standard_model_cycle":Standard_model_cycle, "Standard_smooth_temps":Standard_smooth_temps, "Expanded_smooth_temps": Expanded_smooth_temps,
