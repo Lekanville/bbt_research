@@ -3,6 +3,8 @@ import pandas as pd
 import os
 import loguru
 from sklearn.preprocessing import StandardScaler
+
+import questionnaire_variables.preprocess_quest_tools as imputation
 #############################################################################################
 #The “custom_k_fold.py” script
 #This scrip contains a class which splits the data into k folds for k-1 training data set and
@@ -51,22 +53,20 @@ class CustomKFold:
                                             'rge_Cost_with_Diff']
 
         elif level == "Questionnaire Level":
-            self.independent_variables = ['BMI','Age menstration started',
-                                            'Regular Smoker_Yes',
-                                            'Period in last 3 months_Yes',
-                                            'Regular periods_Yes',
-                                            'Heavy periods_Moderately','Heavy periods_Not at all','Heavy periods_Very',
-                                            'Painful periods_Moderately','Painful periods_Not at all','Painful periods_Very']
+            # self.independent_variables = ['BMI','Age menstration started',
+            #                                 'Regular Smoker_Yes',
+            #                                 'Period in last 3 months_Yes',
+            #                                 'Regular periods_Yes',
+            #                                 'Heavy periods_Moderately','Heavy periods_Not at all','Heavy periods_Very',
+            #                                 'Painful periods_Moderately','Painful periods_Not at all','Painful periods_Very']
+            self.independent_variables = ["Regular Smoker", "Period in last 3 months", "Regular periods", "Heavy periods", "Painful periods"]
 
         elif level == "User and Quest Level":
-            self.independent_variables = ['BMI','Age menstration started',
-                                            'Regular Smoker_Yes',
-                                            'Period in last 3 months_Yes',
-                                            'Regular periods_Yes',
-                                            'Heavy periods_Moderately','Heavy periods_Not at all','Heavy periods_Very',
-                                            'Painful periods_Moderately','Painful periods_Not at all','Painful periods_Very',
+            self.independent_variables = [#'BMI','Age menstration started', 'Regular Smoker_Yes', 'Period in last 3 months_Yes', 'Regular periods_Yes',
+                                          #'Heavy periods_Moderately','Heavy periods_Not at all','Heavy periods_Very', 'Painful periods_Moderately','Painful periods_Not at all','Painful periods_Very',
+                                            "Regular Smoker", "Period in last 3 months", "Regular periods", "Heavy periods", "Painful periods"
 
-                                         'med_pair_distances','med_pair_lengths',
+                                            'med_pair_distances','med_pair_lengths',
             
                                             'min_Data_Length','min_Cycle_Length','min_Cycle_Completeness','min_Curve_by_Data','min_Max_of_2_Periods',
                                             'min_Max_Pos_of_2_Periods','min_Max_of_3_Periods','min_Max_Pos_of_3_Periods','min_Change_Point_Day',
@@ -204,14 +204,9 @@ class CustomKFold:
                 print ("No groups out of range")
         
             return(df)
-        
-        user_grouped = edit_outstanding_groups(initial_user_groups) #edit the user groups for uniformity
-        df_merged = pd.merge(df_sorted, user_grouped, how = 'inner', on = "User") #merge the df with the original
-        df_grouped = df_merged.sort_values(by = ["User", "Group"]) #sort by the users and groups
-        
-        groups = list(range(self.n_splits)) #a list of the groups  
+    
    
-############################For User and Cycle Level Splitting####################################
+        ############################For User and Cycle Level Splitting####################################
         def user_and_cycle_groups_list(grped_df, grps): 
             #To see the number of users and cycles in each group
             grps_list = [] #empty groups list
@@ -233,9 +228,9 @@ class CustomKFold:
                 cycles_list.append(y_count) #append the group and cycle count
             
             return(grps_list, cycles_list) #return the functions
-###################################################################################################  
+        ###################################################################################################  
      
-############################For User and Cycle Level Splitting####################################   
+        ############################For User and Cycle Level Splitting####################################   
         def user_groups_list(grped_df, grps): 
             #To see the number of users in each group
             grps_list = [] #empty groups list
@@ -243,36 +238,40 @@ class CustomKFold:
             
             for i in grps:
                 x = sum(1 for j in user_groups if j[0] == i+1) #count the users in each group (+1 is necessary because
-                                                                #the initial counting satrted at 1)  
+                                                                #the initial counting started at 1)  
                 x_count = {"Group":i, "User_Count":x} #a dictionary of the group and user counts
                 grps_list.append(x_count) #append the group and user count
             return(grps_list) #return the functions
-###################################################################################################         
+        ###################################################################################################         
         
         def fold_data(grped_df, grps):
             the_folds = [] #an empty fold list
             
             for i in grps:
                 testing_data = grped_df[grped_df["Group"] == i+1] #testing data is the group at i (+1 is necessary cos
-                                                                #the initial counting satrted at 1) 
+                                                                #the initial counting started at 1) 
                 training_data = grped_df[~(grped_df["Group"] == i+1)]#training data is all other groups (+1 is necessary
                                                                     #cos the initial counting satrted at 1) 
-                scaler = StandardScaler() #using scaling
                 
-                testing_data_independent = testing_data[self.independent_variables] #independent variables for testing
-                scaler.fit(testing_data_independent) #fitting the independent variables for testing
-                X_test = scaler.transform(testing_data_independent) #Transforming the independent variables for testing
+                df_test = testing_data[self.independent_variables] #independent variables for testing
                 #X_test = np.array(testing_data_independent)
                 y_test = list(testing_data[self.dependent_variable]) #listing the dependent variable for testing
                 #testing_variables = [X_test, y_test]
                 
-                training_data_independent = training_data[self.independent_variables] #independent variables for training              
-                scaler.fit(training_data_independent) #fitting the independent variables for training
-                X_train = scaler.transform(training_data_independent) #fitting the independent variables for training
+                
+                #training_data_independent = training_data[self.independent_variables] #independent variables for training              
+                #scaler.fit(training_data_independent) #fitting the independent variables for training
+                #X_train = scaler.transform(training_data_independent) #fitting the independent variables for training
                 #X_train = np.array(training_data_independent)
+                df_train = training_data[self.independent_variables]
                 y_train = list(training_data[self.dependent_variable]) #listing the dependent variable for training
                 #training_variables = np.array([X_train,y_train])              
                 
+                if (self.level == "Questionnaire Level") | (self.level == "User and Quest Level"):
+                    X_train, X_test = preprocess.imputation(df_train, df_test)
+                else:
+                    X_train, X_test = (df_train, df_test)
+
                 train = {"train":{"X_train":X_train, "y_train":y_train}} #dictionary of training data for each fold
                 test = {"test":{"X_test":X_test, "y_test":y_test}} #dictionary of testing data for each fold
                 
@@ -281,6 +280,16 @@ class CustomKFold:
                 
             return (the_folds) #returning the fold
         
+        user_grouped = edit_outstanding_groups(initial_user_groups) #edit the user groups for uniformity
+        df_merged = pd.merge(df_sorted, user_grouped, how = 'inner', on = "User") #merge the df with the original
+        df_grouped = df_merged.sort_values(by = ["User", "Group"]) #sort by the users and groups
+        
+        scaler = StandardScaler() #using scaling
+        df_grouped = scaler.fit(df_grouped)
+        #I think I should do the dummy variables here to avoid issues
+        ###############################################################################
+
+        groups = list(range(self.n_splits)) #a list of the groups  
         if self.level == "Cycle Level":
             grps_list = user_and_cycle_groups_list(df_grouped, groups) #getting the group and cycle lists for cycle level only
         else:

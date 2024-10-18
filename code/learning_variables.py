@@ -88,13 +88,18 @@ def the_variables(INPUT_TEMPS, INPUT_QUEST, MODEL_CYCLE, OUTPUT_TEMPS, OUTPUT_QU
     #missingness in the questionnaire variables (take out users with more than 5 missing values)
     df_missingness = preprocess.get_missing(had_menstruation).reset_index(drop = True)
     
+    ##### To ensure imputation for missing values at fold level, i do not not need to imput here. The impuataion will be doen during the splitting
     #preprocessing and defining categories (missing values imputted to here)
-    df_preprocessed = preprocess.pre_processing_redone(df_missingness)
+    #df_preprocessed = preprocess.pre_processing_redone(df_missingness)
 
+    ##### Also for creating the dummy variables, is better do do it during splitting becasue of the imputation
     #Get dummy variables
-    dummies = pd.get_dummies(df_preprocessed[["Regular Smoker", "Period in last 3 months", "Regular periods", "Heavy periods", "Painful periods"]], drop_first=True)
-    df_init = df_preprocessed[["User ID", "BMI", "Age menstration started", "PCOS"]]
-    final_quest_ml = pd.concat([df_init, dummies], axis = 1)
+    #dummies = pd.get_dummies(df_missingness[["Regular Smoker", "Period in last 3 months", "Regular periods", "Heavy periods", "Painful periods"]], drop_first=True)
+    #df_init = df_preprocessed[["User ID", "BMI", "Age menstration started", "PCOS"]]
+    #final_quest_ml = pd.concat([df_init, dummies], axis = 1)
+    ###################################
+    
+    final_quest_ml = df_missingness[["User ID", "BMI", "Age menstration started", "PCOS", "Regular Smoker", "Period in last 3 months", "Regular periods", "Heavy periods", "Painful periods"]]
     final_quest_ml.rename({"User ID":"User"}, axis =1, inplace=True)
     counts = final_quest_ml["User"].nunique()
     logger.info(f"Users in questionnaire data after taking out missingness: {counts}")

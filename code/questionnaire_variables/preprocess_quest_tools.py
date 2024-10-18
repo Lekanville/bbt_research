@@ -156,7 +156,7 @@ def pre_processing_redone(df):
 
 
 #I may need this because Louise asks that we imput for each of the folds. 
-def pre_processing_redone_imputation(df_train, df_test):
+def missing_imputation(df_train, df_test):
         
     median_BMI = np.median(df_train[df_train["BMI"] != "No response"]["BMI"].astype(float))
     median_menst_age = np.median(df_train[(df_train["Age menstration started"] != "No response") &
@@ -206,12 +206,14 @@ def pre_processing_redone_imputation(df_train, df_test):
         if df_test.loc[i, "Regular periods"] == "No response":
             df_test.loc[i, "Regular periods"] =  mode_regular_periods
 
-    dummies_train = pd.get_dummies(df_train[["Regular Smoker", "Period in last 3 months", "Regular periods", "Heavy periods", "Painful periods"]], drop_first=True)
-    df_init_train = df_train[["User", "BMI", "Age menstration started", "PCOS"]]
-    final_quest_ml_train = pd.concat([df_init_train, dummies_train], axis = 1)
+    final_quest_ml_train = pd.get_dummies(df_train, drop_first=True)
+    # df_init_train = df_train[["User", "BMI", "Age menstration started", "PCOS"]]
+    # final_quest_ml_train = pd.concat([df_init_train, dummies_train], axis = 1)
+    # dummies_train = pd.get_dummies(df_train, drop_first=True)
 
-    dummies_test = pd.get_dummies(df_test[["Regular Smoker", "Period in last 3 months", "Regular periods", "Heavy periods", "Painful periods"]], drop_first=True)
-    df_init_test = df_test[["User", "BMI", "Age menstration started", "PCOS"]]
-    final_quest_ml_test = pd.concat([df_init_test, dummies_test], axis = 1)
+    final_quest_ml_test = pd.get_dummies(df_test, drop_first=True)
+    # df_init_test = df_test[["User", "BMI", "Age menstration started", "PCOS"]]
+    # final_quest_ml_test = pd.concat([df_init_test, dummies_test], axis = 1)
+    # dummies_test = pd.get_dummies(df_test, drop_first=True)
 
     return (final_quest_ml_train, final_quest_ml_test)

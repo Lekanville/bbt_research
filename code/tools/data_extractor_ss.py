@@ -150,6 +150,7 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     
     Expanded_smooth_temps = tools.get_expanded_values(smooth_temps_with_missing_head_and_tail)
     Expanded_smooth_temps_not_null = [e for e in Expanded_smooth_temps if ~np.isnan(e)]
+    Expanded_smooth_temps_offset = min([i for i,j in enumerate(Expanded_smooth_temps) if ~np.isnan(j)])
     # print(Expanded_smooth_temps)
 
     #standardizing the smooth values    
@@ -173,7 +174,7 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     # Standard_distance = "{0:.2f}".format(dtw.distance(Standard_model_cycle, Standard_smooth_temps))
     # d, Standard_path_values = dtw.warping_paths(Standard_model_cycle, Standard_smooth_temps)
 
-    #for those with zero or positive offsets, the DTW with missigness algorithm is used
+    #Not anymore-for those with zero or positive offsets, the DTW with missingness algorithm is used
     if (offset >= 0):
         # d, Standard_path_values, Standard_path = dtw_m.warping_paths(np.array(Standard_model_cycle), np.array(Standard_smooth_temps), return_optimal_warping_path=True)
         # Standard_distance = "{0:.2f}".format(d)
@@ -228,8 +229,10 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     Standard_nadir_day, Standard_nadir_temp, Standard_nadir_temp_actual, Standard_peak_day, Standard_peak_temp, Standard_peak_temp_actual = tools.get_nadirs_and_peaks(
         Standard_smooth_temps, Standard_path, Expanded_smooth_temps_not_null, model_cycle, cycle
         )
+    #Standard_smooth_temps
+    #Standard_path
 
-    #Nadir and Peak Validity Check
+    #I might Nadir and Peak Validity Check
     if (~(np.isnan(Standard_nadir_day)) & ~(np.isnan(Standard_peak_day))):
         temp_diffs = [Expanded_smooth_temps_not_null[i+1] - Expanded_smooth_temps_not_null[i] for i in range(len(Expanded_smooth_temps_not_null)-1)]
         lower_curve_list = temp_diffs[:Standard_nadir_day]
@@ -249,13 +252,32 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
         Standard_nadir_to_peak = np.nan
         Standard_low_to_high_temp = np.nan
 
+    #for extrapolating nadirs and peaks in incomplete cycles
+    cycle_least_pos = np.where(~(np.isnan(Standard_smooth_temps)))[0][0] #Position of the first warp on cycle
+    beginning_warps = len([x for x in Standard_path if x[1] == cycle_least_pos]) #The beginning warps
+    
+    cycle_max_pos = np.where(~(np.isnan(Standard_smooth_temps)))[0][-1] #Position of the last warp on cycle
+    ending_warps = len([x for x in Standard_path if x[1] == cycle_max_pos]) #The ending warps
+
+    if (nadir_valid == False) & (beginning_warps > 1): #cycles with no negative slope before peaks and many-to-one warps at the beginning
+        nadir_extrapolated = tools.extrapolate_nadir(Standard_path, model_cycle, Expanded_smooth_temps, cycle_least_pos)
+        Expanded_nadir_day = nadir_extrapolated
+    else:
+        Expanded_nadir_day = Expanded_smooth_temps_offset + Standard_nadir_day
+
+    if (peak_valid == False) & (beginning_warps > 1)(ending_warps > 1): #cycles with no negative slope before peaks and many-to-one warps at the beginning
+        peak_extrapolated = tools.extrapolate_peak(Standard_path, model_cycle, Expanded_smooth_temps, cycle_max_pos)
+        Expanded_peak_day =  peak_extrapolated
+    else:
+        Expanded_peak_day = Expanded_smooth_temps_offset + Standard_peak_day
+
     #we create a dictionary of the results for each cycle
     data = {"User":user, "Cycle":cycle, "Temps":temps, "Smooth_Temp":smooth_temps, "Smooth_Temp_with_NAs": smooth_temps_with_missing_head_and_tail,
             "Ovulation Day":ovulation, "Next Cycle Difference":Date_Diff, "Offset":offset, "PCOS":PCOS, "Cycle Completeness":cycle_compl,
-
-            "Standard_model_cycle":Standard_model_cycle, "Standard_smooth_temps":Standard_smooth_temps, "Expanded_smooth_temps": Expanded_smooth_temps,
+            "Standard_model_cycle":Standard_model_cycle, "Expanded_smooth_temps": Expanded_smooth_temps, "Standard_smooth_temps":Standard_smooth_temps, 
             "Standard_distance":Standard_distance, "Standard_path":Standard_path, 
-            "Standard_nadir_day":Standard_nadir_day, "Standard_peak_day":Standard_peak_day, 
+            "Standard_nadir_day":Standard_nadir_day, "Standard_peak_day":Standard_peak_day,
+            "Expanded_nadir_day":Expanded_nadir_day, "Expanded_peak_day":Expanded_peak_day, 
             "Standard_nadir_temp":Standard_nadir_temp, "Standard_peak_temp":Standard_peak_temp,
             "Standard_nadir_temp_actual":Standard_nadir_temp_actual, "Standard_peak_temp_actual":Standard_peak_temp_actual,
             "Standard_nadir_to_peak":Standard_nadir_to_peak, "Standard_low_to_high_temp":Standard_low_to_high_temp,

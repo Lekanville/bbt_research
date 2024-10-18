@@ -495,3 +495,52 @@ def clean_expanded(vals):
             cleaned_vals.append(float(i))
     
     return cleaned_vals
+
+#This extrapolates nadirs in situations of incomplete cycles
+def extrapolate_nadir(Standard_path, model_cycle, Expanded_smooth_temps, cycle_least_pos):
+    least = max([x for x in Standard_path if x[1] == cycle_least_pos])
+    
+    #Louise's extrapolation algorithm for missing nadirs
+    model_nadir_pos = [i for i,j in enumerate(model_cycle) if j == min(model_cycle)][0]
+    cycle_first_record = min([i for i,j in enumerate(Expanded_smooth_temps) if ~np.isnan(j)])
+
+    #least reference point warped to cycle
+    model_warped_least = least[0]
+
+    #proportion of model nadir to least reference point warped to cycle 
+    prop_of_model_nadir = (model_nadir_pos+1)/(model_warped_least+1)
+
+    #interpolated cycle nadir
+    extrapolated_nadir = int(round(prop_of_model_nadir*(cycle_first_record+1))) - 1 #the last -1 puts the day pack on the list index
+
+    return (extrapolated_nadir)
+
+#This extrapolates peaks in situations of incomplete cycles
+def extrapolate_peak(Standard_path, model_cycle, Expanded_smooth_temps, cycle_max_pos):
+    maximum = min([x for x in Standard_path if x[1] == cycle_max_pos])
+
+    #Adaptation of Louise's extrapolation algorithm for missing nadirs for obtaining missing peaks
+    model_peak_pos = [i for i,j in enumerate(model_cycle) if j == max(model_cycle)][0]
+    cycle_last_record = max([i for i,j in enumerate(Expanded_smooth_temps) if ~np.isnan(j)])
+
+    position_of_last_cycle_warp = [i for i, j in enumerate(Standard_path) if j == maximum][0] #Last warp before many to one
+
+    total_warp = len(Standard_path) #The total warps
+    unknown_positions = (total_warp - position_of_last_cycle_warp-1) + 1 #Difference between last warp before many and the total warps
+
+    peak_pos_in_all_paths = [i for i, j in enumerate(Standard_path) if j[0] == model_peak_pos][0] #Position of the peak in all paths
+    peak_pos_in_unknowns = (peak_pos_in_all_paths - position_of_last_cycle_warp) + 1 # Position of peak after last warp
+
+    #Proportion of peak within the unknowns
+    prop_of_model_peak = peak_pos_in_unknowns/unknown_positions
+
+    #The missing portions in the peak part of the cycle
+    total_cycle_length = len(Expanded_smooth_temps)
+    recorded_cycle_length = cycle_last_record + 1
+    missing_portion_peak = (total_cycle_length - recorded_cycle_length)
+
+    #extrapolated cycle peak within unknowns
+    extrapolated_peak_unknowns = prop_of_model_peak*missing_portion_peak
+    extrapolated_peak = int(round(recorded_cycle_length + extrapolated_peak_unknowns)) - 1 #the last -1 puts the day pack on the list index
+
+    return (extrapolated_peak)
