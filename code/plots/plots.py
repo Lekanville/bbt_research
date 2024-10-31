@@ -489,6 +489,79 @@ def plot_nadir_peak_StandardScaler(u, data):
         j+=1
     plt.savefig(u+'.png')
 
+
+
+#All cycles for a user. Use the features dataset
+def plot_nadir_peak_StandardScaler_expanded(u, data):
+    #use the processed temperatures from features_dtw_SS
+    chunks = pd.read_csv(data, chunksize=5000)
+    features = pd.concat(chunks)
+    new_user_cycles = features.groupby("User")
+
+    user_cycles = new_user_cycles.get_group(u).set_index("Cycle")
+    len_cycles = len(user_cycles)
+    
+    fig = fig_layout()
+    fig, ax = plt.subplots(figsize=(6*len_cycles, 5), nrows=1, ncols=len_cycles)
+    #fig, ax_1 = plt.subplots(figsize=(6*len_cycles, 5), nrows=1, ncols=len_cycles)
+    j = 0
+    k = 0
+
+    for c in user_cycles.index:
+        model_cycle_array = user_cycles[user_cycles.index == c]["Standard_model_cycle"]
+        Standard_model_cycle = list(map(float, model_cycle_array[0].replace("[", "").replace("]", "").split(", ")))
+        
+        Standard_smooth_array = user_cycles[user_cycles.index == c]["Standard_smooth_temps"]
+        #Standard_smooth_temps = list(map(float, Standard_smooth_array[0].replace("[", "").replace("]", "").split("\n ")))
+        x = Standard_smooth_array[0].replace("[", "").replace("]", "").replace("\n", "").split(" ")
+        Standard_smooth_temps = tools.clean_expanded(x)
+        
+        Standard_path = user_cycles[user_cycles.index == c]["Standard_path"].values[0]
+        Standard_path = list(map(int, Standard_path.replace("[", "").replace("]", "").replace("(", "").replace(")", "").split(", ")))
+        Standard_path = [(Standard_path[i], Standard_path[i+1]) for i,j in enumerate(Standard_path) if i%2 == 0 ]
+        
+        Standard_distance = str(user_cycles[user_cycles.index == c]["Standard_distance"].values[0])
+        Curve_Length =  str("{0:.2f}".format(user_cycles[user_cycles.index == c]["Curve_Length"].values[0]))
+        
+        #Pad the cycle with the expanded offset 
+        expanded_offset = user_cycles[user_cycles.index == c]["Expanded_smooth_temps_offset"].values[0]
+        Standard_path_offset = [(j[0], j[1]+expanded_offset) for i,j in enumerate(Standard_path)]
+        Standard_smooth_temps_pad = np.concatenate((np.array(expanded_offset*[np.nan]), Standard_smooth_temps))
+
+        lower_day = user_cycles[user_cycles.index == c]["Expanded_nadir_day"].values[0]
+        #lower_smooth = float(user_cycles[user_cycles.index == c]["Standard_nadir_temp"].values[0].replace("[", "").replace("]", ""))
+        lower_smooth = user_cycles[user_cycles.index == c]["Standard_nadir_temp"].values[0]
+        
+        upper_day = user_cycles[user_cycles.index == c]["Expanded_peak_day"].values[0]
+        #upper_smooth = float(user_cycles[user_cycles.index == c]["Standard_peak_temp"].values[0].replace("[", "").replace("]", ""))
+        upper_smooth = user_cycles[user_cycles.index == c]["Standard_peak_temp"].values[0]
+        
+        for [map_x, map_y] in Standard_path_offset:
+            ax[j].plot([map_x, map_y], [Standard_model_cycle[map_x], Standard_smooth_temps_pad[map_y]], "--k", linewidth=1, alpha = 0.5)
+        
+        ax[j].plot(Standard_smooth_temps_pad, "-ro", label = "User Cycle", linewidth=2, markersize = 5, markerfacecolor = "skyblue", markeredgecolor = "skyblue")
+        ax[j].plot(Standard_model_cycle, "-bo", label = "Reference Cycle", linewidth=2, markersize =5, markerfacecolor = "lightcoral", markeredgecolor = "lightcoral")
+        
+        ax[j].plot(lower_day, lower_smooth, label = "Nadir", marker="o", markersize=20,
+            markerfacecolor="yellow", markeredgecolor="green",  markeredgewidth=2, alpha=0.5)
+
+        ax[j].plot(upper_day, upper_smooth, label = "Peak", marker="o", markersize=20,
+            markerfacecolor="red", markeredgecolor="green",  markeredgewidth=2, alpha=0.5)
+
+        
+        #ax[j].set_xlabel('Cycle Day')
+        #ax[j].set_ylabel(u+' Temp(°C)')
+        ax[j].set_xlabel('Normalised Cycle Day')
+        ax[j].set_ylabel('Standardised Temperature')
+        ax[j].set_title(c+"\n Dtw Distance:"+ Standard_distance + " Curve_Length:"+Curve_Length)
+        ax[j].legend(loc=0)
+        plt.tight_layout()
+
+        j+=1
+    plt.savefig(u+'.png')
+
+
+
 #Plot all cycles for various users in a embedded list eg [{"user":"iiii","ref_cycles":"jjjj"}, {"user":"xxxx","ref_cycles":"yyyy"}]
 def plot_refs(ref_users, data):
     #use the processed temperatures from features_dtw_SS

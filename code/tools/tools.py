@@ -496,8 +496,8 @@ def clean_expanded(vals):
     
     return cleaned_vals
 
-#This extrapolates nadirs in situations of incomplete cycles
-def extrapolate_nadir(Standard_path, model_cycle, Expanded_smooth_temps, cycle_least_pos):
+#This extrapolates nadir day in situations of incomplete cycles
+def extrapolate_nadir_day(Standard_path, model_cycle, Expanded_smooth_temps, cycle_least_pos):
     least = max([x for x in Standard_path if x[1] == cycle_least_pos])
     
     #Louise's extrapolation algorithm for missing nadirs
@@ -515,8 +515,8 @@ def extrapolate_nadir(Standard_path, model_cycle, Expanded_smooth_temps, cycle_l
 
     return (extrapolated_nadir)
 
-#This extrapolates peaks in situations of incomplete cycles
-def extrapolate_peak(Standard_path, model_cycle, Expanded_smooth_temps, cycle_max_pos):
+#This extrapolates peak day in situations of incomplete cycles
+def extrapolate_peak_day(Standard_path, model_cycle, Expanded_smooth_temps, cycle_max_pos):
     maximum = min([x for x in Standard_path if x[1] == cycle_max_pos])
 
     #Adaptation of Louise's extrapolation algorithm for missing nadirs for obtaining missing peaks
@@ -544,3 +544,67 @@ def extrapolate_peak(Standard_path, model_cycle, Expanded_smooth_temps, cycle_ma
     extrapolated_peak = int(round(recorded_cycle_length + extrapolated_peak_unknowns)) - 1 #the last -1 puts the day pack on the list index
 
     return (extrapolated_peak)
+
+
+#This extrapolates nadir temperature in situations of incomplete cycles
+def extrapolate_nadir_temp(Standard_path, model_cycle, Standard_smooth_temps, Expanded_smooth_temps_not_null, Standard_peak_temp, Standard_peak_temp_actual, cycle_least_pos):
+    least = max([x for x in Standard_path if x[1] == cycle_least_pos]) #last nadir many-to-one warps
+    
+    least_nadir_model = least[0] #Least point on model after one-to-many warps
+    least_nadir_model_temp = model_cycle[least_nadir_model] #Temp of the least point on model after one-to-many warps
+
+    model_peak = max(model_cycle) #Model peak
+    model_nadir = min(model_cycle) #Model nadir
+
+    d_1 = model_peak - least_nadir_model_temp #Difference btw model last warp and peak temps
+    d_2 = model_peak - model_nadir #Difference btw model nadir and peak temps
+
+    w = d_2/d_1 #Ratio of temp difference between model last multiple warps and peak temp
+
+    false_nadir_pos = least[1] #Position of false nadir. Usually the first recording
+    false_nadir_pos_temp_actual_std = Standard_smooth_temps[false_nadir_pos] #Std temp of false nadir
+    false_nadir_pos_temp_actual =  Expanded_smooth_temps_not_null[false_nadir_pos] #Actual temp of false nadir
+
+    D_1_std = Standard_peak_temp - false_nadir_pos_temp_actual_std
+    D_1_actual = Standard_peak_temp_actual - false_nadir_pos_temp_actual
+
+    D_2_std = w * D_1_std
+    D_2_actual = w * D_1_actual
+
+    ExNadir = Standard_peak_temp - D_2_std
+    ExNadir_actual = Standard_peak_temp_actual - D_2_actual
+    
+    return (ExNadir, ExNadir_actual)
+
+
+#This extrapolates peak temperature in situations of incomplete cycles
+def extrapolate_peak_temp(Standard_path, model_cycle, Standard_smooth_temps, Expanded_smooth_temps_not_null, Standard_nadir_temp, Standard_nadir_temp_actual, cycle_max_pos):
+
+    maximum = min([x for x in Standard_path if x[1] == cycle_max_pos]) #First peak many-to-one warps
+
+    least_peak_model = maximum[0] #Least point on model before one-to-many warps
+    least_peak_model_temp = model_cycle[least_peak_model] #Temp of the least point on model before one-to-many warps
+
+    model_peak = max(model_cycle) #Model peak
+    model_nadir = min(model_cycle) #Model nadir
+
+    d_1 = least_peak_model_temp - model_nadir #Difference btw model last warp and peak temps
+    d_2 = model_peak - model_nadir #Difference btw model nadir and peak temps
+
+
+    w = d_2/d_1 #Ratio of temp difference between model first multiple warps and nadir temp
+
+    false_peak_pos = maximum[1] #Position of false nadir. Usually the first recording
+    false_peak_pos_temp_actual_std = Standard_smooth_temps[false_peak_pos] #Std temp of false nadir
+    false_peak_pos_temp_actual = Expanded_smooth_temps_not_null[false_peak_pos] #Actual temp of false nadir
+
+    D_1_std = false_peak_pos_temp_actual_std - Standard_nadir_temp
+    D_1_actual = false_peak_pos_temp_actual - Standard_nadir_temp_actual
+
+    D_2_std = w * D_1_std
+    D_2_actual = w * D_1_actual
+
+    ExPeak = Standard_nadir_temp + D_2_std
+    ExPeak_actual = Standard_nadir_temp_actual + D_2_actual
+    
+    return (ExPeak, ExPeak_actual)

@@ -57,11 +57,7 @@ class Learning:
 
         ############################################################################################
     ### For Rule 15 (quest_level_learning) - 
-    ### 1. The first input is the file containing the dependent and independent variables
-    ###  - the output of preprocess_quest rule (rule 14) 
-    ## 
-    ## Note I have refactored this. I need to change this to the output of questionnaire variables of the get_learning_variables 
-    ##                                                                     
+    ### 1. The input is the file containing the preprocessed qustionnaire variables - the second output of get_learning_variables rule (rule 10)                                                                      
     ### 2. Specify the output folder to save the learning results of the questionnaire level learning
     ##  3. Specify the number of k-splits
         ############################################################################################"
