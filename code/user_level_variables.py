@@ -14,6 +14,8 @@ import os
 import argparse
 from dtaidistance import dtw
 from sklearn.preprocessing import StandardScaler
+import argparse
+from loguru import logger
 
 import itertools
 import tools.tools as tools
@@ -94,13 +96,16 @@ def the_user_level_variables(INPUT, OUTPUT):
         Change_Point_Day = list(test_df["Change Point Day"])
         Change_Point_Mean_Diff = list(test_df["Change Point Mean Diff"])
         Path_Length_with_Diff = list(test_df["path_length_with_diff"])
-        Standard_Nadir_Day = list(test_df["Standard_nadir_day"])
-        Standard_Peak_Day = list(test_df["Standard_peak_day"])
         Standard_Nadir_Temp_Actual = list(test_df["Standard_nadir_temp_actual"])
         Standard_Peak_Temp_Actual = list(test_df["Standard_peak_temp_actual"])
-        Nadir_to_Peak = list(test_df["Standard_nadir_to_peak"])
         Low_to_High_Temp = list(test_df["Standard_low_to_high_temp"])
         Cost_with_Diff = list(test_df["cost_with_diff"])
+        Standard_Nadir_Day = list(test_df["Standard_nadir_day"])
+        Standard_Peak_Day = list(test_df["Standard_peak_day"])
+        Nadir_to_Peak = list(test_df["Standard_nadir_to_peak"])
+        Expanded_Nadir_Day = list(test_df["Expanded_nadir_day"])
+        Expanded_Peak_Day = list(test_df["Expanded_peak_day"])
+        Expanded_Nadir_to_Peak = list(test_df["Expanded_nadir_to_peak"])
 
         #minimum cycle level features
         min_Data_Length = np.min(Data_Length)
@@ -114,13 +119,16 @@ def the_user_level_variables(INPUT, OUTPUT):
         min_Change_Point_Day = np.min(Change_Point_Day)
         min_Change_Point_Mean_Diff = np.min(Change_Point_Mean_Diff)
         min_Path_Length_with_Diff = np.min(Path_Length_with_Diff)
-        min_Standard_Nadir_Day = np.min(Standard_Nadir_Day)
-        min_Standard_Peak_Day = np.min(Standard_Peak_Day)
         min_Standard_Nadir_Temp_Actual = np.min(Standard_Nadir_Temp_Actual)
         min_Standard_Peak_Temp_Actual = np.min(Standard_Peak_Temp_Actual)
-        min_Nadir_to_Peak = np.min(Nadir_to_Peak)
         min_Low_to_High_Temp = np.min(Low_to_High_Temp)
         min_Cost_with_Diff = np.min(Cost_with_Diff)
+        min_Standard_Nadir_Day = np.min(Standard_Nadir_Day)
+        min_Standard_Peak_Day = np.min(Standard_Peak_Day)
+        min_Nadir_to_Peak = np.min(Nadir_to_Peak)
+        min_Expanded_Nadir_Day = np.min(Expanded_Nadir_Day)
+        min_Expanded_Peak_Day = np.min(Expanded_Peak_Day)
+        min_Expanded_Nadir_to_Peak = np.min(Expanded_Nadir_to_Peak)
 
         #maximum cycle level features
         max_Data_Length = np.max(Data_Length)
@@ -134,13 +142,16 @@ def the_user_level_variables(INPUT, OUTPUT):
         max_Change_Point_Day = np.max(Change_Point_Day)
         max_Change_Point_Mean_Diff = np.max(Change_Point_Mean_Diff)
         max_Path_Length_with_Diff = np.max(Path_Length_with_Diff)
-        max_Standard_Nadir_Day = np.max(Standard_Nadir_Day)
-        max_Standard_Peak_Day = np.max(Standard_Peak_Day)
         max_Standard_Nadir_Temp_Actual = np.max(Standard_Nadir_Temp_Actual)
         max_Standard_Peak_Temp_Actual = np.max(Standard_Peak_Temp_Actual)
-        max_Nadir_to_Peak = np.max(Nadir_to_Peak)
         max_Low_to_High_Temp = np.max(Low_to_High_Temp)
         max_Cost_with_Diff = np.max(Cost_with_Diff)
+        max_Standard_Nadir_Day = np.max(Standard_Nadir_Day)
+        max_Standard_Peak_Day = np.max(Standard_Peak_Day)
+        max_Nadir_to_Peak = np.max(Nadir_to_Peak)
+        max_Expanded_Nadir_Day = np.max(Expanded_Nadir_Day)
+        max_Expanded_Peak_Day = np.max(Expanded_Peak_Day)
+        max_Expanded_Nadir_to_Peak = np.max(Expanded_Nadir_to_Peak)
 
         #median cycle level features
         med_Data_Length = np.median(Data_Length)
@@ -154,13 +165,17 @@ def the_user_level_variables(INPUT, OUTPUT):
         med_Change_Point_Day = np.median(Change_Point_Day)
         med_Change_Point_Mean_Diff = np.median(Change_Point_Mean_Diff)
         med_Path_Length_with_Diff = np.median(Path_Length_with_Diff)
-        med_Standard_Nadir_Day = np.median(Standard_Nadir_Day)
-        med_Standard_Peak_Day = np.median(Standard_Peak_Day)
         med_Standard_Nadir_Temp_Actual = np.median(Standard_Nadir_Temp_Actual)
         med_Standard_Peak_Temp_Actual = np.median(Standard_Peak_Temp_Actual)
-        med_Nadir_to_Peak = np.median(Nadir_to_Peak)
         med_Low_to_High_Temp = np.median(Low_to_High_Temp)
         med_Cost_with_Diff = np.median(Cost_with_Diff)
+        med_Standard_Nadir_Day = np.median(Standard_Nadir_Day)
+        med_Standard_Peak_Day = np.median(Standard_Peak_Day)
+        med_Nadir_to_Peak = np.median(Nadir_to_Peak)
+        med_Expanded_Nadir_Day = np.median(Expanded_Nadir_Day)
+        med_Expanded_Peak_Day = np.median(Expanded_Peak_Day)
+        med_Expanded_Nadir_to_Peak = np.median(Expanded_Nadir_to_Peak)
+        
 
         #range of cycle level features
         rge_Data_Length = np.ptp(Data_Length)
@@ -174,13 +189,16 @@ def the_user_level_variables(INPUT, OUTPUT):
         rge_Change_Point_Day = np.ptp(Change_Point_Day)
         rge_Change_Point_Mean_Diff = np.ptp(Change_Point_Mean_Diff)
         rge_Path_Length_with_Diff = np.ptp(Path_Length_with_Diff)
-        rge_Standard_Nadir_Day = np.ptp(Standard_Nadir_Day)
-        rge_Standard_Peak_Day = np.ptp(Standard_Peak_Day)
         rge_Standard_Nadir_Temp_Actual = np.ptp(Standard_Nadir_Temp_Actual)
         rge_Standard_Peak_Temp_Actual = np.ptp(Standard_Peak_Temp_Actual)
-        rge_Nadir_to_Peak = np.ptp(Nadir_to_Peak)
         rge_Low_to_High_Temp = np.ptp(Low_to_High_Temp)
         rge_Cost_with_Diff = np.ptp(Cost_with_Diff)
+        rge_Standard_Nadir_Day = np.ptp(Standard_Nadir_Day)
+        rge_Standard_Peak_Day = np.ptp(Standard_Peak_Day)
+        rge_Nadir_to_Peak = np.ptp(Nadir_to_Peak)
+        rge_Expanded_Nadir_Day = np.ptp(Expanded_Nadir_Day)
+        rge_Expanded_Peak_Day = np.ptp(Expanded_Peak_Day)
+        rge_Expanded_Nadir_to_Peak = np.ptp(Expanded_Nadir_to_Peak)
 
         #The dependent variable
         PCOS = list(test_df["PCOS"])[0]
@@ -201,13 +219,16 @@ def the_user_level_variables(INPUT, OUTPUT):
             "min_Change_Point_Day":min_Change_Point_Day,
             "min_Change_Point_Mean_Diff":min_Change_Point_Mean_Diff,
             "min_Path_Length_with_Diff":min_Path_Length_with_Diff,
-            "min_Standard_Nadir_Day":min_Standard_Nadir_Day,
-            "min_Standard_Peak_Day":min_Standard_Peak_Day,
             "min_Standard_Nadir_Temp_Actual":min_Standard_Nadir_Temp_Actual,
             "min_Standard_Peak_Temp_Actual":min_Standard_Peak_Temp_Actual,
-            "min_Nadir_to_Peak":min_Nadir_to_Peak,
             "min_Low_to_High_Temp":min_Low_to_High_Temp,
             "min_Cost_with_Diff":min_Cost_with_Diff,
+            "min_Standard_Nadir_Day":min_Standard_Nadir_Day,
+            "min_Standard_Peak_Day":min_Standard_Peak_Day,
+            "min_Nadir_to_Peak":min_Nadir_to_Peak,
+            "min_Expanded_Nadir_Day":min_Expanded_Nadir_Day,
+            "min_Expanded_Peak_Day":min_Expanded_Peak_Day,
+            "min_Expanded_Nadir_to_Peak":min_Expanded_Nadir_to_Peak,
 
             "max_Data_Length":max_Data_Length,
             "max_Cycle_Length":max_Cycle_Length,
@@ -220,13 +241,16 @@ def the_user_level_variables(INPUT, OUTPUT):
             "max_Change_Point_Day":max_Change_Point_Day,
             "max_Change_Point_Mean_Diff":max_Change_Point_Mean_Diff,
             "max_Path_Length_with_Diff":max_Path_Length_with_Diff,
-            "max_Standard_Nadir_Day":max_Standard_Nadir_Day,
-            "max_Standard_Peak_Day":max_Standard_Peak_Day,
             "max_Standard_Nadir_Temp_Actual":max_Standard_Nadir_Temp_Actual,
             "max_Standard_Peak_Temp_Actual":max_Standard_Peak_Temp_Actual,
-            "max_Nadir_to_Peak":max_Nadir_to_Peak,
             "max_Low_to_High_Temp":max_Low_to_High_Temp,
             "max_Cost_with_Diff":max_Cost_with_Diff,
+            "max_Standard_Nadir_Day":max_Standard_Nadir_Day,
+            "max_Standard_Peak_Day":max_Standard_Peak_Day,
+            "max_Nadir_to_Peak":max_Nadir_to_Peak,
+            "max_Expanded_Nadir_Day":max_Expanded_Nadir_Day,
+            "max_Expanded_Peak_Day":max_Expanded_Peak_Day,
+            "max_Expanded_Nadir_to_Peak":max_Expanded_Nadir_to_Peak,
 
             "med_Data_Length":med_Data_Length,
             "med_Cycle_Length":med_Cycle_Length,
@@ -239,13 +263,16 @@ def the_user_level_variables(INPUT, OUTPUT):
             "med_Change_Point_Day":med_Change_Point_Day,
             "med_Change_Point_Mean_Diff":med_Change_Point_Mean_Diff,
             "med_Path_Length_with_Diff":med_Path_Length_with_Diff,
-            "med_Standard_Nadir_Day":med_Standard_Nadir_Day,
-            "med_Standard_Peak_Day":med_Standard_Peak_Day,
             "med_Standard_Nadir_Temp_Actual":med_Standard_Nadir_Temp_Actual,
             "med_Standard_Peak_Temp_Actual":med_Standard_Peak_Temp_Actual,
-            "med_Nadir_to_Peak":med_Nadir_to_Peak,
             "med_Low_to_High_Temp":med_Low_to_High_Temp,
             "med_Cost_with_Diff":med_Cost_with_Diff,
+            "med_Standard_Nadir_Day":med_Standard_Nadir_Day,
+            "med_Standard_Peak_Day":med_Standard_Peak_Day,
+            "med_Nadir_to_Peak":med_Nadir_to_Peak,
+            "med_Expanded_Nadir_Day":med_Expanded_Nadir_Day,
+            "med_Expanded_Peak_Day":med_Expanded_Peak_Day,
+            "med_Expanded_Nadir_to_Peak":med_Expanded_Nadir_to_Peak,
 
             "rge_Data_Length":rge_Data_Length,
             "rge_Cycle_Length":rge_Cycle_Length,
@@ -258,13 +285,16 @@ def the_user_level_variables(INPUT, OUTPUT):
             "rge_Change_Point_Day":rge_Change_Point_Day,
             "rge_Change_Point_Mean_Diff":rge_Change_Point_Mean_Diff,
             "rge_Path_Length_with_Diff":rge_Path_Length_with_Diff,
-            "rge_Standard_Nadir_Day":rge_Standard_Nadir_Day,
-            "rge_Standard_Peak_Day":rge_Standard_Peak_Day,
             "rge_Standard_Nadir_Temp_Actual":rge_Standard_Nadir_Temp_Actual,
             "rge_Standard_Peak_Temp_Actual":rge_Standard_Peak_Temp_Actual,
-            "rge_Nadir_to_Peak":rge_Nadir_to_Peak,
             "rge_Low_to_High_Temp":rge_Low_to_High_Temp,
             "rge_Cost_with_Diff":rge_Cost_with_Diff,
+            "rge_Standard_Nadir_Day":rge_Standard_Nadir_Day,
+            "rge_Standard_Peak_Day":rge_Standard_Peak_Day,
+            "rge_Nadir_to_Peak":rge_Nadir_to_Peak,
+            "rge_Expanded_Nadir_Day":rge_Expanded_Nadir_Day,
+            "rge_Expanded_Peak_Day":rge_Expanded_Peak_Day,
+            "rge_Expanded_Nadir_to_Peak":rge_Expanded_Nadir_to_Peak,
 
             "PCOS":PCOS
             }
@@ -273,6 +303,7 @@ def the_user_level_variables(INPUT, OUTPUT):
         
     df_user_lvl_ftrs = pd.DataFrame(user_lvl_ftrs)
     df_user_lvl_ftrs.to_csv(OUTPUT, index=False)
+    logger.info(f"User Level Variables: {OUTPUT}")
 
 if __name__ == "__main__":
     args = parser.parse_args()

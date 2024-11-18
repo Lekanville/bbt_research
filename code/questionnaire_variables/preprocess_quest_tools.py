@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import StandardScaler
 
 #getting and defining row and columns missingness levels
 def get_missing(df):
@@ -217,3 +218,89 @@ def missing_imputation(df_train, df_test):
     # dummies_test = pd.get_dummies(df_test, drop_first=True)
 
     return (final_quest_ml_train, final_quest_ml_test)
+
+
+#Cleaning null responses before spliiting at the questionnaire learning
+def clean_null_responses(df):
+    cols_to_clean = ["BMI", "Age menstration started", "Regular Smoker", "Regular periods"]
+    null_responses = ["No response", "I don't remember", "Prefer not to answer"]
+    
+    for i in range(len(df)):
+        for j in cols_to_clean:
+            for k in null_responses:
+                if df.loc[i, j] == k:
+                    df.loc[i, j] = np.nan
+                    
+    return (df)
+
+#Imputation, scaling and dummy variables creation at the questionnaire learning
+def imputation_scaling_and_dummies(train, test, level):
+    
+    df_train = train.copy()
+    df_test = test.copy()
+    
+    to_dummy = ["Regular Smoker", "Period in last 3 months", "Regular periods", "Heavy periods", "Painful periods"]
+    all_cols = df_train.columns.tolist()
+    to_scale = [i for i in all_cols if i not in to_dummy]
+    
+    #Imputation for missing values with traing mean and modes
+    if (level == "Questionnaire Level") | (level == "User and Quest Level"):
+        median_BMI = np.median(df_train[~pd.isnull(df_train["BMI"])]["BMI"].astype(float))
+        median_menst_age = np.median(df_train[~pd.isnull(df_train["Age menstration started"])]["Age menstration started"].astype(float))
+        mode_regular_smoker = df_train[~pd.isnull(df_train["Regular Smoker"])]["Regular Smoker"].mode().values[0]
+        mode_regular_periods = df_train[~pd.isnull(df_train["Regular periods"])]["Regular periods"].mode().values[0]
+        
+        #for i in range(len(df_train)):
+        df_train["BMI"] = df_train["BMI"].fillna(median_BMI)
+        df_train["Age menstration started"] = df_train["Age menstration started"].fillna(median_menst_age)
+        df_train["Regular Smoker"] = df_train["Regular Smoker"].fillna(mode_regular_smoker)
+        df_train["Regular periods"] = df_train["Regular periods"].fillna(mode_regular_periods)
+        
+        df_test["BMI"] = df_test["BMI"].fillna(median_BMI)
+        df_test["Age menstration started"] = df_test["Age menstration started"].fillna(median_menst_age)
+        df_test["Regular Smoker"] = df_test["Regular Smoker"].fillna(mode_regular_smoker)
+        df_test["Regular periods"] = df_test["Regular periods"].fillna(mode_regular_periods)
+    
+    
+    #Selecting values to be scaled scaling
+    df_train_to_scale = df_train[to_scale].reset_index(drop = True)
+    df_test_to_scale = df_test[to_scale].reset_index(drop = True)
+    
+    
+    #Scaling - Scaling values obtained from training dataset...
+    scaler = StandardScaler()
+    scaler.fit(df_train_to_scale)
+    
+    #Scaling - ...and imputed for both training and testing datasets
+    df_train_scaled = pd.DataFrame(scaler.transform(df_train_to_scale), columns=to_scale)
+    df_test_scaled = pd.DataFrame(scaler.transform(df_test_to_scale), columns=to_scale)
+    
+    #Creating dummy variables
+    if (level == "Questionnaire Level") | (level == "User and Quest Level"):
+        df_train_to_dummy = df_train[to_dummy].reset_index(drop = True)
+        df_test_to_dummy = df_test[to_dummy].reset_index(drop = True)
+
+        df_train_dummies = pd.get_dummies(df_train_to_dummy, drop_first=True)
+        df_test_dummies = pd.get_dummies(df_test_to_dummy, drop_first=True)
+
+
+        #Combine both dummy and scaled values                   
+        df_train_combined = pd.concat([df_train_scaled, df_train_dummies], axis = 1)
+        df_test_combined = pd.concat([df_test_scaled, df_test_dummies], axis = 1)    
+    else:
+        df_train_combined = df_train_scaled
+        df_test_combined = df_test_scaled
+        
+    #Incase dummies misses out any dummy cols, then padd those columns
+    train_cols = df_train_combined.columns.to_list()
+    test_cols = df_test_combined.columns.to_list()
+
+    columns_missed_out_in_dummies = [i for i in train_cols if i not in test_cols]
+
+    if len(columns_missed_out_in_dummies) > 0:
+        for i in columns_missed_out_in_dummies:
+            df_test_combined[i] = 0
+
+    df_test_combined = df_test_combined[train_cols]
+
+    return (df_train_combined, df_test_combined)

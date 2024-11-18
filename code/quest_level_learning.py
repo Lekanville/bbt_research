@@ -15,16 +15,19 @@ import argparse
 from loguru import logger
 from pathlib import Path
 
-from classes.custom_k_fold import CustomKFold
+import questionnaire_variables.preprocess_quest_tools as preprocess
+#from classes.custom_k_fold import CustomKFold
+from classes.strat_k_fold import StratKFold
 from tools.classifier_roc_cross_val import classifier_roc_cross_val
 from tools.classifier_importance import plot_importance
+from tools.classifier_importance import shap_explainer
 
 parser = argparse.ArgumentParser(description= "A script to filter data")
 parser.add_argument('-i', '--input_file', type=str, required=True, help= 'The input dataset')
 parser.add_argument('-k', '--splits', type=int, required=True, help= 'The number of splits')
 parser.add_argument('-o', '--output_folder', type=str, required=True, help= 'The output folder')
 
-def user_level_learning(INPUT, SPLITS, OUTPUT):
+def quest_level_learning(INPUT, SPLITS, OUTPUT):
     #reading the data
     logger.info("Reading questionnaire level variables for learning")
     df = pd.read_csv(INPUT) 
@@ -34,10 +37,13 @@ def user_level_learning(INPUT, SPLITS, OUTPUT):
     
     the_value_counts = df["PCOS"].value_counts()
     print("Counts of the values are \n", the_value_counts)
+    
+    #Replace missing vales with NaN
+    df = preprocess.clean_null_responses(df)
 
     #splitting the data into k-folds
     logger.info("Splitting the dataframe into " +str(SPLITS)+ " folds")
-    splitted_df = CustomKFold(n_splits = SPLITS, df = df, level="Questionnaire Level").customSplit()
+    splitted_df = StratKFold(n_splits = SPLITS, df = df, level="Questionnaire Level").customSplit()
     print("The splits \n", splitted_df[1])
 
     print(splitted_df[0]["PCOS"].value_counts())
@@ -50,21 +56,28 @@ def user_level_learning(INPUT, SPLITS, OUTPUT):
 
     #RFC classifier
     logger.info("Performing Random Forest Classification")
-    rfc_model = classifier_roc_cross_val("Questionnaire Level", "RFC", df_for_learning, OUTPUT)
     #RFC variable importance
-    plot_importance("Questionnaire Level", "RFC Model Importance", rfc_model, OUTPUT)
+    rfc_importance, explainers, x_tests = classifier_roc_cross_val("Questionnaire Level", "RFC", df_for_learning, OUTPUT)
+    #RFC SHAP Explainer
+    shap_explainer("Questionnaire Level", "RFC", explainers, x_tests, OUTPUT)
+    #RFC variable importance
+    plot_importance("Questionnaire Level", "RFC Model Importance", rfc_importance, OUTPUT)
 
     #SVM classifier
     logger.info("Performing Support Vector Machine Classification")
-    svm_model = classifier_roc_cross_val("Questionnaire Level", "SVM", df_for_learning, OUTPUT)
+    svm_importance, explainers, x_tests = classifier_roc_cross_val("Questionnaire Level", "SVM", df_for_learning, OUTPUT)
+    #SVM SHAP Explainer
+    shap_explainer("Questionnaire Level", "SVM", explainers, x_tests, OUTPUT)
     #SVM variable importance
-    plot_importance("Questionnaire Level", "SVM Model Importance", svm_model, OUTPUT)
+    plot_importance("Questionnaire Level", "SVM Model Importance", svm_importance, OUTPUT)
 
     #LogReg classifier
     logger.info("Performing Logistic Regression")
-    logreg_model = classifier_roc_cross_val("Questionnaire Level", "LogReg", df_for_learning, OUTPUT)
+    logreg_importance, explainers, x_tests = classifier_roc_cross_val("Questionnaire Level", "LogReg", df_for_learning, OUTPUT)
+    #LogReg SHAP Explainer
+    shap_explainer("Questionnaire Level", "LogReg", explainers, x_tests, OUTPUT)
     #LogReg variable importance
-    plot_importance("Questionnaire Level", "LogReg Model Importance", logreg_model, OUTPUT)
+    plot_importance("Questionnaire Level", "LogReg Model Importance", logreg_importance, OUTPUT)
 
     #DT classifier
     # logger.info("Performing Decsion Tree Classification")
@@ -74,4 +87,4 @@ def user_level_learning(INPUT, SPLITS, OUTPUT):
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    user_level_learning(args.input_file, args.splits, args.output_folder)
+    quest_level_learning(args.input_file, args.splits, args.output_folder)

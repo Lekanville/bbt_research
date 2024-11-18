@@ -8,8 +8,8 @@
 #are trimmed upto 3 times the std after mean. Outliers on the nadir temp are equally trimmed
 #upto 3 times the standard deviation before abd after the mean. Records that have their nadir
 #days to be greater than 50 were also trimmed out. Records with the difference between their
-#nadirs and peaks days as zero, incomplete cycles (mostly last cycles) and cycles with data
-#lengths more than 101 are also taken out
+#nadirs and peaks days as zero, incomplete cycles (mostly last cycles) and cycles with long data
+#lengths are also taken out
 #############################################################################################
 
 import numpy as np
@@ -88,11 +88,11 @@ def the_variables(INPUT_TEMPS, INPUT_QUEST, MODEL_CYCLE, OUTPUT_TEMPS, OUTPUT_QU
     #missingness in the questionnaire variables (take out users with more than 5 missing values)
     df_missingness = preprocess.get_missing(had_menstruation).reset_index(drop = True)
     
-    ##### To ensure imputation for missing values at fold level, i do not not need to imput here. The impuataion will be doen during the splitting
+    ##### To ensure imputation for missing values at fold level, i do not not need to imput here. The imputation will be done during the splitting
     #preprocessing and defining categories (missing values imputted to here)
     #df_preprocessed = preprocess.pre_processing_redone(df_missingness)
 
-    ##### Also for creating the dummy variables, is better do do it during splitting becasue of the imputation
+    ##### Also for creating the dummy variables, is better to do it during splitting becasue of the imputation
     #Get dummy variables
     #dummies = pd.get_dummies(df_missingness[["Regular Smoker", "Period in last 3 months", "Regular periods", "Heavy periods", "Painful periods"]], drop_first=True)
     #df_init = df_preprocessed[["User ID", "BMI", "Age menstration started", "PCOS"]]
@@ -118,17 +118,20 @@ def the_variables(INPUT_TEMPS, INPUT_QUEST, MODEL_CYCLE, OUTPUT_TEMPS, OUTPUT_QU
     logger.info(f"Final Cycles Distribution: {counts}")
 
     #An intermediate dataset of the cleaned users dataset for examination of features
-    final_temp_df.to_csv("/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/final_user_list_before_3_sampling.csv", index=False)
+    TEMP_SAVE = os.path.join("/".join(OUTPUT_TEMPS.split("/")[:-1]), "final_user_list_before_3_sampling.csv")
+    final_temp_df.to_csv(TEMP_SAVE, index=False)
+    logger.info(f"Complete Cycle Level Variables: {TEMP_SAVE}")
+    #final_temp_df.to_csv("/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/final_user_list_before_3_sampling.csv", index=False)
 
-    logger.info("================User Selection Started==================")
+    logger.info("================User Selection Ended==================")
 
     #select the independent and non-indepent variables
     dep_and_indep = final_temp_df[[
     "User", "Cycle", "Standard_smooth_temps", "Smooth_Temp", "Data_Length", "Next Cycle Difference", "Cycle Completeness", "Curve_by_Data", 
     "max_of_2_periods", "max_pos_of_2_periods", "max_of_3_periods", "max_pos_of_3_periods", 
     "Change Point Day", "Change Point Mean Diff", 
-    "cost_with_diff", "path_length_with_diff", "Standard_nadir_day", "Standard_peak_day", 
-    "Standard_nadir_temp_actual", "Standard_peak_temp_actual", "Standard_nadir_to_peak", "Standard_low_to_high_temp", 
+    "cost_with_diff", "path_length_with_diff", "Standard_nadir_day", "Standard_peak_day", "Expanded_nadir_day", "Expanded_peak_day",
+    "Standard_nadir_temp_actual", "Standard_peak_temp_actual", "Standard_nadir_to_peak", "Expanded_nadir_to_peak", "Standard_low_to_high_temp", 
     "PCOS"
     ]]
 
@@ -143,7 +146,7 @@ def the_variables(INPUT_TEMPS, INPUT_QUEST, MODEL_CYCLE, OUTPUT_TEMPS, OUTPUT_QU
 
     #save the final result
     df_3_cycles.to_csv(OUTPUT_TEMPS, index=False)
-    logger.info(f"Cycle Level Variables: {OUTPUT_TEMPS}")
+    logger.info(f"Cycle Level Variables of 3 Sampled Cycles per User: {OUTPUT_TEMPS}")
 
     final_quest_ml.to_csv(OUTPUT_QUEST, index=False)
     logger.info(f"Questionnaire Variables: {OUTPUT_QUEST}")

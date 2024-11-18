@@ -62,6 +62,7 @@ class Learning:
     ##  3. Specify the number of k-splits
         ############################################################################################"
     quest_level_learning_results =  "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/quest_learning_results/"
+    #quest_level_learning_results =  "/projects/MRC-IEU/research/projects/ieu2/p6/063/working/data/results/test/quest_learning_results/"
     quest_level_learning_number_of_k_splits =  5
 
 

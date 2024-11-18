@@ -608,3 +608,4 @@ def extrapolate_peak_temp(Standard_path, model_cycle, Standard_smooth_temps, Exp
     ExPeak_actual = Standard_nadir_temp_actual + D_2_actual
     
     return (ExPeak, ExPeak_actual)
+

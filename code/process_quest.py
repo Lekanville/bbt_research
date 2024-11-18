@@ -46,7 +46,7 @@ def process_quest(INPUT, INPUT_CYCLES, OUTPUT, CLEANED_QUEST):
     #rename the PCOS column
     df_cleaned_questionnaire.rename({"What diagnoses were made? (tick all that apply)":"PCOS"}, axis = 1, inplace=True)
 
-    #recode the PCOS column, gives a df of coded PCOS (0-negative, 1-positive) rows from the questionnaire
+    #recode the PCOS column, gives a df of coded PCOS (0-negative, 1-positive, 2-no response to infertility question) rows from the questionnaire
     the_quest_df = Frames(df_cleaned_questionnaire).recode_pcos()
 
     #processing the BMI variables

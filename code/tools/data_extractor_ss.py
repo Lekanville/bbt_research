@@ -241,11 +241,6 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
         nadir_valid = any(i < 0 for i in lower_curve_list)
         peak_valid = any(i < 0 for i in top_curve_list)
 
-        #Time from nadir to peak using Standard Scaling
-        Standard_nadir_to_peak = Standard_peak_day - Standard_nadir_day
-
-        #Difference between lowest and highest temperature using Standard Scaling
-        Standard_low_to_high_temp = Standard_peak_temp_actual - Standard_nadir_temp_actual
     else:
         nadir_valid = np.nan
         peak_valid = np.nan
@@ -260,18 +255,28 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     ending_warps = len([x for x in Standard_path if x[1] == cycle_max_pos]) #The ending warps
 
     if (nadir_valid == False) & (beginning_warps > 1): #cycles with no negative slope before peaks and many-to-one warps at the beginning
-        nadir_extrapolated = tools.extrapolate_nadir_day(Standard_path, model_cycle, Expanded_smooth_temps, cycle_least_pos)
-        Expanded_nadir_day = nadir_extrapolated
+        Expanded_nadir_day = tools.extrapolate_nadir_day(Standard_path, model_cycle, Expanded_smooth_temps, cycle_least_pos)
         Standard_nadir_temp, Standard_nadir_temp_actual = tools.extrapolate_nadir_temp(Standard_path, model_cycle, Standard_smooth_temps, Expanded_smooth_temps_not_null, Standard_peak_temp, Standard_peak_temp_actual, cycle_least_pos)
     else:
         Expanded_nadir_day = Expanded_smooth_temps_offset + Standard_nadir_day #added offset for those without many-to-one warps at the nadir
+        Standard_nadir_temp = Standard_nadir_temp
+        Standard_nadir_temp_actual = Standard_nadir_temp_actual
 
     if (peak_valid == False) & (ending_warps > 1): #cycles with no negative slope before peaks and many-to-one warps at the beginning
-        peak_extrapolated = tools.extrapolate_peak_day(Standard_path, model_cycle, Expanded_smooth_temps, cycle_max_pos)
-        Expanded_peak_day =  peak_extrapolated
+        Expanded_peak_day = tools.extrapolate_peak_day(Standard_path, model_cycle, Expanded_smooth_temps, cycle_max_pos)
         Standard_peak_temp, Standard_peak_temp_actual = tools.extrapolate_peak_temp(Standard_path, model_cycle, Standard_smooth_temps, Expanded_smooth_temps_not_null, Standard_nadir_temp, Standard_nadir_temp_actual, cycle_max_pos)
     else:
         Expanded_peak_day = Expanded_smooth_temps_offset + Standard_peak_day #added offset for those without many-to-one warps at the peak
+        Standard_peak_temp = Standard_peak_temp
+        Standard_peak_temp_actual = Standard_peak_temp_actual
+
+    #Time from nadir to peak using Standard Scaling
+    Standard_nadir_to_peak = Standard_peak_day - Standard_nadir_day
+    Expanded_nadir_to_peak = Expanded_peak_day - Expanded_nadir_day
+
+    #Difference between lowest and highest temperature using Standard Scaling
+    Standard_low_to_high_temp = Standard_peak_temp_actual - Standard_nadir_temp_actual
+    
 
     #we create a dictionary of the results for each cycle
     data = {"User":user, "Cycle":cycle, "Temps":temps, "Smooth_Temp":smooth_temps, "Smooth_Temp_with_NAs": smooth_temps_with_missing_head_and_tail,
@@ -279,10 +284,11 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
             "Standard_model_cycle":Standard_model_cycle, "Expanded_smooth_temps": Expanded_smooth_temps, "Standard_smooth_temps":Standard_smooth_temps, 
             "Standard_distance":Standard_distance, "Standard_path":Standard_path, 
             "Standard_nadir_day":Standard_nadir_day, "Standard_peak_day":Standard_peak_day,
-            "Expanded_nadir_day":Expanded_nadir_day, "Expanded_peak_day":Expanded_peak_day, "Expanded_smooth_temps_offset":Expanded_smooth_temps_offset,
+            "Expanded_smooth_temps_offset":Expanded_smooth_temps_offset, "Expanded_nadir_day":Expanded_nadir_day, "Expanded_peak_day":Expanded_peak_day, 
             "Standard_nadir_temp":Standard_nadir_temp, "Standard_peak_temp":Standard_peak_temp,
             "Standard_nadir_temp_actual":Standard_nadir_temp_actual, "Standard_peak_temp_actual":Standard_peak_temp_actual,
-            "Standard_nadir_to_peak":Standard_nadir_to_peak, "Standard_low_to_high_temp":Standard_low_to_high_temp,
+            "Standard_nadir_to_peak":Standard_nadir_to_peak, "Expanded_nadir_to_peak":Expanded_nadir_to_peak,
+            "Standard_low_to_high_temp":Standard_low_to_high_temp,
             "nadir_valid":nadir_valid, "peak_valid":peak_valid,
             "initial_path_length":initial_path_length, "pos_count_with_diff":pos_count_with_diff, "path_length_with_diff":path_length_with_diff, 
             "cost_with_diff":cost_with_diff

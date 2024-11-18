@@ -3,7 +3,8 @@ import numpy as np
 from loguru import logger
 import matplotlib.pyplot as plt
 from sklearn.metrics import RocCurveDisplay, auc, roc_curve
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score   
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+import shap  
 
 import tools.classifier_algorithms as class_alg
 
@@ -16,6 +17,8 @@ def classifier_roc_cross_val(level, classifier_name, df, OUTPUT_FOLDER):
     aucs = []
     accs = []
     imp = []
+    explainers = []
+    x_tests = []
 
     mean_fpr = np.linspace(0, 1, 100)
 
@@ -39,8 +42,14 @@ def classifier_roc_cross_val(level, classifier_name, df, OUTPUT_FOLDER):
         )
         
         class_pred = classifier.predict(test["X_test"])
-        
         accs.append(accuracy_score(test["y_test"], class_pred))
+        #models.append(classifier)
+
+        #For SHAP Explainer
+        x_test = test["X_test"]
+        explainer = shap.Explainer(classifier.predict, x_test)
+        explainers.append(explainer)
+        x_tests.append(x_test)
         
         interp_tpr = np.interp(mean_fpr, viz.fpr, viz.tpr)
         interp_tpr[0] = 0.0
@@ -111,4 +120,4 @@ def classifier_roc_cross_val(level, classifier_name, df, OUTPUT_FOLDER):
     filename = classifier_name+"_"+ name_and_ext
     plt.savefig(os.path.join(OUTPUT_FOLDER, filename))
 
-    return mean_imp
+    return (mean_imp, explainers, x_tests)

@@ -15,9 +15,11 @@ import argparse
 from loguru import logger
 from pathlib import Path
 
-from classes.custom_k_fold import CustomKFold
+#from classes.custom_k_fold import CustomKFold
+from classes.strat_k_fold import StratKFold
 from tools.classifier_roc_cross_val import classifier_roc_cross_val
 from tools.classifier_importance import plot_importance
+from tools.classifier_importance import shap_explainer
 
 parser = argparse.ArgumentParser(description= "A script to filter data")
 parser.add_argument('-i', '--input_file', type=str, required=True, help= 'The input dataset')
@@ -37,7 +39,7 @@ def cycle_level_learning(INPUT, SPLITS, OUTPUT):
 
     #splitting the data into k-folds
     logger.info("Splitting the dataframe into " +str(SPLITS)+ " folds")
-    splitted_df = CustomKFold(n_splits = SPLITS, df = df, level="Cycle Level").customSplit()
+    splitted_df = StratKFold(n_splits = SPLITS, df = df, level="Cycle Level").customSplit()
     print("The splits \n", splitted_df[1])
 
     print(splitted_df[0]["PCOS"].value_counts())
@@ -50,21 +52,27 @@ def cycle_level_learning(INPUT, SPLITS, OUTPUT):
 
     #RFC classifier
     logger.info("Performing Random Forest Classification")
-    rfc_model = classifier_roc_cross_val("Cycle Level", "RFC", df_for_learning, OUTPUT)
+    rfc_importance, explainers, x_tests = classifier_roc_cross_val("Cycle Level", "RFC", df_for_learning, OUTPUT)
+    #RFC SHAP Explainer
+    shap_explainer("Cycle Level", "RFC", explainers, x_tests, OUTPUT)
     #RFC variable importance
-    plot_importance("Cycle Level", "RFC Model Importance", rfc_model, OUTPUT)
+    plot_importance("Cycle Level", "RFC Model Importance", rfc_importance, OUTPUT)
 
     #SVM classifier
     logger.info("Performing Support Vector Machine Classification")
-    svm_model = classifier_roc_cross_val("Cycle Level", "SVM", df_for_learning, OUTPUT)
+    svm_importance, explainers, x_tests = classifier_roc_cross_val("Cycle Level", "SVM", df_for_learning, OUTPUT)
+    #SVM SHAP Explainer
+    shap_explainer("Cycle Level", "SVM", explainers, x_tests, OUTPUT)
     #SVM variable importance
-    plot_importance("Cycle Level", "SVM Model Importance", svm_model, OUTPUT)
+    plot_importance("Cycle Level", "SVM Model Importance", svm_importance, OUTPUT)
 
     #LogReg classifier
     logger.info("Performing Logistic Regression")
-    logreg_model = classifier_roc_cross_val("Cycle Level", "LogReg", df_for_learning, OUTPUT)
+    logreg_importance, explainers, x_tests = classifier_roc_cross_val("Cycle Level", "LogReg", df_for_learning, OUTPUT)
+    #LogReg SHAP Explainer
+    shap_explainer("Cycle Level", "LogReg", explainers, x_tests, OUTPUT)
     #LogReg variable importance
-    plot_importance("Cycle Level", "LogReg Model Importance", logreg_model, OUTPUT)
+    plot_importance("Cycle Level", "LogReg Model Importance", logreg_importance, OUTPUT)
 
     #DT classifier
     # logger.info("Performing Decsion Tree Classification")
