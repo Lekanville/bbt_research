@@ -233,7 +233,7 @@ def clean_null_responses(df):
                     
     return (df)
 
-#Imputation, scaling and dummy variables creation at the questionnaire learning
+#Imputation, scaling and dummy variables creation
 def imputation_scaling_and_dummies(train, test, level):
     
     df_train = train.copy()
@@ -280,8 +280,8 @@ def imputation_scaling_and_dummies(train, test, level):
         df_train_to_dummy = df_train[to_dummy].reset_index(drop = True)
         df_test_to_dummy = df_test[to_dummy].reset_index(drop = True)
 
-        df_train_dummies = pd.get_dummies(df_train_to_dummy, drop_first=True)
-        df_test_dummies = pd.get_dummies(df_test_to_dummy, drop_first=True)
+        df_train_dummies = pd.get_dummies(df_train_to_dummy, drop_first=True, dtype=int)
+        df_test_dummies = pd.get_dummies(df_test_to_dummy, drop_first=True, dtype=int)
 
 
         #Combine both dummy and scaled values                   

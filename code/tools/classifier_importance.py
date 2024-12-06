@@ -139,18 +139,71 @@ def plot_importance(level, title, model_importance, OUTPUT_FOLDER):
 
     print ("The top 10 predictors for", title_name, "are:")
     print(imp_df.sort_values(by = title, ascending = False).head(10))
+    plt.close()
 
 
-def shap_explainer(level, classifier_name, explainers, x_tests, OUTPUT_FOLDER):
+#def shap_explainer(level, classifier_name, explainers, x_tests, OUTPUT_FOLDER):
+def shap_explainer(level, classifier_name, explainers, OUTPUT_FOLDER):
 
+    #For each fold
     for i, j in enumerate(explainers):
+        #fig = plt.figure()
+        #ax = fig.add_axes([0,0, 1, 1])
+        #fig, ax = plt.subplots(figsize=(12, 5), nrows=1, ncols=len_cycles)
+
+        #explainer = explainers[i]
+        #x_test = x_tests[i]
+        #shap_values = explainer(x_test)
+        shap_values = explainers[i]
+
+        #SHAP beeswarm plot
         fig = plt.figure()
-        ax = fig.add_axes([0,0, 1, 1])
-
-        explainer = explainers[i]
-        x_test = x_tests[i]
-        shap_values = explainer(x_test)
-        shap.plots.beeswarm(shap_values, show=False)
-
-        shap_file = level+"_"+classifier_name+"_"+str(i)+".png"
+        shap.plots.beeswarm(shap_values, max_display=14, show=False)
+        fig = plt.gcf()
+        ax_1 = plt.gca()
+        shap_file = level+"_"+classifier_name+"_beeswarm_"+str(i)+".png"
         plt.savefig(os.path.join(OUTPUT_FOLDER,shap_file), format='png', dpi=700, bbox_inches='tight')
+        plt.close()
+
+        #SHAP waterfall plot
+        test = [10, 35, 55]
+        for k in test:
+            fig = plt.figure()
+            sample_ind = k
+            shap.plots.waterfall(shap_values[sample_ind], max_display=14, show=False)
+            fig = plt.gcf()
+            ax_2 = plt.gca()
+            shap_file = level+"_"+classifier_name+"_waterfall_"+str(i)+"_"+str(sample_ind)+"_"".png"
+            plt.savefig(os.path.join(OUTPUT_FOLDER,shap_file), format='png', dpi=700, bbox_inches='tight')
+            plt.close()
+
+    #Combining the SHAP values and plotting them
+    #for the values
+    vals = [i.values for i in explainers]
+    values = vals[1] #the second set of values
+    for i in range(2, len(vals)):
+        values = np.concatenate((values, vals[i]), axis = 0) #concatenate with the rest
+    explainers[0].values = np.concatenate((explainers[0].values, values), axis = 0)
+
+    #for the base_values
+    base_vals = [i.base_values for i in explainers]
+    base_values = base_vals[1] #the second set of values
+    for i in range(2, len(base_vals)):
+        base_values = np.concatenate((base_values, base_vals[i]), axis = 0) #concatenate with the rest
+    explainers[0].base_values = np.concatenate((explainers[0].base_values, base_values), axis = 0)
+
+    #for the base_values
+    dats = [i.data for i in explainers]
+    data = dats[1] #the second set of values
+    for i in range(2, len(dats)):
+        data = np.concatenate((data, dats[i]), axis = 0) #concatenate with the rest
+    explainers[0].data = np.concatenate((explainers[0].data, data), axis = 0)
+
+    shap_value_combined = explainers[0]
+    fig = plt.figure()
+    shap.plots.beeswarm(shap_value_combined, max_display=14, show=False)
+    fig = plt.gcf()
+    ax_3 = plt.gca()
+    shap_file = level+"_"+classifier_name+"_beeswarm_combined_"+str(i)+".png"
+    plt.savefig(os.path.join(OUTPUT_FOLDER,shap_file), format='png', dpi=700, bbox_inches='tight')
+    plt.close()

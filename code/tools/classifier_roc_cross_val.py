@@ -17,8 +17,9 @@ def classifier_roc_cross_val(level, classifier_name, df, OUTPUT_FOLDER):
     aucs = []
     accs = []
     imp = []
-    explainers = []
-    x_tests = []
+    value_shaps = []
+    #explainers = []
+    #x_tests = []
 
     mean_fpr = np.linspace(0, 1, 100)
 
@@ -48,8 +49,10 @@ def classifier_roc_cross_val(level, classifier_name, df, OUTPUT_FOLDER):
         #For SHAP Explainer
         x_test = test["X_test"]
         explainer = shap.Explainer(classifier.predict, x_test)
-        explainers.append(explainer)
-        x_tests.append(x_test)
+        shap_values = explainer(x_test)
+        value_shaps.append(shap_values)
+        #explainers.append(explainer)
+        #x_tests.append(x_test)
         
         interp_tpr = np.interp(mean_fpr, viz.fpr, viz.tpr)
         interp_tpr[0] = 0.0
@@ -119,5 +122,6 @@ def classifier_roc_cross_val(level, classifier_name, df, OUTPUT_FOLDER):
     name_and_ext = "_".join(level.split(" "))+".png"
     filename = classifier_name+"_"+ name_and_ext
     plt.savefig(os.path.join(OUTPUT_FOLDER, filename))
-
-    return (mean_imp, explainers, x_tests)
+    plt.close()
+    return (mean_imp, value_shaps)
+    #return (mean_imp, explainers, x_tests)

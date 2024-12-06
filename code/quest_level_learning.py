@@ -14,6 +14,7 @@ import os
 import argparse
 from loguru import logger
 from pathlib import Path
+import joblib
 
 import questionnaire_variables.preprocess_quest_tools as preprocess
 #from classes.custom_k_fold import CustomKFold
@@ -56,28 +57,41 @@ def quest_level_learning(INPUT, SPLITS, OUTPUT):
 
     #RFC classifier
     logger.info("Performing Random Forest Classification")
-    #RFC variable importance
-    rfc_importance, explainers, x_tests = classifier_roc_cross_val("Questionnaire Level", "RFC", df_for_learning, OUTPUT)
+    #rfc_importance, explainers, x_tests = classifier_roc_cross_val("Questionnaire Level", "RFC", df_for_learning, OUTPUT)
+    rfc_importance, shap_values = classifier_roc_cross_val("Questionnaire Level", "RFC", df_for_learning, OUTPUT)
     #RFC SHAP Explainer
-    shap_explainer("Questionnaire Level", "RFC", explainers, x_tests, OUTPUT)
+    #shap_explainer("Questionnaire Level", "RFC", explainers, x_tests, OUTPUT)
+    shap_explainer("Questionnaire Level", "RFC",shap_values, OUTPUT)
     #RFC variable importance
-    plot_importance("Questionnaire Level", "RFC Model Importance", rfc_importance, OUTPUT)
+    #shap_file = os.path.join(OUTPUT, "rfc_explainers.pkl")
+    #joblib.dump(shap_values, shap_file)
+
+    #plot_importance("Questionnaire Level", "RFC Model Importance", rfc_importance, OUTPUT)
 
     #SVM classifier
     logger.info("Performing Support Vector Machine Classification")
-    svm_importance, explainers, x_tests = classifier_roc_cross_val("Questionnaire Level", "SVM", df_for_learning, OUTPUT)
+    #svm_importance, explainers, x_tests = classifier_roc_cross_val("Questionnaire Level", "SVM", df_for_learning, OUTPUT)
+    svm_importance, shap_values = classifier_roc_cross_val("Questionnaire Level", "SVM", df_for_learning, OUTPUT)
     #SVM SHAP Explainer
-    shap_explainer("Questionnaire Level", "SVM", explainers, x_tests, OUTPUT)
+    #shap_explainer("Questionnaire Level", "SVM", explainers, x_tests, OUTPUT)
+    shap_explainer("Questionnaire Level", "SVM", shap_values, OUTPUT)
     #SVM variable importance
-    plot_importance("Questionnaire Level", "SVM Model Importance", svm_importance, OUTPUT)
+    #shap_file = os.path.join(OUTPUT, "svm_explainers.pkl")
+    #joblib.dump(shap_values, shap_file)
+
+    #plot_importance("Questionnaire Level", "SVM Model Importance", svm_importance, OUTPUT)
 
     #LogReg classifier
     logger.info("Performing Logistic Regression")
-    logreg_importance, explainers, x_tests = classifier_roc_cross_val("Questionnaire Level", "LogReg", df_for_learning, OUTPUT)
+    #logreg_importance, explainers, x_tests = classifier_roc_cross_val("Questionnaire Level", "LogReg", df_for_learning, OUTPUT)
+    logreg_importance, shap_values = classifier_roc_cross_val("Questionnaire Level", "LogReg", df_for_learning, OUTPUT)
     #LogReg SHAP Explainer
-    shap_explainer("Questionnaire Level", "LogReg", explainers, x_tests, OUTPUT)
+    #shap_explainer("Questionnaire Level", "LogReg", explainers, x_tests, OUTPUT)
+    shap_explainer("Questionnaire Level", "LogReg", shap_values, OUTPUT)
     #LogReg variable importance
-    plot_importance("Questionnaire Level", "LogReg Model Importance", logreg_importance, OUTPUT)
+    #shap_file = os.path.join(OUTPUT, "logreg_explainers.pkl")
+    #joblib.dump(shap_values, shap_file)
+    #plot_importance("Questionnaire Level", "LogReg Model Importance", logreg_importance, OUTPUT)
 
     #DT classifier
     # logger.info("Performing Decsion Tree Classification")
