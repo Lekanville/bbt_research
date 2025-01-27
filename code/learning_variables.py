@@ -41,8 +41,21 @@ def the_variables(INPUT_TEMPS, INPUT_QUEST, MODEL_CYCLE, OUTPUT_TEMPS, OUTPUT_QU
     logger.info("================User Selection Started==================")
 
     #From temperature data
+
+    #This counts the current cycles after removing cycles that are less than 10 days and greater than 366 days
+    counts = dict(temperatures["PCOS"].value_counts())
+    logger.info(f"Cycles with more than 10 days and less than 367 days: {counts}")
+
+    #3 (from cycle level filtering). Cycle completeness - I moved this here from User-Level Filtering (process_quest.py > tools.py > cycle_completeness()) so
+    # as to obtain the correct cycle completeness after interpolation (see data_extractor_ss.py > slope_nadir_peak())
+    df_complete = temperatures[temperatures["Interpolated Cycle Completeness"] >= 0.4]
+    counts = dict(df_complete["PCOS"].value_counts())
+    logger.info(f"The complete cycles: {counts}")
+    current_users = df_complete["User"].nunique()
+    logger.info(f"Number of users with complete cycles: {current_users}")
+
     #1. Total Users with Questionnaire and Temperature Data
-    temperatures_with_quest = temperatures[temperatures["PCOS"] != 3] 
+    temperatures_with_quest = df_complete[df_complete["PCOS"] != 3] 
     counts = temperatures_with_quest["User"].nunique()
     logger.info(f"Users with Questionnaire and Temperature Data: {counts}")
     

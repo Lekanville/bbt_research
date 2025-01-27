@@ -454,18 +454,15 @@ def cycle_completeness(df):
     #1. Non-last cycles
     df_non_last = df[(df["Date_Diff"] != 'Indeterminate Last Cycle')]
     counts = dict(df_non_last["PCOS"].value_counts())
-    counts_users = dict(df_non_last["User ID"].value_counts())
     logger.info(f"Non last cycles: {counts}")
-    logger.info(f"Number of Users: {counts_users}")
 
     #2. Non-negative offsets
     df_non_neg_offset = df_non_last[df_non_last["Offset"] >= 0]
     counts = dict(df_non_neg_offset["PCOS"].value_counts())
-    counts_users = dict(df_non_neg_offset["User ID"].value_counts())
     logger.info(f"Non negative offsets: {counts}")
-    logger.info(f"Number of Users: {counts_users}")
     df_non_neg_offset.reset_index(inplace = True, drop = True)
 
+    #3. Cycle completeness - I have moved this to User-Level Filtering (learning_variables.py)
     for i in range(len(df_non_neg_offset)):
         df_non_neg_offset.loc[i, "Date_Diff"] = int(df_non_neg_offset.loc[i, "Date_Diff"])
         if (df_non_neg_offset.loc[i, "Date_Diff"] !=  0.0):
@@ -475,15 +472,14 @@ def cycle_completeness(df):
         # if df_non_last.loc[i, "Date_Diff"] < 1.0:
         #     logger.info(df_non_last.loc[i, "Cycle ID"])
 
-    #3. Cycle completeness
-    df_complete = df_non_neg_offset[df_non_neg_offset["cycle_compl"] >= 0.4]
-    counts = dict(df_complete["PCOS"].value_counts())
-    counts_users = dict(df_complete["User ID"].value_counts())
-    logger.info(f"The complete cycles: {counts}")
-    logger.info(f"Number of Users: {counts_users}")
+ 
+    # df_complete = df_non_neg_offset[df_non_neg_offset["cycle_compl"] >= 0.4]
+    # counts = dict(df_complete["PCOS"].value_counts())
+    # logger.info(f"The complete cycles: {counts}")
     logger.info("================Cycle filtering ended==================")
 
-    return df_complete
+    #return df_complete
+    return df_non_neg_offset
 
 def clean_expanded(vals):
     y = [i for i in vals if i != ""]
@@ -608,4 +604,13 @@ def extrapolate_peak_temp(Standard_path, model_cycle, Standard_smooth_temps, Exp
     ExPeak_actual = Standard_nadir_temp_actual + D_2_actual
     
     return (ExPeak, ExPeak_actual)
+
+
+def interpolated_cycle_completeness(Smooth_Temp_with_NAs):
+    processed_cycle_len = len(Smooth_Temp_with_NAs)
+    non_nans_len = len([i for i in Smooth_Temp_with_NAs if ~np.isnan(i)])
+
+    processed_cycle_completeness = non_nans_len/processed_cycle_len
+
+    return processed_cycle_completeness
 

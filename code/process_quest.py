@@ -93,8 +93,6 @@ def process_quest(INPUT, INPUT_CYCLES, OUTPUT, CLEANED_QUEST):
     #merge the questionnaire (df_ailments) with the cycle 
     temp_dates_duration_pcos = pd.merge(
         cycles, df_new, left_on="User ID_y", right_on="User ID", how = "left"
-        ).drop(
-            "User ID", axis = 1
         )
 
     for i in range(len(temp_dates_duration_pcos)):

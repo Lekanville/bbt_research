@@ -93,8 +93,10 @@ def model_temps_process(cycle, grouped_temps):
         temperature_vals = temperature_vals #otherwise keep all temperatures with the missing dates
     
     temperature_vals["Mean_Temp"] = temperature_vals["Mean_Temp"].interpolate(method = "linear", limit_direction = "forward")
-    temperature_vals["Cycle ID"] = temperature_vals["Cycle ID"].fillna(method = "pad") #fill the missing cycle IDs
-    temperature_vals["User ID"] = temperature_vals["User ID"].fillna(method = "pad") #fill the missing user IDs
+    temperature_vals["Cycle ID"] = temperature_vals["Cycle ID"].ffill() #fill the missing cycle IDs
+    temperature_vals["User ID"] = temperature_vals["User ID"].ffill()  #fill the missing user IDs
+    #temperature_vals["Cycle ID"] = temperature_vals["Cycle ID"].fillna(method = "pad") #fill the missing cycle IDs
+    #temperature_vals["User ID"] = temperature_vals["User ID"].fillna(method = "pad") #fill the missing user IDs
 
     return (temperature_vals)
 

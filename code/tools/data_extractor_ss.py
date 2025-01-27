@@ -59,8 +59,10 @@ def actual_day(group_temp, user, cycle):
         temperature_vals = temperature_vals #otherwise keep all temperatures with the missing dates
 
     temperature_vals["Mean_Temp"] = temperature_vals["Mean_Temp"].interpolate(method = "linear", limit_direction = "forward")
-    temperature_vals["Cycle ID"] = temperature_vals["Cycle ID"].fillna(method = "pad") #fill the missing cycle IDs
-    temperature_vals["User ID"] = temperature_vals["User ID"].fillna(method = "pad") #fill the missing user IDs
+    temperature_vals["Cycle ID"] = temperature_vals["Cycle ID"].ffill()#fill the missing cycle IDs
+    temperature_vals["User ID"] = temperature_vals["User ID"].ffill() #fill the missing user IDs
+    #temperature_vals["Cycle ID"] = temperature_vals["Cycle ID"].fillna(method = "pad") #fill the missing cycle IDs
+    #temperature_vals["User ID"] = temperature_vals["User ID"].fillna(method = "pad") #fill the missing user IDs
 
     return temperature_vals
 
@@ -69,7 +71,7 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     model_cycle = tools.load_model_cycle(model_cycle)['model_cycle']#the model cycle 
     keep = user_cycles[user_cycles.index == cycle]
     date_dur = keep["Data_Dur"].values[0]#get the data duration of the cycle
-    offset = int(keep["Offset"])#get the offset of the cycle
+    offset = int(keep["Offset"].iloc[0])#get the offset of the cycle
     #Date_D = keep["Date_Diff"].values#get the cycle length of the cycle
     Date_Diff = keep["Date_Diff"].values[0]
     cycle_compl = keep['cycle_compl'].values[0]
@@ -85,7 +87,7 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     if str(ovul.values) == "[nan]":
         ovulation = ""#ovulation dates not found
     else:
-        ovulation = int(ovul) #ovulation dates found
+        ovulation = int(ovul.iloc[0]) #ovulation dates found
 
     cycle_temp = temp_vals#the temperature data frame of the cycle
 
@@ -277,10 +279,17 @@ def slope_nadir_peak(user, user_cycles, cycle, temp_vals, model_cycle):
     #Difference between lowest and highest temperature using Standard Scaling
     Standard_low_to_high_temp = Standard_peak_temp_actual - Standard_nadir_temp_actual
     
+    #This was added as an after thought -
+    #Cycle completeness was created earlier on in the project before interpolation (process_quest.py). After we interoplated for missing values, 
+    #some cycles might be cut off if there are more than 10 consecutive missing days within them thereby altering their cycle completeness
+    #(extract.actual_day in nadirs_and_peaks.py). This part was added to view cycles whose completness would have changed after interpolation
+    Smooth_Temp_with_NAs = smooth_temps_with_missing_head_and_tail
+    interp_cycle_compl = tools.interpolated_cycle_completeness(Smooth_Temp_with_NAs)
+
 
     #we create a dictionary of the results for each cycle
     data = {"User":user, "Cycle":cycle, "Temps":temps, "Smooth_Temp":smooth_temps, "Smooth_Temp_with_NAs": smooth_temps_with_missing_head_and_tail,
-            "Ovulation Day":ovulation, "Next Cycle Difference":Date_Diff, "Offset":offset, "PCOS":PCOS, "Cycle Completeness":cycle_compl,
+            "Ovulation Day":ovulation, "Next Cycle Difference":Date_Diff, "Offset":offset, "PCOS":PCOS, "Cycle Completeness":cycle_compl, "Interpolated Cycle Completeness":interp_cycle_compl,
             "Standard_model_cycle":Standard_model_cycle, "Expanded_smooth_temps": Expanded_smooth_temps, "Standard_smooth_temps":Standard_smooth_temps, 
             "Standard_distance":Standard_distance, "Standard_path":Standard_path, 
             "Standard_nadir_day":Standard_nadir_day, "Standard_peak_day":Standard_peak_day,
@@ -354,10 +363,10 @@ def temp_rise(nad_and_peak):
             vals_of_periods.append(diff)
 
         max_of_periods = max(vals_of_periods)
-        max_two_periods_pos = vals_of_periods.index(max_of_periods) + offset
+        max_periods_pos = vals_of_periods.index(max_of_periods) + offset
         
         vals[f"max_of_{j}_periods"] = max_of_periods
-        vals[f"max_pos_of_{j}_periods"] = max_two_periods_pos
+        vals[f"max_pos_of_{j}_periods"] = max_periods_pos
     
     
     return (vals)

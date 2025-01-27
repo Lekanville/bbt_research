@@ -40,7 +40,7 @@ def users_cycles_and_temps(INPUT_TEMPS, INPUT_CYCLES, MODEL_CYCLE):
     #read the cycles and questionnaire  dataset (from process_quest)
     logger.info("loading the cycles dataset")    
     cycles = Frames(INPUT_CYCLES).read_cycles_and_pcos()
-    cycles = cycles[cycles["Date_Diff"] < 360] #Take out users with very long next cycles
+    cycles = cycles[cycles["Date_Diff"] < 367] #Take out users with very long next cycles
     logger.info("cycles dataset loaded")
 
     #Group the temperatures by the user IDs and cycle IDs
