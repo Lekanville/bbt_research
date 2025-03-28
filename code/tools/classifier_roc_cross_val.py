@@ -16,8 +16,8 @@ def classifier_roc_cross_val(level, classifier_name, df, OUTPUT_FOLDER):
     tprs = []
     aucs = []
     accs = []
-    imp = []
     value_shaps = []
+    #imp = []
     #explainers = []
     #x_tests = []
 
@@ -59,12 +59,13 @@ def classifier_roc_cross_val(level, classifier_name, df, OUTPUT_FOLDER):
         tprs.append(interp_tpr)
         aucs.append(viz.roc_auc)
 
-        if classifier_name == "RFC":
-            imp.append(classifier.feature_importances_)
-        elif classifier_name == "SVM":
-            imp.append(classifier.coef_[0])
-        elif classifier_name == "LogReg":
-            imp.append(classifier.coef_[0])
+        #Default model importance
+        # if classifier_name == "RFC":
+        #     imp.append(classifier.feature_importances_)
+        # elif classifier_name == "SVM":
+        #     imp.append(classifier.coef_[0])
+        # elif classifier_name == "LogReg":
+        #     imp.append(classifier.coef_[0])
 
 
     mean_tpr = np.mean(tprs, axis=0)
@@ -110,10 +111,12 @@ def classifier_roc_cross_val(level, classifier_name, df, OUTPUT_FOLDER):
     mean_acc = np.mean(accs)
     print(mean_acc)
 
+    #Default model importance
     #logger.info("Importances at each fold")
     #print (imp)
 
-    mean_imp = np.mean(imp, axis=0)
+    #Default model importance
+    #mean_imp = np.mean(imp, axis=0)
     #logger.info("Mean of the Importances for the fold")
     #print (mean_imp)
 
@@ -123,5 +126,8 @@ def classifier_roc_cross_val(level, classifier_name, df, OUTPUT_FOLDER):
     filename = classifier_name+"_"+ name_and_ext
     plt.savefig(os.path.join(OUTPUT_FOLDER, filename))
     plt.close()
-    return (mean_imp, value_shaps)
+
+    #return (mean_imp, value_shaps)
     #return (mean_imp, explainers, x_tests)
+
+    return (value_shaps, mean_tpr, mean_auc, std_auc, tprs_upper, tprs_lower)

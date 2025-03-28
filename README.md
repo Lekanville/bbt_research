@@ -21,7 +21,7 @@ conda activate bbt
 #Add module directory to python path
 cd code
 pwd
-export PYTHONPATH=$PYTHONPATH:pwd
+export PYTHONPATH=$PYTHONPATH:$PWD
 ```
 
 ## General

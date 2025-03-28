@@ -87,44 +87,52 @@ class StratKFold(StratFunctions):
         self.level = level
 
         if level == "Cycle Level":
-            self.independent_variables = ['Data_Length','Next Cycle Difference','Cycle Completeness','Curve_by_Data','max_of_2_periods',
-                                            'max_pos_of_2_periods','max_of_3_periods','max_pos_of_3_periods','Change Point Day','Change Point Mean Diff',
-                                            'cost_with_diff','path_length_with_diff','Standard_nadir_temp_actual',
-                                            'Standard_peak_temp_actual','Standard_low_to_high_temp',
-                                            #'Standard_nadir_day','Standard_peak_day','Standard_nadir_to_peak',
-                                            'Expanded_nadir_day', 'Expanded_peak_day', 'Expanded_nadir_to_peak'
+            self.independent_variables = [#'Data_Length','Next Cycle Difference','Cycle Completeness','Curve_by_Data','max_of_2_periods',
+                                            #'max_pos_of_2_periods','max_of_3_periods','max_pos_of_3_periods','Change Point Day','Change Point Mean Diff',
+                                            #'cost_with_diff','path_length_with_diff','Standard_nadir_temp_actual',
+                                            #'Standard_peak_temp_actual','Standard_low_to_high_temp',
+                                            ##'Standard_nadir_day','Standard_peak_day','Standard_nadir_to_peak',
+                                            #'Expanded_nadir_day', 'Expanded_peak_day', 'Expanded_nadir_to_peak'
+                                            'Data length','Cycle length','Recorded period cycle proportion','Length of the cycle curve',
+                                            'Temperature of largest three-day period','Position of temperature of largest three-day period',
+                                            'Temperature of largest four-day period','Position of temperature of largest four-day period',
+                                            'Day of temperature change','Diff in temperature before and after temperature change',
+                                            'DTW distance','Length of optimal warping path','Nadir day','Peak day','Nadir temperature',
+                                            'Peak temperature','Time to peak','Difference between nadir and peak temperatures'
                                             ]
         
         elif level == "User Level":
-            self.independent_variables = ['med_pair_distances','med_pair_lengths',
-            
-                                            'min_Data_Length','min_Cycle_Length','min_Cycle_Completeness','min_Curve_by_Data','min_Max_of_2_Periods',
-                                            'min_Max_Pos_of_2_Periods','min_Max_of_3_Periods','min_Max_Pos_of_3_Periods','min_Change_Point_Day',
-                                            'min_Change_Point_Mean_Diff','min_Path_Length_with_Diff',
-                                            'min_Standard_Nadir_Temp_Actual','min_Standard_Peak_Temp_Actual','min_Low_to_High_Temp','min_Cost_with_Diff',
-                                            #'min_Standard_Nadir_Day','min_Standard_Peak_Day','min_Nadir_to_Peak',
-                                            'min_Expanded_Nadir_Day', 'min_Expanded_Peak_Day', 'min_Expanded_Nadir_to_Peak',
-                                            
-                                            'max_Data_Length','max_Cycle_Length','max_Cycle_Completeness','max_Curve_by_Data','max_Max_of_2_Periods',
-                                            'max_Max_Pos_of_2_Periods','max_Max_of_3_Periods','max_Max_Pos_of_3_Periods','max_Change_Point_Day',
-                                            'max_Change_Point_Mean_Diff','max_Path_Length_with_Diff',
-                                            'max_Standard_Nadir_Temp_Actual','max_Standard_Peak_Temp_Actual','max_Low_to_High_Temp','max_Cost_with_Diff',
-                                            #'max_Standard_Nadir_Day','max_Standard_Peak_Day','max_Nadir_to_Peak',
-                                            'max_Expanded_Nadir_Day', 'max_Expanded_Peak_Day', 'max_Expanded_Nadir_to_Peak',
+            self.independent_variables = [
+                                            "Median of paired distances", "Median of paired curve lengths",
 
-                                            'med_Data_Length','med_Cycle_Length','med_Cycle_Completeness','med_Curve_by_Data','med_Max_of_2_Periods',
-                                            'med_Max_Pos_of_2_Periods','med_Max_of_3_Periods','med_Max_Pos_of_3_Periods','med_Change_Point_Day',
-                                            'med_Change_Point_Mean_Diff','med_Path_Length_with_Diff',
-                                            'med_Standard_Nadir_Temp_Actual','med_Standard_Peak_Temp_Actual','med_Low_to_High_Temp','med_Cost_with_Diff',
-                                            #'med_Standard_Nadir_Day','med_Standard_Peak_Day','med_Nadir_to_Peak',
-                                            'med_Expanded_Nadir_Day', 'med_Expanded_Peak_Day', 'med_Expanded_Nadir_to_Peak',
+                                            "Minimum data length", "Minimum cycle length", "Minimum recorded period cycle proportion", "Minimum length of the cycle curve",
+                                            "Minimum temp of largest three-day period", "Minimum of position of temp of largest three-day period", "Minimum temp of largest four-day period",
+                                            "Minimum of position of temp of largest four-day period", "Minimum day of temperature change", "Minimum diff in temp before and after temp change",
+                                            "Minimum DTW distance", "Minimum length of optimal warping path", "Minimum nadir Temp", "Minimum peak Temp", "Minimum Diff btw nadir and peak temps",
+                                            "Minimum nadir day",  "Minimum peak day", "Minimum time to peak",
+
+                                            "Maximum data length", "Maximum cycle length", "Maximum recorded period cycle proportion", "Maximum length of the cycle curve",
+                                            "Maximum temp of largest three-day period", "Maximum of position of temp of largest three-day period", "Maximum temp of largest four-day period",
+                                            "Maximum of position of temp of largest four-day period", "Maximum day of temperature change", "Maximum diff in temp before and after temp change",
+                                            "Maximum DTW distance", "Maximum length of optimal warping path", "Maximum nadir Temp", "Maximum peak Temp", "Maximum Diff btw nadir and peak temps",
+                                            "Maximum nadir day",  "Maximum peak day",  "Maximum time to peak",
+                                                
+                                            "Median data length", "Median cycle length", "Median recorded period cycle proportion", "Median length of the cycle curve", 
+                                            "Median temp of largest three-day period", "Median of position of temp of largest three-day period", "Median temp of largest four-day period",
+                                            "Median of position of temp of largest four-day period", "Median day of temperature change", "Median diff in temp before and after temp change",
+                                            "Median DTW distance", "Median length of optimal warping path", "Median nadir Temp", "Median peak Temp", "Median Diff btw nadir and peak temps",
+                                            "Median nadir day",  "Median peak day",  "Median time to peak",
+
+                                            "Range of data length", "Range of cycle length", "Range of recorded period cycle proportion", "Range of length of the cycle curve", 
+                                            "Range of temp of largest three-day period", "Range of position of temp of largest three-day period", "Range of temp of largest four-day period",
+                                            "Range of position of temp of largest four-day period", "Range of day of temperature change", "Range of diff in temp before and after temp change",
+                                            "Range of DTW distance", "Range of length of optimal warping path", "Range of nadir Temp", "Range of peak Temp", "Range of Diff btw nadir and peak temps",
+                                            "Range of nadir day",  "Range of peak day", "Range of time to peak",
                                             
-                                            'rge_Data_Length','rge_Cycle_Length','rge_Cycle_Completeness','rge_Curve_by_Data','rge_Max_of_2_Periods',
-                                            'rge_Max_Pos_of_2_Periods','rge_Max_of_3_Periods','rge_Max_Pos_of_3_Periods','rge_Change_Point_Day',
-                                            'rge_Change_Point_Mean_Diff','rge_Path_Length_with_Diff',
-                                            'rge_Standard_Nadir_Temp_Actual','rge_Standard_Peak_Temp_Actual','rge_Low_to_High_Temp','rge_Cost_with_Diff',
+                                            #'min_Standard_Nadir_Day','min_Standard_Peak_Day','min_Nadir_to_Peak',
+                                            #'max_Standard_Nadir_Day','max_Standard_Peak_Day','max_Nadir_to_Peak',
+                                            #'med_Standard_Nadir_Day','med_Standard_Peak_Day','med_Nadir_to_Peak',
                                             #'rge_Standard_Nadir_Day','rge_Standard_Peak_Day','rge_Nadir_to_Peak',
-                                            'rge_Expanded_Nadir_Day','rge_Expanded_Peak_Day','rge_Expanded_Nadir_to_Peak'
                                             ]
 
         elif level == "Questionnaire Level":
@@ -143,36 +151,37 @@ class StratKFold(StratFunctions):
                                             "BMI", "Age menstration started", 
                                             "Regular Smoker", "Period in last 3 months", "Regular periods", "Heavy periods", "Painful periods",
 
-                                            'med_pair_distances','med_pair_lengths',
-            
-                                            'min_Data_Length','min_Cycle_Length','min_Cycle_Completeness','min_Curve_by_Data','min_Max_of_2_Periods',
-                                            'min_Max_Pos_of_2_Periods','min_Max_of_3_Periods','min_Max_Pos_of_3_Periods','min_Change_Point_Day',
-                                            'min_Change_Point_Mean_Diff','min_Path_Length_with_Diff',
-                                            'min_Standard_Nadir_Temp_Actual','min_Standard_Peak_Temp_Actual','min_Low_to_High_Temp','min_Cost_with_Diff',
-                                            #'min_Standard_Nadir_Day','min_Standard_Peak_Day','min_Nadir_to_Peak',
-                                            "min_Expanded_Nadir_Day","min_Expanded_Peak_Day","min_Expanded_Nadir_to_Peak",
-                                            
-                                            'max_Data_Length','max_Cycle_Length','max_Cycle_Completeness','max_Curve_by_Data','max_Max_of_2_Periods',
-                                            'max_Max_Pos_of_2_Periods','max_Max_of_3_Periods','max_Max_Pos_of_3_Periods','max_Change_Point_Day',
-                                            'max_Change_Point_Mean_Diff','max_Path_Length_with_Diff',
-                                            'max_Standard_Nadir_Temp_Actual','max_Standard_Peak_Temp_Actual','max_Low_to_High_Temp','max_Cost_with_Diff',
-                                            #'max_Standard_Nadir_Day','max_Standard_Peak_Day','max_Nadir_to_Peak',
-                                            "max_Expanded_Nadir_Day","max_Expanded_Peak_Day","max_Expanded_Nadir_to_Peak",
+                                            "Median of paired distances", "Median of paired curve lengths",
 
-                                            'med_Data_Length','med_Cycle_Length','med_Cycle_Completeness','med_Curve_by_Data','med_Max_of_2_Periods',
-                                            'med_Max_Pos_of_2_Periods','med_Max_of_3_Periods','med_Max_Pos_of_3_Periods','med_Change_Point_Day',
-                                            'med_Change_Point_Mean_Diff','med_Path_Length_with_Diff',
-                                            'med_Standard_Nadir_Temp_Actual','med_Standard_Peak_Temp_Actual','med_Low_to_High_Temp','med_Cost_with_Diff',
-                                            #'med_Standard_Nadir_Day','med_Standard_Peak_Day','med_Nadir_to_Peak',
-                                            "med_Expanded_Nadir_Day","med_Expanded_Peak_Day","med_Expanded_Nadir_to_Peak",
+                                            "Minimum data length", "Minimum cycle length", "Minimum recorded period cycle proportion", "Minimum length of the cycle curve",
+                                            "Minimum temp of largest three-day period", "Minimum of position of temp of largest three-day period", "Minimum temp of largest four-day period",
+                                            "Minimum of position of temp of largest four-day period", "Minimum day of temperature change", "Minimum diff in temp before and after temp change",
+                                            "Minimum DTW distance", "Minimum length of optimal warping path", "Minimum nadir Temp", "Minimum peak Temp", "Minimum Diff btw nadir and peak temps",
+                                            "Minimum nadir day",  "Minimum peak day", "Minimum time to peak",
+
+                                            "Maximum data length", "Maximum cycle length", "Maximum recorded period cycle proportion", "Maximum length of the cycle curve",
+                                            "Maximum temp of largest three-day period", "Maximum of position of temp of largest three-day period", "Maximum temp of largest four-day period",
+                                            "Maximum of position of temp of largest four-day period", "Maximum day of temperature change", "Maximum diff in temp before and after temp change",
+                                            "Maximum DTW distance", "Maximum length of optimal warping path", "Maximum nadir Temp", "Maximum peak Temp", "Maximum Diff btw nadir and peak temps",
+                                            "Maximum nadir day",  "Maximum peak day",  "Maximum time to peak",
+                                                
+                                            "Median data length", "Median cycle length", "Median recorded period cycle proportion", "Median length of the cycle curve", 
+                                            "Median temp of largest three-day period", "Median of position of temp of largest three-day period", "Median temp of largest four-day period",
+                                            "Median of position of temp of largest four-day period", "Median day of temperature change", "Median diff in temp before and after temp change",
+                                            "Median DTW distance", "Median length of optimal warping path", "Median nadir Temp", "Median peak Temp", "Median Diff btw nadir and peak temps",
+                                            "Median nadir day",  "Median peak day",  "Median time to peak",
+
+                                            "Range of data length", "Range of cycle length", "Range of recorded period cycle proportion", "Range of length of the cycle curve", 
+                                            "Range of temp of largest three-day period", "Range of position of temp of largest three-day period", "Range of temp of largest four-day period",
+                                            "Range of position of temp of largest four-day period", "Range of day of temperature change", "Range of diff in temp before and after temp change",
+                                            "Range of DTW distance", "Range of length of optimal warping path", "Range of nadir Temp", "Range of peak Temp", "Range of Diff btw nadir and peak temps",
+                                            "Range of nadir day",  "Range of peak day", "Range of time to peak",
                                             
-                                            'rge_Data_Length','rge_Cycle_Length','rge_Cycle_Completeness','rge_Curve_by_Data','rge_Max_of_2_Periods',
-                                            'rge_Max_Pos_of_2_Periods','rge_Max_of_3_Periods','rge_Max_Pos_of_3_Periods','rge_Change_Point_Day',
-                                            'rge_Change_Point_Mean_Diff','rge_Path_Length_with_Diff',
-                                            'rge_Standard_Nadir_Temp_Actual','rge_Standard_Peak_Temp_Actual','rge_Low_to_High_Temp','rge_Cost_with_Diff',
+                                            #'min_Standard_Nadir_Day','min_Standard_Peak_Day','min_Nadir_to_Peak',
+                                            #'max_Standard_Nadir_Day','max_Standard_Peak_Day','max_Nadir_to_Peak',
+                                            #'med_Standard_Nadir_Day','med_Standard_Peak_Day','med_Nadir_to_Peak',
                                             #'rge_Standard_Nadir_Day','rge_Standard_Peak_Day','rge_Nadir_to_Peak',
-                                            'rge_Expanded_Nadir_Day', 'rge_Expanded_Peak_Day', 'rge_Expanded_Nadir_to_Peak'  
-                                            ]
+                                        ]
 
         self.dependent_variable = "PCOS"
 

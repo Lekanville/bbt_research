@@ -146,36 +146,36 @@ def plot_importance(level, title, model_importance, OUTPUT_FOLDER):
 def shap_explainer(level, classifier_name, explainers, OUTPUT_FOLDER):
 
     #For each fold
-    for i, j in enumerate(explainers):
-        #fig = plt.figure()
-        #ax = fig.add_axes([0,0, 1, 1])
-        #fig, ax = plt.subplots(figsize=(12, 5), nrows=1, ncols=len_cycles)
+    # for i, j in enumerate(explainers):
+    #     #fig = plt.figure()
+    #     #ax = fig.add_axes([0,0, 1, 1])
+    #     #fig, ax = plt.subplots(figsize=(12, 5), nrows=1, ncols=len_cycles)
 
-        #explainer = explainers[i]
-        #x_test = x_tests[i]
-        #shap_values = explainer(x_test)
-        shap_values = explainers[i]
+    #     #explainer = explainers[i]
+    #     #x_test = x_tests[i]
+    #     #shap_values = explainer(x_test)
+    #     shap_values = explainers[i]
 
         #SHAP beeswarm plot
-        fig = plt.figure()
-        shap.plots.beeswarm(shap_values, max_display=14, show=False)
-        fig = plt.gcf()
-        ax_1 = plt.gca()
-        shap_file = level+"_"+classifier_name+"_beeswarm_"+str(i)+".png"
-        plt.savefig(os.path.join(OUTPUT_FOLDER,shap_file), format='png', dpi=700, bbox_inches='tight')
-        plt.close()
+        # fig = plt.figure()
+        # shap.plots.beeswarm(shap_values, max_display=14, show=False)
+        # fig = plt.gcf()
+        # ax_1 = plt.gca()
+        # shap_file = level+"_"+classifier_name+"_beeswarm_"+str(i)+".png"
+        # plt.savefig(os.path.join(OUTPUT_FOLDER,shap_file), format='png', dpi=700, bbox_inches='tight')
+        # plt.close()
 
         #SHAP waterfall plot
-        test = [10, 35, 55]
-        for k in test:
-            fig = plt.figure()
-            sample_ind = k
-            shap.plots.waterfall(shap_values[sample_ind], max_display=14, show=False)
-            fig = plt.gcf()
-            ax_2 = plt.gca()
-            shap_file = level+"_"+classifier_name+"_waterfall_"+str(i)+"_"+str(sample_ind)+"_"".png"
-            plt.savefig(os.path.join(OUTPUT_FOLDER,shap_file), format='png', dpi=700, bbox_inches='tight')
-            plt.close()
+        # test = [10, 35, 55]
+        # for k in test:
+        #     fig = plt.figure()
+        #     sample_ind = k
+        #     shap.plots.waterfall(shap_values[sample_ind], max_display=14, show=False)
+        #     fig = plt.gcf()
+        #     ax_2 = plt.gca()
+        #     shap_file = level+"_"+classifier_name+"_waterfall_"+str(i)+"_"+str(sample_ind)+"_"".png"
+        #     plt.savefig(os.path.join(OUTPUT_FOLDER,shap_file), format='png', dpi=700, bbox_inches='tight')
+        #     plt.close()
 
     #Combining the SHAP values and plotting them
     #for the values
